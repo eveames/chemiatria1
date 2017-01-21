@@ -1,0 +1,1 @@
+{"virtualbox":{"/home/vagrant/chemiatria":{"type":null,"mount_options":[],"guestpath":"/home/vagrant/chemiatria","hostpath":"/Users/Emily/Game/chemiatria","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"/Users/Emily/Game/chemiatria","disabled":false,"__vagrantfile":true}}}
