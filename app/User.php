@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace chemiatria;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -22,8 +22,9 @@ class User extends Authenticatable
      * The attributes that should be hidden for arrays.
      *
      * @var array
+     * 'auth_type' takes values student, teacher, admin
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token','auth_type'
     ];
 }

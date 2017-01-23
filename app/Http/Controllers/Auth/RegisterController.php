@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace chemiatria\Http\Controllers\Auth;
 
-use App\User;
+use chemiatria\User;
 use Validator;
-use App\Http\Controllers\Controller;
+use chemiatria\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\RegistersUsers;
 
 class RegisterController extends Controller
@@ -66,6 +66,7 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
+            'auth_type' => 'student'
         ]);
     }
 }

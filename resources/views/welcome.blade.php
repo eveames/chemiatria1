@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+        <title>Chemiatria</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
@@ -75,15 +75,19 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    Laravel
+                    Chemiatria: Learn Chemistry
                 </div>
+                <p>Chemiatria is currently under construction, and there's not much here right now.
+                    It will be a collection of tools and games to help you learn chemistry quickly and painlessly,
+                    informed by current science on how people most quickly master new material. For example,
+                    you can use spaced repetition to learn facts quickly, and you can learn to recognize patterns
+                    effortlessly (for example, to see if Lewis structures are correct at a glance) by seeing many 
+                    examples quickly.</p>
 
                 <div class="links">
-                    <a href="https://laravel.com/docs">Documentation</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
+                    <a href="http://www.graylark.com/eve/Chemiatria">Old Version</a>
+                    <a href="http://www.graylark.com/eve">My GenChem 1 reference site</a>
+                    <a href="https://github.com/evames/">My projects on GitHub</a>
                 </div>
             </div>
         </div>
