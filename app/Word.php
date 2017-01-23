@@ -9,7 +9,7 @@ class Word extends Model
 {
     //
     protected $fillable = ['word', 'prompts'];
-    public function alternates(){
+    public function altwords(){
     	return $this->hasMany('chemiatria\Altword');
   	}
 }

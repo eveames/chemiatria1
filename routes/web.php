@@ -14,7 +14,7 @@
 Route::get('/', function () {
     return view('welcome');
 });
-Route::resource('words', 'WordsController');
+Route::resource('words', 'WordController');
 
 Auth::routes();
 

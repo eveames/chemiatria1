@@ -2,6 +2,8 @@
 
 @section('header')
 <h4>Hi {{$user->name}}! This is your Dashboard</h4>
+@endsection
+
 @section('content')
 <div class="container">
     <div class="row">

@@ -2,9 +2,10 @@
 
 namespace chemiatria\Http\Controllers;
 
+use chemiatria\Word;
 use Illuminate\Http\Request;
 
-class WordsController extends Controller
+class WordController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -13,7 +14,11 @@ class WordsController extends Controller
      */
     public function index()
     {
-        //
+        //show all words; will be a lot!
+        $words = Word::all();
+        return view('words.index')
+            ->with('words', $words);
+
     }
 
     /**
@@ -40,10 +45,10 @@ class WordsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \chemiatria\Word  $word
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Word $word)
     {
         //
     }
@@ -51,10 +56,10 @@ class WordsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \chemiatria\Word  $word
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Word $word)
     {
         //
     }
@@ -63,10 +68,10 @@ class WordsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \chemiatria\Word  $word
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Word $word)
     {
         //
     }
@@ -74,10 +79,10 @@ class WordsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \chemiatria\Word  $word
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Word $word)
     {
         //
     }
