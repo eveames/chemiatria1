@@ -4,6 +4,7 @@ namespace chemiatria\Http\Controllers;
 
 use chemiatria\Word;
 use Illuminate\Http\Request;
+//use Collective\Html;
 
 class WordController extends Controller
 {
@@ -29,6 +30,7 @@ class WordController extends Controller
     public function create()
     {
         //
+        return view('words.create');
     }
 
     /**
@@ -51,6 +53,8 @@ class WordController extends Controller
     public function show(Word $word)
     {
         //
+        return view('words.show')
+            ->with('word', $word)->with('altwords', $word->altwords);
     }
 
     /**
