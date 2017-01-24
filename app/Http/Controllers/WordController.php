@@ -41,7 +41,27 @@ class WordController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //// validate
+        // read more on validation at http://laravel.com/docs/validation
+        $rules = array(
+            'word'       => 'required|unique:words',
+            'prompts'      => 'required',
+        );
+        //$validator = Validator::make(Input::all(), $rules);
+
+        // process the login
+        $this->validate($request, $rules);
+        
+        // store
+        $word = new Word;
+        $word->word = $request->word;
+        $word->prompts = json_encode(explode("; ", $request->prompts));
+        $word->save();
+
+        // redirect
+        //Session::flash('message', 'Successfully added word!');
+        return redirect(url('words/' . $word->id . '/edit/'));
+        
     }
 
     /**
@@ -65,7 +85,10 @@ class WordController extends Controller
      */
     public function edit(Word $word)
     {
-        //
+
+        // show the edit form and pass the word
+        return view('words.edit')
+            ->with('word', $word)->with('altwords', $word->altwords);
     }
 
     /**
