@@ -10,6 +10,8 @@
     <div class="alert alert-info">{{ Session::get('message') }}</div>
 @endif
 
+<div></div>
+
 <table class="table table-striped table-bordered">
     <thead>
         <tr>

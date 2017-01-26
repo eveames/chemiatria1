@@ -19,3 +19,5 @@ Route::resource('words', 'WordController');
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
+
+//Route::get('words-create-error', 'WordController@create_error');

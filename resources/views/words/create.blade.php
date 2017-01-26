@@ -21,6 +21,9 @@
             @endforeach
         </ul>
     </div>
+    <p>{{ $word->word }}</p>
+
+
 @endif
 
 {!! Form::open(array('url' => 'words')) !!}
