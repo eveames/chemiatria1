@@ -6,6 +6,7 @@ use chemiatria\Word;
 use chemiatria\Altword;
 use Illuminate\Http\Request;
 use chemiatria\Http\Requests\CreateWord;
+use Illuminate\Support\Facades\Auth;
 
 //use Collective\Html;
 
@@ -16,6 +17,7 @@ class WordController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function index()
     {
         //show all words; will be a lot!
@@ -33,6 +35,10 @@ class WordController extends Controller
     public function create()
     {
         //
+        $user = Auth::user();
+        if($user->cant('create_word')){
+            return redirect(url('words'));
+        }
         return view('words.create');
     }
 
@@ -89,6 +95,11 @@ class WordController extends Controller
     public function edit(Word $word)
     {
 
+        //authorize
+        $user = Auth::user();
+        if($user->cant('edit_word')){
+            return redirect(url('words/' . $word->id));
+        }
         // show the edit form and pass the word
         return view('words.edit')
             ->with('word', $word)->with('altwords', $word->altwords);
@@ -103,7 +114,11 @@ class WordController extends Controller
      */
     public function update(Request $request)
     {
-        //
+        // authorize
+        $user = Auth::user();
+        if($user->cant('edit_word')){
+            return redirect(url('words/' . $word->id));
+        }
         // store
         //dd($request);
         $path = $request->path();
@@ -151,6 +166,7 @@ class WordController extends Controller
     public function destroy(Word $word)
     {
         //
+        $user = Auth::user();
     }
 
     public function create_error(Request $request)
@@ -162,5 +178,6 @@ class WordController extends Controller
 
     public function __construct() {
         //add middleware here
+        $this->middleware('auth');
     }
 }
