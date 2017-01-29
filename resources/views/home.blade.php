@@ -17,7 +17,6 @@
                 </div>
                 @can('create_word') 
                 <div class="panel-body"><a href="{{ url('/words') }}">View Vocab Words</a></div>
-                <div class="panel-body"><a href="{{ url('/words/create') }}">Add new Vocab Word</a></div>
                 @endcan
 
 

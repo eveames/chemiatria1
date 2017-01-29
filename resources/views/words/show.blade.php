@@ -41,7 +41,8 @@
     			</tbody>
 			</table>
 			<br>
-			<a class="btn btn-small btn-info" href="{{ URL::to('words/' . $word->id . '/edit') }}">Edit this word</a>
+			<a class="btn btn-small btn-primary" href="{{ URL::to('words/' . $word->id . '/edit') }}">Edit this word</a>
+			<a class="btn btn-small btn-primary" href="{{ URL::to('words/') }}">Back to search</a>
        	</p>
     </div>
 

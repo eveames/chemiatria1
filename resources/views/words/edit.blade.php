@@ -91,6 +91,7 @@
     {{ Form::submit('Update the word!', array('class' => 'btn btn-primary')) }}
 
     {{ Form::close() }}
+    <a class="btn btn-small btn-primary" href="{{ URL::to('words/') }}">Back to search</a>
 
 @endsection
 

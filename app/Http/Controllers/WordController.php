@@ -7,6 +7,7 @@ use chemiatria\Altword;
 use Illuminate\Http\Request;
 use chemiatria\Http\Requests\CreateWord;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 //use Collective\Html;
 
@@ -18,12 +19,37 @@ class WordController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function index()
+    public function index(Request $request)
     {
         //show all words; will be a lot!
-        $words = Word::all();
-        return view('words.index')
-            ->with('words', $words);
+        //$words = Word::all();
+        //return view('words.index')
+        //    ->with('words', $words);
+
+        
+        if($request->search) 
+        {
+            $search = $request->search; //<-- we use global request to get the param of URL
+            
+            $searchArray = explode('; ', $search);
+            //dd($searchArray);
+            
+            $words = DB::table('words')->whereIn('word', $searchArray)->get();
+            $alternates = Altword::with('word')->whereIn('alt', $searchArray)->get();
+            //dd($alternates);
+            $request->session()->flash('message', 'You searched for ' . $search . '.');
+            
+        }
+        else {
+            //dd('in else');
+            $words = Word::all();
+            $alternates = false;
+        }
+        
+        //$words = DB::table('words')->whereIn('word', ['heat', 'energy', 'proton'])->get();
+        //dd($words);
+        //$words = Word::all();
+        return view('words.index')->with('words', $words)->with('alternates', $alternates);
 
     }
 
@@ -68,7 +94,7 @@ class WordController extends Controller
         $word->save();
 
         // redirect
-        //Session::flash('message', 'Successfully added word!');
+        Session::flash('message', 'Successfully added word!');
         return redirect(url('words/' . $word->id . '/edit/'));
         
     }
@@ -119,8 +145,10 @@ class WordController extends Controller
         if($user->cant('edit_word')){
             return redirect(url('words/' . $word->id));
         }
+
+        // validate!!
+
         // store
-        //dd($request);
         $path = $request->path();
         $array = explode('/',$path);
         $id = array_pop($array);
@@ -132,27 +160,39 @@ class WordController extends Controller
         $word->prompts = json_encode($prompts);
 
         $word->save();
-        dd($request->all());
-        foreach($request->altwords as $alt)
+        $altIDs = $word->altwords()->select('id')->get();
+        //dd($altIDs);
+        //dd($request->all());
+        $data = array_filter($request->all());
+        $altArray = array_filter($data, function($k){
+            return preg_match('/altword/', $k) ;
+        }, ARRAY_FILTER_USE_KEY);
+        $newAltArray = array_filter($data, function($k){
+            return preg_match('/newAltword/', $k);
+        }, ARRAY_FILTER_USE_KEY);
+        //dd($altArray,$newAltArray);
+
+        foreach($altIDs as $id)
         {
-            $altword = Altword::where('alt', $alt->alt)->first();
-            $altword->correct = $alt->correct;
-            $altword->message = $alt->message;
-            $altword->save();
+            //dd('$id is: '. $id->id);
+            $alt = Altword::find($id);
+            //dd($altArray['altwords' . $id->id . 'message']);
+            $alt->correct = 'correct';
+            $alt->message = $altArray['altwords' . $id->id . 'message'];
+            $alt->save();
         }
 
-        foreach($request->newAltwords as $alt)
+        for($i = 0; $i < 3; $i++)
         {
-            $altword = new Altword;
-            $altword->alt = $alt->alt;
-            $altword->word_id = $word->id;
-            $altword->correct = $alt->correct;
-            $altword->message = $alt->message;
-            $altword->save();
+            if(! $newAltArray['newAltwords' . $i . 'alt']) {break;}
+            $alt = new Altword;
+            $alt->alt = $newAltArray['newAltwords' . $i . 'alt'];
+            $alt->correct = $newAltArray['newAltwords' . $i . 'correct'];
+            $alt->message = $newAltArray['newAltwords' . $i . 'message'];
         }
 
         // redirect
-        //Session::flash('message', 'Successfully updated!');
+        Session::flash('message', 'Successfully updated!');
         return redirect(url('words/' . $word->id . '/edit/'));
 
     }
