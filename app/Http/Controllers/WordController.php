@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use chemiatria\Http\Requests\CreateWord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 //use Collective\Html;
 
@@ -160,7 +161,7 @@ class WordController extends Controller
         $word->prompts = json_encode($prompts);
 
         $word->save();
-        $altIDs = $word->altwords()->select('id')->get();
+        $alts = $word->altwords()->get();
         //dd($altIDs);
         //dd($request->all());
         $data = array_filter($request->all());
@@ -172,19 +173,18 @@ class WordController extends Controller
         }, ARRAY_FILTER_USE_KEY);
         //dd($altArray,$newAltArray);
 
-        foreach($altIDs as $id)
+        foreach($alts as $alt)
         {
-            //dd('$id is: '. $id->id);
-            $alt = Altword::find($id);
-            //dd($altArray['altwords' . $id->id . 'message']);
-            $alt->correct = 'correct';
-            $alt->message = $altArray['altwords' . $id->id . 'message'];
+            //dd($alt);
+            $alt->correct = $altArray['altwords' . $alt->id . 'correct'];
+            $alt->message = $altArray['altwords' . $alt->id . 'message'];
             $alt->save();
         }
 
         for($i = 0; $i < 3; $i++)
         {
-            if(! $newAltArray['newAltwords' . $i . 'alt']) {break;}
+            //dd($newAltArray['newAltwords' . $i . 'alt']);
+            if(!isset($newAltArray['newAltwords' . $i . 'alt'])) {break;}
             $alt = new Altword;
             $alt->alt = $newAltArray['newAltwords' . $i . 'alt'];
             $alt->correct = $newAltArray['newAltwords' . $i . 'correct'];
