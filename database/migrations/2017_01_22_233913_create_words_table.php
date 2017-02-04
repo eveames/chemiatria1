@@ -19,7 +19,7 @@ class CreateWordsTable extends Migration
         Schema::create('words', function (Blueprint $table) {
             $table->increments('id');
             $table->string('word', 50)->unique();
-            $table->json('prompts');
+            $table->text('prompts');
             $table->timestamps();
         });
     }

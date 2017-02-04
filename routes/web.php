@@ -20,4 +20,6 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index');
 
+Route::get('/home/report', 'HomeController@email_progress');
+
 //Route::get('words-create-error', 'WordController@create_error');

@@ -3,6 +3,10 @@
 namespace chemiatria\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use chemiatria\Mail\Report;
+use Illuminate\Support\Facades\Session;
+
 
 class HomeController extends Controller
 {
@@ -23,6 +27,14 @@ class HomeController extends Controller
      */
     public function index()
     {
+        return view('home')->with('user', auth()->user());
+    }
+
+    public function email_progress()
+    {
+        $user = auth()->user();
+        Mail::to($user)->send(new Report($user));
+        Session::flash('message', 'Successfully emailed!');
         return view('home')->with('user', auth()->user());
     }
 }
