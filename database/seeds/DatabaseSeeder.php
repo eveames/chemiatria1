@@ -14,5 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UsersTableSeeder::class);
         $this->call(WordsTableSeeder::class);
         $this->call(AltwordsTableSeeder::class);
+        $this->call(TopicsTableSeeder::class);
+        $this->call(TopicWordTableSeeder::class);
     }
 }

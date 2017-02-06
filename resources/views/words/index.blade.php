@@ -31,6 +31,35 @@
     <thead>
         <tr>
             <td>ID</td>
+            <td>Topic</td>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach($topics as $key => $value)
+        <tr>
+            <td>{{ $value->id }}</td>
+            <td>{{ $value->topic }}</td>
+            
+
+            <!-- we will also add show, edit, and delete buttons -->
+            <td>
+
+                <!-- delete the word (uses the destroy method DESTROY /words/{id} -->
+                <!-- we will add this later since its a little more complicated than the other two buttons -->
+
+                <!-- show the word (uses the show method found at GET /words/{id} -->
+                <a class="btn btn-small btn-success" href="{{ URL::to('words/topics/' . $value->id) }}">Show these words</a>
+
+            </td>
+        </tr>
+    @endforeach
+    </tbody>
+</table>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <td>ID</td>
             <td>Word</td>
             <td>Prompts</td>
         </tr>

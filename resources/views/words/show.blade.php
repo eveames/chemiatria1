@@ -40,6 +40,14 @@
     				@endforeach
     			</tbody>
 			</table>
+            <br>
+            <strong>Topics</strong> 
+            <ul>
+            @foreach($topics as $topic)
+            <li>{{ $topic->topic }}</li>
+            @endforeach
+            </ul>
+
 			<br>
 			<a class="btn btn-small btn-primary" href="{{ URL::to('words/' . $word->id . '/edit') }}">Edit this word</a>
 			<a class="btn btn-small btn-primary" href="{{ URL::to('words/') }}">Back to search</a>

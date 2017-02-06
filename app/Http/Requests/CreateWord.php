@@ -21,18 +21,6 @@ class CreateWord extends FormRequest
         return Gate::allows('create_word');
     }
 
-    //protected $word = Word::where('word', $request->old('word'));
-    //protected $redirectTo = view('words.create')->with($request)->with($word);
-
-    //protected $redirectAction = 'WordController@create_error';
-
-    protected function getRedirectUrl()
-    {
-        $word = Word::where('word', $request->old('word'));
-        $url = $this->redirector->getUrlGenerator();
-
-        return $url->route('words.create', $word);
-    }
     /**
      * Get the validation rules that apply to the request.
      *
@@ -41,8 +29,33 @@ class CreateWord extends FormRequest
     public function rules()
     {    
         return [
-            'word'       => 'required|unique:words',
-            'prompts'      => 'required'
+            'word'       => 'bail|required|unique:words',
+            'prompts'      => 'required',
+            'topic'    =>'required'
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'word.required' => 'You must enter a word',
+            'word.unique'   => 'That word already exists. Please edit it instead',
+            'prompts.required'  => 'You must enter at least one prompt',
+            'topic.required'    => 'You must select at least one topic',
+        ];
+    }
+
+    //protected $word = Word::where('word', $request->old('word'));
+    //protected $redirectTo = view('words.create')->with($request)->with($word);
+
+    //protected $redirectAction = 'WordController@create_error';
+
+    /*protected function getRedirectUrl()
+    {
+        $word = Word::where('word', $this->old('word'));
+        $url = $this->redirector->getUrlGenerator();
+        dd($url);
+
+        return $url->route('words.create', $word);
+    }*/
 }

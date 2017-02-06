@@ -10,6 +10,7 @@
     <div class="alert alert-info">{{ Session::get('message') }}</div>
 @endif
 
+
 <h1>Add Word</h1>
 <p>Use the Edit Word form to add alternate answers</p>
 
@@ -20,8 +21,8 @@
                 <li>{{ $error }}</li>
             @endforeach
         </ul>
+        <a class="btn btn-small btn-primary" href="{{ URL::to('words/') }}">Back to search</a>
     </div>
-    <p>{{ $word->word }}</p>
 
 
 @endif
@@ -36,6 +37,13 @@
     <div class="form-group">
         {!! Form::label('prompts', 'Enter prompts, separated by semicolons (;):') !!}
         {!! Form::text('prompts', null, ['class' => 'form-control']) !!}
+    </div>
+
+    <div class="form-group">
+        @foreach($topics as $key => $value)
+            <nobr>{{ Form::checkbox('topic[' . $value->id . ']') }}
+            {{ Form::label('topic[' . $value->id . ']', $value->topic)}}&emsp;</nobr>
+        @endforeach
     </div>
 
     {!! Form::submit('Add the word!', array('class' => 'btn btn-primary')) !!}

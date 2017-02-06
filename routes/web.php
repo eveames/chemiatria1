@@ -16,6 +16,8 @@ Route::get('/', function () {
 });
 Route::resource('words', 'WordController');
 
+Route::get('/words/topics/{id}', 'WordController@topic_search');
+
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
