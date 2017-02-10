@@ -28,5 +28,6 @@
             </div>
         </div>
     </div>
+    <my-app>Loading App here...</my-app>
 </div>
 @endsection
