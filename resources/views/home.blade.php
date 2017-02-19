@@ -9,6 +9,9 @@
 @endif
 
 @section('content')
+<example></example>
+<test></test>
+
 <div class="container">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
@@ -16,18 +19,25 @@
                 <div class="panel-heading">Dashboard</div>
 
                 <div class="panel-body">
-                    You are logged in!
                     <a class="btn btn-small btn-success" href="{{ URL::to('home/report') }}">Email me my progress</a>
                 </div>
 
-                @can('create_word') 
-                <div class="panel-body"><a href="{{ url('/words') }}">View Vocab Words</a></div>
+                @can('create_word')
+                <div class="panel-body">
+                  <a class="btn btn-small btn-success" href="{{ url('/words') }}">View Vocab Words</a>
+                </div>
                 @endcan
-
+                
 
             </div>
         </div>
     </div>
-    <my-app>Loading App here...</my-app>
+    <app-root>Loading...</app-root>
+      <script type="text/javascript" src="/js/inline.bundle.js"></script>
+      <script type="text/javascript" src="/js/polyfills.bundle.js"></script>
+      <script type="text/javascript" src="/js/styles.bundle.js"></script>
+      <script type="text/javascript" src="/js/vendor.bundle.js">
+      </script><script type="text/javascript" src="/js/main.bundle.js"></script>
 </div>
+
 @endsection

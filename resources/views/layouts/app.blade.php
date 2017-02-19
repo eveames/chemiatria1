@@ -14,15 +14,6 @@
     <link href="/css/app.css" rel="stylesheet">
 
     <!-- Scripts -->
-    <script src="node_modules/core-js/client/shim.min.js"></script>
-
-    <script src="node_modules/zone.js/dist/zone.js"></script>
-    <script src="node_modules/systemjs/dist/system.src.js"></script>
-
-    <script src="systemjs.config.js"></script>
-    <script>
-      System.import('/js/app.js').catch(function(err){ console.error(err); });
-    </script>
     <script>
         window.Laravel = <?php echo json_encode([
             'csrfToken' => csrf_token(),

@@ -1,4 +1,4 @@
-
+console.log('did something in bootstrap');
 window._ = require('lodash');
 
 /**
