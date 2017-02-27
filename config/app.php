@@ -164,6 +164,7 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
 
+
         /*
          * Package Service Providers...
          */
@@ -178,6 +179,7 @@ return [
         // chemiatria\Providers\BroadcastServiceProvider::class,
         chemiatria\Providers\EventServiceProvider::class,
         chemiatria\Providers\RouteServiceProvider::class,
+
 
     ],
 

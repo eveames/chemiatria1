@@ -11,6 +11,7 @@ const { mix } = require('laravel-mix');
  |
  */
 
-mix.copy('ngchem/dist', 'public/js')
+mix.js('resources/assets/js/bootstrap.js', 'public/js')
+    .copy('ngchem/dist', 'public/js')
    .sass('resources/assets/sass/app.scss', 'public/css');
    //

@@ -4,15 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
+import { SigfigQuestionComponent } from './questions/sigfig-question/sigfig-question.component';
+import { CoreModule }       from './core/core.module';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    SigfigQuestionComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule
+    HttpModule,
+    CoreModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

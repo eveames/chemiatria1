@@ -24,4 +24,22 @@ Route::get('/home', 'HomeController@index');
 
 Route::get('/home/report', 'HomeController@email_progress');
 
-//Route::get('words-create-error', 'WordController@create_error');
+Route::get('/home/play', 'HomeController@play');
+
+Route::get('/home/play/all', 'HomeController@playall');
+
+Route::get('/home/plan', 'HomeController@plan');
+
+Route::post('/home/plan', 'HomeController@update_plan');
+
+Route::group(['middleware' => 'auth', 'prefix' => 'api/student'], function () {
+	  Route::get('words', 'ApiController@getWords');
+    Route::get('words/{topic_id}', 'ApiController@getWordsByTopic');
+    Route::get('topics', 'ApiController@getTopics');
+    Route::get('states', 'ApiController@getStates');
+    Route::post('states', 'ApiController@updateAllStates');
+    Route::post('states/new', 'ApiController@newState');
+    Route::post('states/{id}', 'ApiController@updateState');
+    Route::post('actions', 'ApiController@postAction');
+    Route::get('user', 'ApiController@getUser');
+});

@@ -12,17 +12,6 @@ class WordRoutesTest extends TestCase
      *
      * @return void
      */
-    public function testWelcomeRoute()
-    {
-        $this->visit('/')
-             ->see('Chemiatria');
-    }
-
-    public function testHomePageRedirection() {
-        $this->call('GET', '/home');
-        $this->assertRedirectedTo('login');
-    }
-
     public function testWordsCreateRedirection() {
         $this->call('GET', '/words/create');
         $this->assertRedirectedTo('login');

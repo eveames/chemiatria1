@@ -16,3 +16,14 @@ use Illuminate\Http\Request;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:api');
+
+Route::group(['middleware' => 'auth', 'prefix' => 'api/student'], function () {
+	  Route::get('words', 'ApiController@getWords');
+    Route::get('words/{topic_id}', 'ApiController@getWordsByTopic');
+    Route::get('topics', 'ApiController@getTopics');
+    Route::get('states', 'ApiController@getStates');
+    Route::post('states', 'ApiController@updateAllStates');
+    Route::post('states/new', 'ApiController@newState');
+    Route::post('states/{id}', 'ApiController@updateState');
+    Route::post('actions', 'ApiController@postAction');
+});
