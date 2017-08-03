@@ -21,6 +21,11 @@ export class LogService {
                .map(this.extractData)
                .catch(this.handleError);
   }
+  getActiveStates(): Observable<State[]> {
+    return this.http.get(this.statesUrl + '/active')
+               .map(this.extractData)
+               .catch(this.handleError);
+  }
 
   getUser(): Observable<User> {
     return this.http.get(this.userUrl)

@@ -22,16 +22,12 @@ var LogService = (function () {
     }
     LogService.prototype.getStates = function () {
         return this.http.get(this.statesUrl)
-            .toPromise()
-            .then(function (response) { return response.json(); })
+            .map(this.extractData)
             .catch(this.handleError);
     };
-    LogService.prototype.getUser1 = function () {
-        console.log('about to call http');
-        this.http.get(this.userUrl).toPromise().then(function (response) { return console.log(response.json()); });
-        return this.http.get(this.userUrl)
-            .toPromise()
-            .then(function (response) { return response.json().data; })
+    LogService.prototype.getActiveStates = function () {
+        return this.http.get(this.statesUrl + '/active')
+            .map(this.extractData)
             .catch(this.handleError);
     };
     LogService.prototype.getUser = function () {
@@ -40,9 +36,7 @@ var LogService = (function () {
             .catch(this.handleError);
     };
     LogService.prototype.extractData = function (res) {
-        console.log(res);
         var body = res.json();
-        console.log(body);
         return body || {};
     };
     LogService.prototype.handleError = function (error) {

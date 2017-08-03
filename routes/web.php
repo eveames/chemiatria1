@@ -35,8 +35,10 @@ Route::post('/home/plan', 'HomeController@update_plan');
 Route::group(['middleware' => 'auth', 'prefix' => 'api/student'], function () {
 	  Route::get('words', 'ApiController@getWords');
     Route::get('words/{topic_id}', 'ApiController@getWordsByTopic');
+    Route::get('facts', 'ApiController@getFacts');
     Route::get('topics', 'ApiController@getTopics');
     Route::get('states', 'ApiController@getStates');
+    Route::get('states/active', 'ApiController@getActiveStates');
     Route::post('states', 'ApiController@updateAllStates');
     Route::post('states/new', 'ApiController@newState');
     Route::post('states/{id}', 'ApiController@updateState');

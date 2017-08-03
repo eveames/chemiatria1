@@ -18,6 +18,7 @@ class CreateSkillsTable extends Migration
             $table->increments('id');
             $table->string('skill', 50)->unique();
             $table->text('description')->nullable();
+            $table->string('subtype', 30);
         });
     }
 

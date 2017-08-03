@@ -3,6 +3,7 @@ export class State {
   id: number;
   type: string;
   subtype?: string;
+  type_id: number;
   stage: string;
   priority: number;
   accs: string;

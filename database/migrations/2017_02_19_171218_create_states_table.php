@@ -20,6 +20,7 @@ class CreateStatesTable extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('studyable_type',100);
             $table->unsignedInteger('studyable_id');
+            $table->unsignedInteger('subtype_id');
             $table->text('accuracies');
             $table->text('rts');
             $table->text('history');

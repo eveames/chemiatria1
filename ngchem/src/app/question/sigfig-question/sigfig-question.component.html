@@ -1,0 +1,10 @@
+<div class="alert" role="alert" *ngIf="data.answer.message" [ngClass]="data.answer.correct">
+  {{ data.answer.message }}
+        </div><br>
+        <div class="panel panel-default" *ngIf="showHint">
+          <div class="panel-body">{{ data.question.hint }}</div>
+        </div>
+<p>
+  How many sig figs does {{ data.question.number }} have?
+</p>
+<input (keyup.enter)="submit(input.value)" #input placeholder=""/>

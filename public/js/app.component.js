@@ -18,7 +18,12 @@ var AppComponent = (function () {
     }
     AppComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.logService.getUser().subscribe(function (user) { return _this.user = user; });
+        this.logService.getUser().subscribe(function (user) { return _this.user = user; }, function (error) { return _this.errorMessage = error; });
+        this.sessionManagerService.setup();
+        this.sessionManagerService.question.subscribe(function (question) { return _this.question = question; }, function (error) { return _this.errorMessage = error; });
+    };
+    AppComponent.prototype.ngOnDestroy = function () {
+        this.sessionManagerService.question.unsubscribe();
     };
     return AppComponent;
 }());

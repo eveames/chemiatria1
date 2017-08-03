@@ -27,7 +27,7 @@ class Skill extends Model
     }
     public function data()
     {
-      return ['name' =>$this->skill, 'id' => $this->id, 'type' => 'skill'];
+      return ['name' =>$this->skill, 'type_id' => $this->id, 'type' => 'skill', 'subtype' => $this->subtype];
     }
 
 }

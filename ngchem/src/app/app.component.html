@@ -3,3 +3,5 @@
 </h1>
 <p>Changes still showing</p>
 <p *ngIf="user">Hello {{user.name}}</p>
+<app-word-question></app-word-question>
+<app-question-container *ngIf="question" [question]="question"></app-question-container>

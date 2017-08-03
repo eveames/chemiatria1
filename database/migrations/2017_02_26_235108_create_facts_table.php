@@ -18,7 +18,8 @@ class CreateFactsTable extends Migration
             $table->string('group_name',50); //category of questions, like polyatomic ion
             $table->string('key', 50); //short side of fact
             $table->string('key_name', 50);//name, such as formula or element
-            $table->text('props'); //json including properties of key with names
+            $table->string('prop',100); //long side of fact
+            $table->string('prop_name', 50)->nullable(); //name, if appropriate
             $table->timestamps();
         });
     }

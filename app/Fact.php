@@ -23,6 +23,6 @@ class Fact extends Model
     }
     public function data()
     {
-      return ['name' =>$this->key, 'id' => $this->id, 'type' => 'fact', 'subtype' => $this->group_name];
+      return ['name' =>$this->key, 'type_id' => $this->id, 'type' => 'fact', 'subtype' => $this->group_name];
     }
 }

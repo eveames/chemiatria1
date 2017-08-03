@@ -8,6 +8,7 @@ use chemiatria\Topic;
 use chemiatria\Skill;
 use chemiatria\State;
 use chemiatria\Altword;
+use chemiatria\Fact;
 use Illuminate\Support\Facades\Auth;
 use chemiatria\Helpers\SessionPlanHelper;
 
@@ -41,6 +42,18 @@ class ApiController extends Controller
         }
     }
 
+    public function getFacts() {
+    	//returns json object all props on fact
+    	try {
+            $facts = Fact::all();
+            return $facts;
+        }
+        catch (Exception $e) {
+            $errorMessage = 'Caught exception: ' . $e->getMessage();
+
+            return $errorMessage;
+        }
+    }
     public function getTopics() {
     	//returns json object list all available topics
     	//maybe someday sorts them by course, student progress?
@@ -58,6 +71,19 @@ class ApiController extends Controller
     	$user = Auth::user();
       //$states =
     	$states = $user->states->map(function($item)
+        {
+          //dd($item->data());
+          return $item->data();
+        });
+      //dd($states);
+    	return $states;
+    }
+
+    public function getActiveStates() {
+    	//returns full list of states for all items in study array, by user
+    	$user = Auth::user();
+      //$states =
+    	$states = $user->states->where('current', 1)->map(function($item)
         {
           //dd($item->data());
           return $item->data();

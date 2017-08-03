@@ -36,7 +36,7 @@ class Word extends Model
     }
     public function data()
     {
-      return ['name' =>$this->word, 'id' => $this->id, 'type' => 'word'];
+      return ['name' =>$this->word, 'type_id' => $this->id, 'type' => 'word'];
     }
 
 }
