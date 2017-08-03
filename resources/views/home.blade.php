@@ -10,6 +10,12 @@
 
 @section('content')
 
+<div>
+  Here's where the components would be
+<example></example>
+<test1></test>
+</div>
+
 <div class="container">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">

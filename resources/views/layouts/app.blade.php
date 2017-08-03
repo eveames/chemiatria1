@@ -11,7 +11,8 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Styles -->
-    <link href="/css/app.css" rel="stylesheet">
+    <!--<link href="/css/app.css" rel="stylesheet">-->
+    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 
     <!-- Scripts -->
     <script>
@@ -88,9 +89,13 @@
             @endif
             @yield('content')
         </div>
+
+</div>
     </div>
 
     <!-- Scripts -->
-    <script src="/js/bootstrap.js"></script>
+    <!--<script src="/js/bootstrap.js"></script>-->
+
+<script src="{{ mix('js/app.js') }}"></script>
 </body>
 </html>
