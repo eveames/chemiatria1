@@ -54,6 +54,15 @@ class ApiController extends Controller
             return $errorMessage;
         }
     }
+
+    //controls API used by angular
+    public function getFactsByTopic($topic_id) {
+    	//returns json object:  {{word: word, prompts: [], alternates: []}, {}, etc}
+      $topic = Topic::find($topic_id);
+    	$facts = $topic->facts()->get();
+    	return $facts;
+    }
+
     public function getTopics() {
     	//returns json object list all available topics
     	//maybe someday sorts them by course, student progress?

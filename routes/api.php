@@ -20,10 +20,13 @@ Route::get('/user', function (Request $request) {
 Route::group(['middleware' => 'auth', 'prefix' => 'api/student'], function () {
 	  Route::get('words', 'ApiController@getWords');
     Route::get('words/{topic_id}', 'ApiController@getWordsByTopic');
+    Route::get('facts', 'ApiController@getFacts');
+    Route::get('facts/{topic_id}', 'ApiController@getFactsByTopic');
     Route::get('topics', 'ApiController@getTopics');
     Route::get('states', 'ApiController@getStates');
     Route::post('states', 'ApiController@updateAllStates');
     Route::post('states/new', 'ApiController@newState');
     Route::post('states/{id}', 'ApiController@updateState');
+    Route::get('states/active', 'ApiController@getActiveStates');
     Route::post('actions', 'ApiController@postAction');
 });

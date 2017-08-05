@@ -8,7 +8,8 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
-
+window.Vuex = require('vuex');
+//Vue.use(Vuex);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the body of the page. From here, you may begin adding components to
@@ -17,9 +18,11 @@ window.Vue = require('vue');
 
 Vue.component('example', require('./components/Example.vue'));
 Vue.component('test1', require('./components/Test.vue'));
-
-console.log('did something');
+Vue.component('study-session', require('./components/StudySession.vue'));
+import store from './vuex/store';
+//console.log('did something');
 
 const app = new Vue({
     el: '#app',
+    store: store
 });

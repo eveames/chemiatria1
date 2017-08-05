@@ -9,5 +9,5 @@
 @endif
 
 @section('content')
-
-  @endsection
+<study-session></study-session>
+@endsection

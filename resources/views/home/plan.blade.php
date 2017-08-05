@@ -102,19 +102,19 @@
         </tr>
     </thead>
     <tbody>
-    @foreach($new as $value)
-        <tr>
-            <td>{{ Form::checkbox('new[' . $value['id'] . ']', $value['selected']) }}</td>
-            <td>{{ $value['id'] }}</td>
-            <td>{{ $value['name'] }}</td>
-            <td>{{ $value['words']->implode(', ') }}</td>
-            <td>{{ implode(', ', $value['skills']) }}</td>
-            <td>
-                <a class="btn btn-small btn-primary"
-                href="{{ URL::to('home/plan/topic' . $value['id']) }}">Manage topic details</a>
-            </td>
-        </tr>
-    @endforeach
+      @foreach($new as $value)
+          <tr>
+              <td>{{ Form::checkbox('new[' . $value['id'] . ']', $value['selected']) }}</td>
+              <td>{{ $value['id'] }}</td>
+              <td>{{ $value['name'] }}</td>
+              <td>{{ $value['words']->implode(', ') }}</td>
+              <td>{{ $value['skills']->implode(', ') }}</td>
+              <td>
+                  <a class="btn btn-small btn-primary"
+                  href="{{ URL::to('home/plan/topic' . $value['id']) }}">Manage topic details</a>
+              </td>
+          </tr>
+      @endforeach
     </tbody>
 </table>
 @endif
