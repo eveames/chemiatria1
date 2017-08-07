@@ -46,6 +46,7 @@ class State extends Model
       $detail['priority'] = $this->priority;
       $detail['accs'] = $this->accuracies;
       $detail['rts'] = $this->rts;
+      $detail['lastStudied'] = $this->lastStudied;
       $detail['topic_ids'] = $this->topics()->pluck('topic_id')->toArray();
       return $detail;
     }

@@ -1204,8 +1204,11 @@ const INITIALIZE_STATES = 'INITIALIZE_STATES'
 const SET_USER = 'SET_USER'
 /* unused harmony export SET_USER */
 
-const UPDATE_STATE = 'UPDATE_STATE'
-/* unused harmony export UPDATE_STATE */
+const UPDATE_STAGE = 'UPDATE_STAGE'
+/* harmony export (immutable) */ __webpack_exports__["h"] = UPDATE_STAGE;
+
+const UPDATE_RTS_ACCS = 'UPDATE_RTS_ACCS'
+/* harmony export (immutable) */ __webpack_exports__["g"] = UPDATE_RTS_ACCS;
 
 const INCREMENT_FRUSTRATION = 'INCREMENT_FRUSTRATION'
 /* unused harmony export INCREMENT_FRUSTRATION */
@@ -1213,14 +1216,15 @@ const INCREMENT_FRUSTRATION = 'INCREMENT_FRUSTRATION'
 const INCREMENT_HINTS = 'INCREMENT_HINTS'
 /* unused harmony export INCREMENT_HINTS */
 
-const NEW_QUESTION = 'NEW_QUESTION'
-/* unused harmony export NEW_QUESTION */
-
+//export const NEW_QUESTION = 'NEW_QUESTION'
 const SET_READY = 'SET_READY'
-/* harmony export (immutable) */ __webpack_exports__["e"] = SET_READY;
+/* harmony export (immutable) */ __webpack_exports__["f"] = SET_READY;
 
 const SET_QUESTION = 'SET_QUESTION'
 /* harmony export (immutable) */ __webpack_exports__["d"] = SET_QUESTION;
+
+const SET_QUESTION_START = 'SET_QUESTION_START'
+/* harmony export (immutable) */ __webpack_exports__["e"] = SET_QUESTION_START;
 
 
 
@@ -12129,6 +12133,8 @@ module.exports = __webpack_require__(63);
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__vuex_store__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__plugins_RandomGeneratorPlugin_js__ = __webpack_require__(77);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__plugins_FactPriorityPlugin_js__ = __webpack_require__(78);
 
 /**
  * First we will load all of this project's JavaScript dependencies which
@@ -12150,7 +12156,12 @@ window.Vuex = __webpack_require__(1);
 Vue.component('example', __webpack_require__(41));
 Vue.component('test1', __webpack_require__(47));
 Vue.component('study-session', __webpack_require__(50));
+Vue.component('word-question', __webpack_require__(72));
 
+
+
+Vue.use(__WEBPACK_IMPORTED_MODULE_1__plugins_RandomGeneratorPlugin_js__["a" /* default */]);
+Vue.use(__WEBPACK_IMPORTED_MODULE_2__plugins_FactPriorityPlugin_js__["a" /* default */]);
 //console.log('did something');
 
 var app = new Vue({
@@ -43166,8 +43177,6 @@ module.exports = function listToStyles (parentId, list) {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 //
 //
 //
@@ -43186,17 +43195,19 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       count: 0
     };
   },
-  computed: _extends({
+  props: ['status'],
+  computed: {
     word: function word() {
       return this.$store.getters.getWordById(1);
+    },
+    randomString: function randomString() {
+      return Vue.randomDigitString(8, 8);
     }
-  }, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
-    status: 'checkWordsReady'
-  })),
+  },
   methods: {
     checkUpdate: function checkUpdate(event) {
       this.count += 1;
-      console.log("count is now " + this.count);
+      //console.log("count is now " + this.count);
     }
   }
 });
@@ -43213,7 +43224,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       value: (true),
       expression: "true"
     }]
-  }, [_vm._v("status is " + _vm._s(_vm.status))]), _vm._v(" "), (_vm.status) ? _c('div', [_vm._v("The first word is " + _vm._s(_vm.word.word) + " which is " + _vm._s(_vm.word.prompts[0]))]) : _vm._e(), _vm._v(" "), _c('div', {
+  }, [_vm._v(_vm._s(_vm.randomString))]), _vm._v(" "), (_vm.status) ? _c('div', [_vm._v("The first word is " + _vm._s(_vm.word.word) + " which is " + _vm._s(_vm.word.prompts[0]))]) : _vm._e(), _vm._v(" "), _c('div', {
     on: {
       "click": _vm.checkUpdate
     }
@@ -43291,7 +43302,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     mounted: function mounted() {
-        console.log('Component ready.');
+        //console.log('Component ready.')
     }
 });
 
@@ -43403,7 +43414,7 @@ exports = module.exports = __webpack_require__(12)(undefined);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -43425,6 +43436,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
+//
 
 
 
@@ -43433,20 +43445,26 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     wordsStatus: 'checkWordsReady',
     factsStatus: 'checkFactsReady',
     statesStatus: 'checkStatesReady',
-    currentQuestionState: 'getCurrent'
-  })),
+    currentQuestionState: 'getCurrent',
+    setupReady: 'checkSetup'
+  }), {
+    ready: function ready() {
+      if (this.setupReady === true && typeof this.currentQuestionState !== 'undefined') {
+        return true;
+      } else return false;
+    }
+  }),
   created: function created() {
     var _this = this;
 
     Promise.all([this.$store.dispatch('setupWords'), this.$store.dispatch('setupStates')])
     //this.$store.dispatch('setupFacts')])
     .then(function (results) {
-      console.log(results);
-      console.log('promise resolved, in then');
+      //console.log(results);
+      //console.log('promise resolved, in then')
       _this.$store.dispatch('setReady');
       var curr = _this.currentQuestionState;
-      console.log("curr is ", curr);
-      _this.$store.dispatch('setQuestion', curr);
+      _this.$store.dispatch('setQuestionStart');
     });
   }
 });
@@ -43456,7 +43474,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('example'), _vm._v(" "), _c('test1')], 1)
+  return _c('div', [_c('example', {
+    attrs: {
+      "status": _vm.ready
+    }
+  }), _vm._v(" "), (_vm.ready === true) ? _c('word-question') : _vm._e()], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -43561,7 +43583,7 @@ var actions = {
     var commit = _ref.commit;
 
     axios.get('../api/student/facts').then(function (response) {
-      console.log("facts data is ", +response.data);
+      //console.log("facts data is ", + response.data);
       //console.log(response.data[1])
       //console.log(response.data.length);
       var temp = response.data;
@@ -43583,7 +43605,7 @@ var actions = {
 var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["a" /* INITIALIZE_FACTS */], function (state, facts) {
   //console.log("in mutation, words is: " + words);
   state.facts = facts;
-  console.log('facts set');
+  //console.log('facts set');
   state.factsReady = true;
 });
 
@@ -43600,7 +43622,7 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mutation_types__ = __webpack_require__(2);
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _mutations;
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -43614,19 +43636,32 @@ var state = {
   currentIndex: 0,
   currentTypeID: 0,
   currentType: '',
+  currentStage: 0,
+  currentStateID: 0,
   finished: false
 };
-
 // getters
 var getters = {
   checkStatesReady: function checkStatesReady(state) {
     return state.statesReady;
   },
+  getCurrentStateID: function getCurrentStateID(state) {
+    return state.currentStateID;
+  },
   getCurrent: function getCurrent(state) {
-    console.log("called getCurrent");
-    var curr = [state.currentIndex, state.currentTypeID, state.currentType];
-    console.log(curr, typeof curr === 'undefined' ? 'undefined' : _typeof(curr));
+    //console.log("called getCurrent");
+    var curr = [state.currentIndex, state.currentTypeID, state.currentType, state.currentStage, state.currentStateID];
+    //console.log(curr, typeof(curr));
     return curr;
+  },
+  getStageData: function getStageData() {
+    if (state.states.length !== 0) {
+      var stage = state.states[state.currentIndex];
+      //console.log('called getStageData, ', stage);
+      var temp = { stage: stage.stage, priority: stage.priority,
+        accs: stage.accs, rts: stage.rts, lastStudied: stage.lastStudied };
+      return temp;
+    } else return null;
   }
 
 };
@@ -43641,30 +43676,78 @@ var actions = {
         //console.log(response.data);
         var temp = response.data;
         var states = [];
+        var thisState = {};
         for (var i = 0; i < temp.length; i++) {
-          states.push(temp[i]);
+          thisState = temp[i];
+          if (thisState.rts === "") thisState.rts = [];else if (typeof thisState.rts === "string") {
+            thisState.rts = JSON.parse(thisState.rts);
+          }
+          if (thisState.accs === "") thisState.accs = [];else if (typeof thisState.accs === "string") {
+            thisState.accs = JSON.parse(thisState.accs);
+          }
+          states.push(thisState);
         }
         //console.log(states);
         commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_STATES */], states);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* SET_QUESTION */]);
         resolve();
       }).catch(function (error) {
         console.log(error);
         reject();
       });
     });
+  },
+  updateRtsAccs: function updateRtsAccs(_ref2, newState) {
+    var commit = _ref2.commit;
+
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* UPDATE_RTS_ACCS */], newState);
+  },
+  updateStage: function updateStage(_ref3, newState) {
+    var commit = _ref3.commit;
+
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* UPDATE_STAGE */], newState);
+  },
+  setQuestion: function setQuestion(_ref4) {
+    var commit = _ref4.commit;
+
+    var prev = state.currentIndex;
+    var state_id = state.currentStateID;
+    console.log("prev is ", prev);
+    var url = '../api/student/states/' + state_id;
+    console.log(url);
+    console.log("state for updating: ", state.states[prev]);
+    axios.post(url, state.states[prev]).catch(function (error) {
+      console.log(error);
+    });
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* SET_QUESTION */]);
+    //console.log('after SET_QUESTION, prev is ', prev)
   }
 };
 
 // mutations
-var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_STATES */], function (state, states) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_STATES */], function (state, states) {
   state.states = states;
-  console.log("state.states is ", state.states);
+  state.statesReady = true;
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* SET_QUESTION */], function (state) {
+  //console.log('before getNext index is ', state.currentIndex)
   state.currentIndex = getNext();
-  console.log(_typeof(state.currentIndex));
+  //console.log('after getNext index is ', state.currentIndex)
   state.currentTypeID = state.states[state.currentIndex].type_id;
   state.currentType = state.states[state.currentIndex].type;
-  state.statesReady = true;
-});
+  state.currentStage = state.states[state.currentIndex].stage;
+  state.currentStateID = state.states[state.currentIndex].id;
+  state.states[state.currentIndex].lastStudied = Date.now();
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* UPDATE_RTS_ACCS */], function (state, newState) {
+  console.log("newState is ", newState);
+  state.states[state.currentIndex].accs.push(newState.accs);
+  state.states[state.currentIndex].rts.push(newState.rts);
+  console.log("state is now ", state.states[state.currentIndex]);
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* UPDATE_STAGE */], function (state, newState) {
+  console.log("newState is ", newState);
+  state.states[state.currentIndex].priority = newState.priority;
+  state.states[state.currentIndex].stage = newState.stage;
+  console.log("state is now ", state.states[state.currentIndex]);
+}), _mutations);
 
 var getNext = function getNext() {
   //reduce studyArray to next value
@@ -43678,9 +43761,9 @@ var getNext = function getNext() {
     //console.log('state.states[i -1] is: ', state.states[i-1]);
     if (state.states[i].priority === 1) {
       if (readiest !== -1) {
-        console.log("first:", readiest);return readiest;
+        return readiest;
       } else {
-        console.log(i);return i;
+        return i;
       }
     } else if (state.states[i].priority <= currentTime) {
       if (readiest !== -1) {
@@ -43702,7 +43785,7 @@ var getNext = function getNext() {
   }
   //console.log(readiest);
   if (readiest !== -1) {
-    console.log("readiest: ", readiest);return readiest;
+    return readiest;
   } else {
     //console.log()
     if (state.states[readiestUnready].priority > currentTime + 1800000) {
@@ -43776,7 +43859,7 @@ var actions = {
 
 // mutations
 var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_WORDS */], function (state, words) {
-  console.log("in INITIALIZE_WORDS, words is: " + words);
+  //console.log("in INITIALIZE_WORDS, words is: " + words);
   state.words = words;
   //console.log(state.words[1].altwords[0]);
   state.wordsReady = true;
@@ -43806,7 +43889,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var state = {
   user: "", //user name
   setupComplete: false, //true when everything is initialized
-  currentQuestion: {}, //stores current question
+  questionSetTime: 0,
   frustrationCount: 0, //counts how many times user indicates frustrationCount
   hintCount: 0, //counts how many times user requests hint
   errors: "" //collects session errors for display
@@ -43816,6 +43899,9 @@ var state = {
 var getters = {
   checkSetup: function checkSetup(state) {
     return state.setupComplete;
+  },
+  getQuestionSetTime: function getQuestionSetTime(state) {
+    return state.questionSetTime;
   }
 };
 
@@ -43824,25 +43910,21 @@ var actions = {
   setReady: function setReady(_ref) {
     var commit = _ref.commit;
 
-    console.log('setReady');
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_READY */]);
+    //console.log('setReady');
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_READY */]);
   },
-  setQuestion: function setQuestion(_ref2, question) {
-    var state = _ref2.state,
-        commit = _ref2.commit,
-        rootState = _ref2.rootState;
+  setQuestionStart: function setQuestionStart(_ref2) {
+    var commit = _ref2.commit;
 
-    console.log("in setQuestion, question is ", question);
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* SET_QUESTION */], question);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_QUESTION_START */], Date.now());
   }
 };
 
 // mutations
-var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_READY */], function (state) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_READY */], function (state) {
   state.setupComplete = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* SET_QUESTION */], function (state, question) {
-  console.log(question);
-  state.currentQuestion = question;
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_QUESTION_START */], function (state, time) {
+  state.questionSetTime = time;
 }), _mutations);
 
 /* harmony default export */ __webpack_exports__["a"] = ({
@@ -43857,6 +43939,410 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 64 */,
+/* 65 */,
+/* 66 */,
+/* 67 */,
+/* 68 */,
+/* 69 */,
+/* 70 */,
+/* 71 */,
+/* 72 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(73)
+}
+var Component = __webpack_require__(4)(
+  /* script */
+  __webpack_require__(75),
+  /* template */
+  __webpack_require__(76),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/WordQuestion.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] WordQuestion.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-28e2e31f", Component.options)
+  } else {
+    hotAPI.reload("data-v-28e2e31f", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 73 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(74);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(13)("229eac3a", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-28e2e31f\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./WordQuestion.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-28e2e31f\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./WordQuestion.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 74 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(12)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 75 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      tries: 0,
+      feedback: '',
+      acc: 0,
+      rts: [],
+      startTime: 0
+    };
+  },
+  //props: ['questionTypeID'],
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    currentQuestion: 'getCurrent',
+    questionSetTime: 'getQuestionSetTime',
+    stageData: 'getStageData'
+  }), {
+    word: function word() {
+      return this.$store.getters.getWordById(this.currentQuestion[1]);
+    },
+    answers: function answers() {
+      var temp = [{ alt: this.word.word, correct: 'correct' }];
+      temp = temp.concat(this.word.altwords);
+      return temp;
+    }
+  }),
+  created: function created() {},
+
+  methods: {
+
+    submitEntry: function submitEntry(event) {
+      this.tries += 1;
+      var answerDetail = this.checkEntry();
+      if (this.startTime === 0) {
+        this.startTime = this.questionSetTime;
+      }
+      answerDetail.timeStamp = Date.now();
+
+      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
+      console.log('rts is set to ', this.rts);
+      this.startTime = Date.now();
+
+      var correct = answerDetail.correct;
+      var moveOn = false;
+      var gotIt = false;
+
+      if (correct === 'correct') {
+        answerDetail.messageSent += ' Correct!';
+        moveOn = true;
+        gotIt = true;
+        this.acc = this.tries - 1;
+        console.log('acc is set to ', this.acc);
+      } else if (correct === 'dontKnow') {
+        moveOn = true;
+      } else {
+        if (this.tries < 3) {
+          answerDetail.messageSent += "Try again!";
+        } else moveOn = true;
+      }
+      if (moveOn === true && gotIt === false) {
+        answerDetail.messageSent = 'Answer to "' + this.word.prompts[0] + '" is\n        "' + this.answers[0].alt + '". We\'ll come back to it.';
+        this.acc = 4;
+      }
+      this.feedback = answerDetail.messageSent;
+      var action = {};
+      action.state_id = this.currentQuestion[4];
+      action.type = 'answer given';
+      action.detail = answerDetail;
+      action.time = answerDetail.timeStamp;
+
+      //this code gives a 500 error now, should check laravel side
+      //console.log("action is ", action);
+      axios.post('../api/student/actions', action).catch(function (error) {
+        console.log(error);
+      });
+
+      if (moveOn) {
+        //update states
+
+        var updatedState = { rts: this.rts, accs: this.acc };
+        console.log("updatedState is", updatedState);
+        this.$store.dispatch('updateRtsAccs', updatedState);
+        updatedState = Vue.factPriorityHelper(this.stageData);
+        this.$store.dispatch('updateStage', updatedState);
+
+        //set new question
+        //console.log('about to set new question');
+        this.$store.dispatch('setQuestion');
+        this.$store.dispatch('setQuestionStart');
+
+        //update props
+        this.entry = '';
+        this.tries = 0;
+        this.acc = 0;
+        this.rts = [];
+      }
+    },
+
+    //checks the entry, returns answerDetail
+    checkEntry: function checkEntry() {
+      var answerDetailToReturn = { messageSent: '' };
+      //console.log('this.entry: ', this.entry);
+      //console.log('this.answer: ', this.answers);
+      if (this.entry === '') {
+        answerDetailToReturn.correct = 'noAnswer';
+        answerDetailToReturn.messageSent += 'If you don\'t know the answer to a vocab question, enter zero. ';
+      } else if (Number(this.entry) === 0) {
+        answerDetailToReturn.correct = 'dontKnow';
+      } else {
+        for (var i = 0; i < this.answers.length; i++) {
+          if (this.entry === this.answers[i].alt) {
+            answerDetailToReturn.correct = this.answers[i].correct;
+            if (this.answers[i].message) {
+              answerDetailToReturn.messageSent += this.answers[i].message + ' ';
+            }
+            break;
+          } else if (this.entry.toLowerCase() === this.answers[i].alt.toLowerCase()) {
+            if (this.answers[i].correct === 'correct') {
+              answerDetailToReturn.correct = 'formatError';
+              answerDetailToReturn.messageSent += 'Almost there, please check your capitalization. ';
+              break;
+            }
+          }
+        }
+        if (!answerDetailToReturn.correct) {
+          answerDetailToReturn.correct = 'unknownWrong';
+          answerDetailToReturn.messageSent += 'I don\'t recognize your answer. Spell carefully! ';
+        }
+      }
+      return answerDetailToReturn;
+    }
+  }
+});
+
+/***/ }),
+/* 76 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('h3', [_vm._v("Vocab Practice!")]), _vm._v(" "), _c('p', [_vm._v("Instructions: Enter the vocab word that matches the prompt (many words have\n    several prompts). If you do not\n    know the answer, enter 0 (zero) to display the answer, move on and come back\n    to it later. Answers are case-sensitive; use all lower-case unless there is a\n    specific reason to capitalize something, like a proper name or element symbol.\n  ")]), _vm._v(" "), _c('br'), _vm._v(" "), _c('h4', [_vm._v(_vm._s(_vm.word.prompts[0]))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.entry),
+      expression: "entry"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "autofocus": "",
+      "type": "text"
+    },
+    domProps: {
+      "value": (_vm.entry)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.entry = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit answer!")])]), _vm._v(" "), _c('br'), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.feedback))])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-28e2e31f", module.exports)
+  }
+}
+
+/***/ }),
+/* 77 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  install: function install(Vue) {
+
+    //produces a string of given length; increasing zeros increases probability
+    //that any given digit in string is zero
+    Vue.randomDigitString = function (length, zeros) {
+      var randomString = '';
+      var min = void 0,
+          max = 0;
+      if (zeros === 0) {
+        min = 1;
+        max = 9;
+      } else {
+        min = 0;
+        max = 10 + zeros;
+      }
+      for (var i = 0; i < length; i++) {
+        var newDigit = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(min, max);
+        if (newDigit > 9) {
+          newDigit = 0;
+        }
+        randomString += newDigit;
+      }
+      return randomString;
+    };
+  }
+});
+
+/***/ }),
+/* 78 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  install: function install(Vue) {
+
+    Vue.factPriorityHelper = function (stageData) {
+
+      //ms until next to study
+      var stageArray = [0, //start
+      5000, //5s
+      25000, //25s
+      120000, //2 min
+      600000, //10 min
+      86400000, //1d
+      172800000, //2d
+      345600000, //4d
+      864000000, //10d
+      2160000000 //25d
+      ];
+      console.log("in fact priority, stageData is ", stageData);
+      var timesStudied = stageData.accs.length;
+      var correct = stageData.accs[timesStudied - 1];
+      var stage = Number(stageData.stage);
+      var newStage = 0;
+      if (correct === 0 && timesStudied === 1) {
+        newStage = 4;
+      } else if (correct === 0) {
+        newStage = stage + 1;
+      } else if (correct === 1 || stage === 0) {
+        newStage = stage;
+      } else {
+        newStage = stage - 1;
+      }
+      console.log("lastStudied is", stageData.lastStudied);
+      var newPriority = stageData.lastStudied + stageArray[newStage];
+      console.log('newPriority is ', newPriority);
+      //insert randomization:
+      var randomFactor = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 40) * 1000;
+      newPriority += randomFactor;
+      console.log('with random, newPriority is ', newPriority);
+      return { priority: newPriority, stage: newStage };
+    };
+  }
+});
 
 /***/ })
 /******/ ]);

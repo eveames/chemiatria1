@@ -5,7 +5,7 @@ import * as types from '../mutation_types'
 const state = {
   user: "", //user name
   setupComplete: false, //true when everything is initialized
-  currentQuestion: {}, //stores current question
+  questionSetTime: 0,
   frustrationCount: 0, //counts how many times user indicates frustrationCount
   hintCount: 0, //counts how many times user requests hint
   errors: "" //collects session errors for display
@@ -13,18 +13,18 @@ const state = {
 
 // getters
 const getters = {
-  checkSetup: (state) => state.setupComplete
+  checkSetup: (state) => state.setupComplete,
+  getQuestionSetTime: (state) => state.questionSetTime
 }
 
 // actions
 const actions = {
   setReady ({commit}) {
-    console.log('setReady');
+    //console.log('setReady');
     commit(types.SET_READY);
   },
-  setQuestion ({state, commit, rootState}, question) {
-    console.log("in setQuestion, question is ", question)
-    commit(types.SET_QUESTION, question);
+  setQuestionStart ({commit}) {
+    commit(types.SET_QUESTION_START, Date.now())
   }
 }
 
@@ -33,9 +33,8 @@ const mutations = {
   [types.SET_READY] (state) {
     state.setupComplete = true;
   },
-  [types.SET_QUESTION] (state, question) {
-    console.log(question)
-    state.currentQuestion = question;
+  [types.SET_QUESTION_START] (state, time) {
+    state.questionSetTime = time;
   }
 }
 

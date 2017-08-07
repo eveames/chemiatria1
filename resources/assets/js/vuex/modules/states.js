@@ -8,17 +8,29 @@ const state = {
   currentIndex: 0,
   currentTypeID: 0,
   currentType: '',
-  finished: false
+  currentStage: 0,
+  currentStateID: 0,
+  finished: false,
 }
-
 // getters
 const getters = {
   checkStatesReady: (state) => state.statesReady,
+  getCurrentStateID: (state) => state.currentStateID,
   getCurrent: (state) => {
-    console.log("called getCurrent");
-    let curr = [state.currentIndex, state.currentTypeID, state.currentType];
-    console.log(curr, typeof(curr));
+    //console.log("called getCurrent");
+    let curr = [state.currentIndex, state.currentTypeID, state.currentType, state.currentStage, state.currentStateID];
+    //console.log(curr, typeof(curr));
     return curr;
+  },
+  getStageData: () => {
+    if (state.states.length !== 0) {
+      let stage = state.states[state.currentIndex];
+      //console.log('called getStageData, ', stage);
+      let temp = {stage: stage.stage, priority: stage.priority,
+        accs: stage.accs, rts: stage.rts, lastStudied: stage.lastStudied}
+      return temp;
+    }
+    else return null;
   }
 
 }
@@ -32,17 +44,48 @@ const actions = {
       //console.log(response.data);
       let temp = response.data;
       let states = [];
+      let thisState = {};
       for(let i = 0; i < temp.length; i++ ) {
-        states.push(temp[i]);
+        thisState = temp[i];
+        if (thisState.rts === "") thisState.rts = [];
+        else if (typeof(thisState.rts) === "string") {
+          thisState.rts = JSON.parse(thisState.rts);
+        }
+        if (thisState.accs === "") thisState.accs = [];
+        else if (typeof(thisState.accs) === "string") {
+          thisState.accs = JSON.parse(thisState.accs);
+        }
+        states.push(thisState);
       }
       //console.log(states);
       commit(types.INITIALIZE_STATES, states);
+      commit(types.SET_QUESTION);
       resolve();
       }).catch(function (error) {
         console.log(error);
         reject();
       });
     })
+  },
+  updateRtsAccs ({commit}, newState) {
+    commit(types.UPDATE_RTS_ACCS, newState);
+  },
+  updateStage ({commit}, newState) {
+    commit(types.UPDATE_STAGE, newState);
+  },
+  setQuestion ({commit}) {
+    let prev = state.currentIndex;
+    let state_id = state.currentStateID;
+    console.log("prev is ", prev)
+    let url = '../api/student/states/' + state_id;
+    console.log(url)
+    console.log("state for updating: ", state.states[prev]);
+    axios.post(url, state.states[prev])
+    .catch(function (error) {
+      console.log(error);
+    })
+    commit(types.SET_QUESTION);
+    //console.log('after SET_QUESTION, prev is ', prev)
   }
 }
 
@@ -50,12 +93,29 @@ const actions = {
 const mutations = {
   [types.INITIALIZE_STATES] (state, states) {
     state.states = states;
-    console.log("state.states is ", state.states);
+    state.statesReady = true;
+  },
+  [types.SET_QUESTION] (state) {
+    //console.log('before getNext index is ', state.currentIndex)
     state.currentIndex = getNext();
-    console.log(typeof(state.currentIndex))
+    //console.log('after getNext index is ', state.currentIndex)
     state.currentTypeID = state.states[state.currentIndex].type_id;
     state.currentType = state.states[state.currentIndex].type;
-    state.statesReady = true;
+    state.currentStage = state.states[state.currentIndex].stage;
+    state.currentStateID = state.states[state.currentIndex].id;
+    state.states[state.currentIndex].lastStudied = Date.now();
+  },
+  [types.UPDATE_RTS_ACCS] (state, newState) {
+    console.log("newState is ", newState);
+    state.states[state.currentIndex].accs.push(newState.accs)
+    state.states[state.currentIndex].rts.push(newState.rts)
+    console.log("state is now ", state.states[state.currentIndex])
+  },
+  [types.UPDATE_STAGE] (state, newState) {
+    console.log("newState is ", newState)
+    state.states[state.currentIndex].priority = newState.priority;
+    state.states[state.currentIndex].stage = newState.stage;
+    console.log("state is now ", state.states[state.currentIndex])
   }
 }
 
@@ -70,8 +130,8 @@ const getNext = () => {
         //console.log('state.states[i] is: ', state.states[i]);
         //console.log('state.states[i -1] is: ', state.states[i-1]);
         if (state.states[i].priority === 1) {
-    			if (readiest !== -1) {console.log("first:", readiest); return readiest;}
-    			else {console.log(i); return i;}
+    			if (readiest !== -1) { return readiest;}
+    			else {return i;}
     		}
     		else if (state.states[i].priority <= currentTime) {
     			if (readiest !== -1) {
@@ -91,7 +151,7 @@ const getNext = () => {
     		}
     	}
     	//console.log(readiest);
-    	if (readiest !== -1) {console.log("readiest: ", readiest); return readiest;}
+    	if (readiest !== -1) { return readiest;}
     	else {
             //console.log()
             if (state.states[readiestUnready].priority > currentTime + 1800000) {state.finished = true;}

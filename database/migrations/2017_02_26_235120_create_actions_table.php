@@ -21,7 +21,7 @@ class CreateActionsTable extends Migration
           $table->foreign('state_id')->references('id')->on('states');
           $table->string('type', 30); //include which button pressed, type of answer given, etc
           $table->text('detail')->nullable();
-          $table->text('description')->nullable();
+          //$table->text('description')->nullable();
           $table->unsignedInteger('time');
           $table->timestamps();
         });

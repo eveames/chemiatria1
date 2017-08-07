@@ -19,7 +19,12 @@ window.Vuex = require('vuex');
 Vue.component('example', require('./components/Example.vue'));
 Vue.component('test1', require('./components/Test.vue'));
 Vue.component('study-session', require('./components/StudySession.vue'));
+Vue.component('word-question', require('./components/WordQuestion.vue'));
 import store from './vuex/store';
+import RandomGeneratorPlugin from './plugins/RandomGeneratorPlugin.js';
+import FactPriorityPlugin from './plugins/FactPriorityPlugin.js';
+Vue.use(RandomGeneratorPlugin);
+Vue.use(FactPriorityPlugin);
 //console.log('did something');
 
 const app = new Vue({

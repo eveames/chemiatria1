@@ -20,7 +20,7 @@ const actions = {
   setupFacts ({commit}) {
     axios.get('../api/student/facts')
     .then(function (response) {
-      console.log("facts data is ", + response.data);
+      //console.log("facts data is ", + response.data);
       //console.log(response.data[1])
       //console.log(response.data.length);
       let temp = response.data;
@@ -44,7 +44,7 @@ const mutations = {
   [types.INITIALIZE_FACTS] (state, facts) {
     //console.log("in mutation, words is: " + words);
     state.facts = facts;
-    console.log('facts set');
+    //console.log('facts set');
     state.factsReady = true;
   }
 }

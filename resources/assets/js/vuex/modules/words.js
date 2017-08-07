@@ -43,7 +43,7 @@ const actions = {
 // mutations
 const mutations = {
   [types.INITIALIZE_WORDS] (state, words) {
-    console.log("in INITIALIZE_WORDS, words is: " + words);
+    //console.log("in INITIALIZE_WORDS, words is: " + words);
     state.words = words;
     //console.log(state.words[1].altwords[0]);
     state.wordsReady = true;

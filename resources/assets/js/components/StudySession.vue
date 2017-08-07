@@ -1,7 +1,8 @@
 <template>
 <div>
-  <example></example>
-  <test1></test1>
+  <example :status="ready"></example>
+  <word-question v-if="ready === true">
+  </word-question>
 </div>
 </template>
 <style>
@@ -15,20 +16,26 @@ export default {
       wordsStatus: 'checkWordsReady',
       factsStatus: 'checkFactsReady',
       statesStatus: 'checkStatesReady',
-      currentQuestionState: 'getCurrent'
-    })
+      currentQuestionState: 'getCurrent',
+      setupReady: 'checkSetup'
+    }),
+    ready () {
+      if(this.setupReady === true && typeof(this.currentQuestionState) !== 'undefined') {
+        return true;
+      }
+      else return false;
+    }
   },
   created () {
     Promise.all([this.$store.dispatch('setupWords'),
     this.$store.dispatch('setupStates')])
     //this.$store.dispatch('setupFacts')])
     .then((results) => {
-      console.log(results);
-      console.log('promise resolved, in then')
+      //console.log(results);
+      //console.log('promise resolved, in then')
       this.$store.dispatch('setReady')
       let curr = this.currentQuestionState;
-      console.log("curr is ", curr)
-      this.$store.dispatch('setQuestion', curr)
+      this.$store.dispatch('setQuestionStart');
     })
 
   }

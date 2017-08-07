@@ -11,6 +11,7 @@ use chemiatria\Altword;
 use chemiatria\Fact;
 use Illuminate\Support\Facades\Auth;
 use chemiatria\Helpers\SessionPlanHelper;
+use chemiatria\Action;
 
 class ApiController extends Controller
 {
@@ -154,8 +155,8 @@ class ApiController extends Controller
         //$update = $request->all();
         $state = Auth::user()->states()->find($id);
         $state->lastStudied = $request->lastStudied;
-        $state->accuracyArray = json_encode($request->accuracyArray);
-        $state->rtArray = json_encode($request->rtArray);
+        $state->accuracies = json_encode($request->accs);
+        $state->rts = json_encode($request->rts);
         $state->stage = $request->stage;
         $state->priority = $request->priority;
 
@@ -190,9 +191,13 @@ class ApiController extends Controller
     public function postAction(Request $request) {
     	//posts action to actions table
         try {
-            $action = new Action($request->all());
+            $action = new Action();
+            $action->state_id = $request->state_id;
+            $action->type = $request->type;
+            $action->detail = json_encode($request->detail);
+            $action->time = $request->time;
             Auth::user()->actions()->save($action);
-            return [$request->qID, $action->type];
+            return ['saved successfully'];
         }
         catch(Exception $e) {
             $errorMessage = 'Caught exception: ' . $e->getMessage();
