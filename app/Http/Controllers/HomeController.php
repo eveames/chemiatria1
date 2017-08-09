@@ -27,9 +27,11 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(SessionPlanHelper $formatter)
     {
-        return view('home')->with('user', auth()->user());
+        $user = auth()->user();
+        $numDueToReview = $formatter->checkDue($user);
+        return view('home')->with('user', auth()->user())->with('numDueToReview', $numDueToReview);
     }
 
     public function email_progress()

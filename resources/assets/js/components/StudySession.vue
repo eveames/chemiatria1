@@ -1,8 +1,8 @@
 <template>
 <div>
-  <example :status="ready"></example>
   <word-question v-if="ready === true">
   </word-question>
+  <bug-report></bug-report><frustration-report></frustration-report><suggestion-box></suggestion-box>
 </div>
 </template>
 <style>
@@ -28,8 +28,8 @@ export default {
   },
   created () {
     Promise.all([this.$store.dispatch('setupWords'),
-    this.$store.dispatch('setupStates')])
-    //this.$store.dispatch('setupFacts')])
+    this.$store.dispatch('setupStates'),
+    this.$store.dispatch('setupFacts')])
     .then((results) => {
       //console.log(results);
       //console.log('promise resolved, in then')

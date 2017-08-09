@@ -23,13 +23,13 @@
                     <a class="btn btn-small btn-success" href="{{ URL::to('home/play') }}">Continue previous session</a>
                 </div>
                 <div class="panel-body">
-                  <div>Use this button to review your progress, add new material to study, and setup you new study session</div>
+                  <div>Use this button to review your progress, add new material to study, and setup your new study session</div>
                     <a class="btn btn-small btn-success" href="{{ URL::to('home/plan') }}">Setup new session</a>
                 </div>
 
                 <div class="panel-body">
-                  @if('review-recommended')
-                    <div>You have topics to review! We recommend that you do some review regularly so you don't forget.</div>
+                  @if('numDueToReview' != 0)
+                    <div>You have {{ $numDueToReview }} topics to review! We recommend that you do some review regularly so you don't forget.</div>
                   @else
                     <div>You are caught up and have no recommended review topics, but you can review anyway.</div>
                   @endif
@@ -39,6 +39,9 @@
                 @can('create_word')
                 <div class="panel-body">
                   <a class="btn btn-small btn-success" href="{{ url('/words') }}">View Vocab Words</a>
+                </div>
+                <div class="panel-body">
+                  <a class="btn btn-small btn-success" href="{{ url('/facts') }}">View Facts</a>
                 </div>
                 @endcan
             </div>

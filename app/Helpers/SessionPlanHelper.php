@@ -41,6 +41,12 @@ class SessionPlanHelper
     return $data;
   }
 
+  public function checkDue(User $user)
+  {
+    $dueToReview = $user->states()->whereBetween('priority',[1000, time()+3600])->get();
+    return $dueToReview->count();
+  }
+
   //
   public function organizeNew(User $user)
   {

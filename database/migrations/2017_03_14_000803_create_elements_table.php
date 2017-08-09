@@ -18,7 +18,7 @@ class CreateElementsTable extends Migration
     public function up()
     {
         Schema::create('elements', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id'); //atomic number
             $table->string('name', 20)->unique(); //eg iron
             $table->string('symbol', 3)->unique(); // eg Fe
             $table->string('families',10); //list of number codes

@@ -15,8 +15,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::resource('words', 'WordController');
+Route::resource('facts', 'FactController');
 
 Route::get('/words/topics/{id}', 'WordController@topic_search');
+Route::get('/facts/topics/{id}', 'FactController@topic_search');
 
 Auth::routes();
 

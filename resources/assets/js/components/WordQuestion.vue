@@ -1,23 +1,33 @@
 <template>
-<div>
-  <h3>Vocab Practice!</h3>
-  <p>Instructions: Enter the vocab word that matches the prompt (many words have
-    several prompts). If you do not
-    know the answer, enter 0 (zero) to display the answer, move on and come back
-    to it later. Answers are case-sensitive; use all lower-case unless there is a
-    specific reason to capitalize something, like a proper name or element symbol.
-  </p>
-  <br>
-  <h4>{{word.prompts[0]}}</h4>
-  <br>
-  <div class="input-group">
-    <input autofocus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
-    <span class="input-group-btn">
-      <button @click="submitEntry" class="btn btn-default"
-      type="button">Submit answer!</button>
-    </span>
-    <br>
-    <p>{{feedback}}</p>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">Vocab Practice!</div>
+
+                  <div class="panel-body">
+                    Instructions: Enter the vocab word that matches the prompt (many words have
+                      several prompts). If you do not
+                      know the answer, enter 0 (zero) to display the answer, move on and come back
+                      to it later. Answers are case-sensitive; use all lower-case unless there is a
+                      specific reason to capitalize something, like a proper name or element symbol.
+                    <br>
+                    <div >
+                      <h4>{{word.prompts[0]}}</h4>
+                      <br>
+                      <div class="input-group">
+                        <input autofocus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
+                        <span class="input-group-btn">
+                          <button @click="submitEntry" class="btn btn-default"
+                            type="button">Submit answer!</button>
+                        </span>
+                      </div>
+                      <br>
+                      <div v-show="feedback" class="alert" v-bind:class="feedbackType"><p>{{feedback}}</p></div>
+                  </div>
+              </div>
+          </div>
+      </div>
   </div>
 </div>
 </template>
@@ -36,7 +46,10 @@ export default {
       feedback: '',
       acc: 0,
       rts: [],
-      startTime: 0
+      startTime: 0,
+      feedbackType: {
+        "alert-success": true,
+      }
     }
   },
   //props: ['questionTypeID'],
@@ -78,7 +91,9 @@ export default {
     		moveOn = true;
         gotIt = true;
         this.acc = this.tries-1;
-        console.log('acc is set to ', this.acc)
+        this.feedbackType = {"alert-success": true}
+
+        //console.log('acc is set to ', this.acc)
     	}
     	else if (correct === 'dontKnow') {
     		moveOn = true;
@@ -93,10 +108,15 @@ export default {
         "${this.answers[0].alt}". We\'ll come back to it.`;
         this.acc = 4;
       }
+      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close'
+        || answerDetail.correct === 'dontKnow') {
+        this.feedbackType = {"alert-warning": true}
+      }
+      else if (gotIt === false) this.feedbackType = {"alert-danger": true}
       this.feedback = answerDetail.messageSent;
       let action = {};
       action.state_id = this.currentQuestion[4];
-      action.type = 'answer given';
+      action.type = 'answer given-' + correct;
       action.detail = answerDetail;
       action.time = answerDetail.timeStamp;
 

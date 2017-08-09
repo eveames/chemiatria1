@@ -1205,10 +1205,10 @@ const SET_USER = 'SET_USER'
 /* unused harmony export SET_USER */
 
 const UPDATE_STAGE = 'UPDATE_STAGE'
-/* harmony export (immutable) */ __webpack_exports__["h"] = UPDATE_STAGE;
+/* harmony export (immutable) */ __webpack_exports__["i"] = UPDATE_STAGE;
 
 const UPDATE_RTS_ACCS = 'UPDATE_RTS_ACCS'
-/* harmony export (immutable) */ __webpack_exports__["g"] = UPDATE_RTS_ACCS;
+/* harmony export (immutable) */ __webpack_exports__["h"] = UPDATE_RTS_ACCS;
 
 const INCREMENT_FRUSTRATION = 'INCREMENT_FRUSTRATION'
 /* unused harmony export INCREMENT_FRUSTRATION */
@@ -1218,13 +1218,16 @@ const INCREMENT_HINTS = 'INCREMENT_HINTS'
 
 //export const NEW_QUESTION = 'NEW_QUESTION'
 const SET_READY = 'SET_READY'
-/* harmony export (immutable) */ __webpack_exports__["f"] = SET_READY;
+/* harmony export (immutable) */ __webpack_exports__["g"] = SET_READY;
 
 const SET_QUESTION = 'SET_QUESTION'
-/* harmony export (immutable) */ __webpack_exports__["d"] = SET_QUESTION;
+/* harmony export (immutable) */ __webpack_exports__["e"] = SET_QUESTION;
 
 const SET_QUESTION_START = 'SET_QUESTION_START'
-/* harmony export (immutable) */ __webpack_exports__["e"] = SET_QUESTION_START;
+/* harmony export (immutable) */ __webpack_exports__["f"] = SET_QUESTION_START;
+
+const SET_MESSAGE = 'SET_MESSAGE'
+/* harmony export (immutable) */ __webpack_exports__["d"] = SET_MESSAGE;
 
 
 
@@ -12157,6 +12160,9 @@ Vue.component('example', __webpack_require__(41));
 Vue.component('test1', __webpack_require__(47));
 Vue.component('study-session', __webpack_require__(50));
 Vue.component('word-question', __webpack_require__(72));
+Vue.component('bug-report', __webpack_require__(79));
+Vue.component('frustration-report', __webpack_require__(82));
+Vue.component('suggestion-box', __webpack_require__(85));
 
 
 
@@ -43457,9 +43463,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
   created: function created() {
     var _this = this;
 
-    Promise.all([this.$store.dispatch('setupWords'), this.$store.dispatch('setupStates')])
-    //this.$store.dispatch('setupFacts')])
-    .then(function (results) {
+    Promise.all([this.$store.dispatch('setupWords'), this.$store.dispatch('setupStates'), this.$store.dispatch('setupFacts')]).then(function (results) {
       //console.log(results);
       //console.log('promise resolved, in then')
       _this.$store.dispatch('setReady');
@@ -43474,11 +43478,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('example', {
-    attrs: {
-      "status": _vm.ready
-    }
-  }), _vm._v(" "), (_vm.ready === true) ? _c('word-question') : _vm._e()], 1)
+  return _c('div', [(_vm.ready === true) ? _c('word-question') : _vm._e(), _vm._v(" "), _c('bug-report'), _c('frustration-report'), _c('suggestion-box')], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -43689,7 +43689,7 @@ var actions = {
         }
         //console.log(states);
         commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_STATES */], states);
-        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* SET_QUESTION */]);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_QUESTION */]);
         resolve();
       }).catch(function (error) {
         console.log(error);
@@ -43700,12 +43700,12 @@ var actions = {
   updateRtsAccs: function updateRtsAccs(_ref2, newState) {
     var commit = _ref2.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* UPDATE_RTS_ACCS */], newState);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* UPDATE_RTS_ACCS */], newState);
   },
   updateStage: function updateStage(_ref3, newState) {
     var commit = _ref3.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* UPDATE_STAGE */], newState);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* UPDATE_STAGE */], newState);
   },
   setQuestion: function setQuestion(_ref4) {
     var commit = _ref4.commit;
@@ -43719,7 +43719,7 @@ var actions = {
     axios.post(url, state.states[prev]).catch(function (error) {
       console.log(error);
     });
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* SET_QUESTION */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_QUESTION */]);
     //console.log('after SET_QUESTION, prev is ', prev)
   }
 };
@@ -43728,7 +43728,7 @@ var actions = {
 var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_STATES */], function (state, states) {
   state.states = states;
   state.statesReady = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* SET_QUESTION */], function (state) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_QUESTION */], function (state) {
   //console.log('before getNext index is ', state.currentIndex)
   state.currentIndex = getNext();
   //console.log('after getNext index is ', state.currentIndex)
@@ -43737,12 +43737,12 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
   state.currentStage = state.states[state.currentIndex].stage;
   state.currentStateID = state.states[state.currentIndex].id;
   state.states[state.currentIndex].lastStudied = Date.now();
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* UPDATE_RTS_ACCS */], function (state, newState) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* UPDATE_RTS_ACCS */], function (state, newState) {
   console.log("newState is ", newState);
   state.states[state.currentIndex].accs.push(newState.accs);
   state.states[state.currentIndex].rts.push(newState.rts);
   console.log("state is now ", state.states[state.currentIndex]);
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* UPDATE_STAGE */], function (state, newState) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* UPDATE_STAGE */], function (state, newState) {
   console.log("newState is ", newState);
   state.states[state.currentIndex].priority = newState.priority;
   state.states[state.currentIndex].stage = newState.stage;
@@ -43892,7 +43892,8 @@ var state = {
   questionSetTime: 0,
   frustrationCount: 0, //counts how many times user indicates frustrationCount
   hintCount: 0, //counts how many times user requests hint
-  errors: "" //collects session errors for display
+  errors: "", //collects session errors for display
+  message: ''
 };
 
 // getters
@@ -43911,20 +43912,27 @@ var actions = {
     var commit = _ref.commit;
 
     //console.log('setReady');
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_READY */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_READY */]);
   },
   setQuestionStart: function setQuestionStart(_ref2) {
     var commit = _ref2.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_QUESTION_START */], Date.now());
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_QUESTION_START */], Date.now());
+  },
+  setMessage: function setMessage(_ref3, message) {
+    var commit = _ref3.commit;
+
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* SET_MESSAGE */], message);
   }
 };
 
 // mutations
-var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_READY */], function (state) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_READY */], function (state) {
   state.setupComplete = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_QUESTION_START */], function (state, time) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_QUESTION_START */], function (state, time) {
   state.questionSetTime = time;
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* SET_MESSAGE */], function (state, message) {
+  state.message = message;
 }), _mutations);
 
 /* harmony default export */ __webpack_exports__["a"] = ({
@@ -44027,7 +44035,7 @@ exports = module.exports = __webpack_require__(12)(undefined);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -44068,6 +44076,16 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -44079,7 +44097,10 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       feedback: '',
       acc: 0,
       rts: [],
-      startTime: 0
+      startTime: 0,
+      feedbackType: {
+        "alert-success": true
+      }
     };
   },
   //props: ['questionTypeID'],
@@ -44122,7 +44143,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         moveOn = true;
         gotIt = true;
         this.acc = this.tries - 1;
-        console.log('acc is set to ', this.acc);
+        this.feedbackType = { "alert-success": true };
+
+        //console.log('acc is set to ', this.acc)
       } else if (correct === 'dontKnow') {
         moveOn = true;
       } else {
@@ -44134,10 +44157,13 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         answerDetail.messageSent = 'Answer to "' + this.word.prompts[0] + '" is\n        "' + this.answers[0].alt + '". We\'ll come back to it.';
         this.acc = 4;
       }
+      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
+        this.feedbackType = { "alert-warning": true };
+      } else if (gotIt === false) this.feedbackType = { "alert-danger": true };
       this.feedback = answerDetail.messageSent;
       var action = {};
       action.state_id = this.currentQuestion[4];
-      action.type = 'answer given';
+      action.type = 'answer given-' + correct;
       action.detail = answerDetail;
       action.time = answerDetail.timeStamp;
 
@@ -44210,7 +44236,19 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('h3', [_vm._v("Vocab Practice!")]), _vm._v(" "), _c('p', [_vm._v("Instructions: Enter the vocab word that matches the prompt (many words have\n    several prompts). If you do not\n    know the answer, enter 0 (zero) to display the answer, move on and come back\n    to it later. Answers are case-sensitive; use all lower-case unless there is a\n    specific reason to capitalize something, like a proper name or element symbol.\n  ")]), _vm._v(" "), _c('br'), _vm._v(" "), _c('h4', [_vm._v(_vm._s(_vm.word.prompts[0]))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+  return _c('div', {
+    staticClass: "container"
+  }, [_c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-md-8 col-md-offset-2"
+  }, [_c('div', {
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._v("Vocab Practice!")]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_vm._v("\n                    Instructions: Enter the vocab word that matches the prompt (many words have\n                      several prompts). If you do not\n                      know the answer, enter 0 (zero) to display the answer, move on and come back\n                      to it later. Answers are case-sensitive; use all lower-case unless there is a\n                      specific reason to capitalize something, like a proper name or element symbol.\n                    "), _c('br'), _vm._v(" "), _c('div', [_c('h4', [_vm._v(_vm._s(_vm.word.prompts[0]))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
     staticClass: "input-group"
   }, [_c('input', {
     directives: [{
@@ -44247,7 +44285,16 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "click": _vm.submitEntry
     }
-  }, [_vm._v("Submit answer!")])]), _vm._v(" "), _c('br'), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.feedback))])])])
+  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.feedback),
+      expression: "feedback"
+    }],
+    staticClass: "alert",
+    class: _vm.feedbackType
+  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])])])])])])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -44343,6 +44390,596 @@ if (false) {
     };
   }
 });
+
+/***/ }),
+/* 79 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(4)(
+  /* script */
+  __webpack_require__(81),
+  /* template */
+  __webpack_require__(80),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/BugReport.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] BugReport.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-76703749", Component.options)
+  } else {
+    hotAPI.reload("data-v-76703749", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 80 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.show),
+      expression: "!show"
+    }],
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.showForm
+    }
+  }, [_vm._v("Report Bug")]), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.show),
+      expression: "show"
+    }],
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._v("Report Bug")]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_c('div', [_vm._v("I'm sorry it's not working! Please describe what's gone wrong in detail so I can fix it.")]), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_c('textarea', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.entry),
+      expression: "entry"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "autofocus": "",
+      "type": "text"
+    },
+    domProps: {
+      "value": (_vm.entry)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.entry = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit bug!")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.cancel
+    }
+  }, [_vm._v("Cancel")])])])])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-76703749", module.exports)
+  }
+}
+
+/***/ }),
+/* 81 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      show: false
+    };
+  },
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    stateID: 'getCurrentStateID'
+  })),
+  methods: {
+    showForm: function showForm(event) {
+      this.show = !this.show;
+    },
+    submitEntry: function submitEntry(event) {
+      var _this = this;
+
+      var action = { type: 'bug report', detail: this.entry,
+        state_id: this.stateID, time: Date.now() };
+      axios.post('../api/student/actions', action).then(function (results) {
+        _this.$store.dispatch('setMessage', 'Thank you for your bug report!');
+        _this.show = !_this.show;
+        _this.entry = '';
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
+    cancel: function cancel(event) {
+      var action = { type: 'bug report', detail: 'cancelled',
+        state_id: this.stateID, time: Date.now() };
+      axios.post('../api/student/actions', action).catch(function (error) {
+        console.log(error);
+      });
+      this.show = !this.show;
+    }
+  }
+});
+
+/***/ }),
+/* 82 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(4)(
+  /* script */
+  __webpack_require__(83),
+  /* template */
+  __webpack_require__(84),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/FrustrationReport.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] FrustrationReport.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-3ce0fc22", Component.options)
+  } else {
+    hotAPI.reload("data-v-3ce0fc22", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 83 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      show: false
+    };
+  },
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    stateID: 'getCurrentStateID'
+  })),
+  methods: {
+    showForm: function showForm(event) {
+      this.show = !this.show;
+    },
+    submitEntry: function submitEntry(event) {
+      var _this = this;
+
+      var action = { type: 'frustrated', detail: this.entry,
+        state_id: this.stateID, time: Date.now() };
+      axios.post('../api/student/actions', action).then(function (results) {
+        _this.$store.dispatch('setMessage', 'Thanks for sharing your experience!');
+        _this.show = !_this.show;
+        _this.entry = '';
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
+    cancel: function cancel(event) {
+      var action = { type: 'frustrated', detail: 'null',
+        state_id: this.stateID, time: Date.now() };
+      axios.post('../api/student/actions', action).catch(function (error) {
+        console.log(error);
+      });
+      this.show = !this.show;
+    }
+  }
+});
+
+/***/ }),
+/* 84 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.show),
+      expression: "!show"
+    }],
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.showForm
+    }
+  }, [_vm._v("I'm frustrated")]), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.show),
+      expression: "show"
+    }],
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._v("Frustration")]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_c('div', [_vm._v("I'm sorry you're frustrated! Please tell me why so I can improve the app.")]), _vm._v(" "), _c('div', {}, [_c('textarea', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.entry),
+      expression: "entry"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "autofocus": "",
+      "type": "text"
+    },
+    domProps: {
+      "value": (_vm.entry)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.entry = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default btn-block",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit experience")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default btn-block",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.cancel
+    }
+  }, [_vm._v("Never mind, I just wanted to express myself")])])])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-3ce0fc22", module.exports)
+  }
+}
+
+/***/ }),
+/* 85 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(4)(
+  /* script */
+  __webpack_require__(86),
+  /* template */
+  __webpack_require__(87),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/SuggestionBox.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] SuggestionBox.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-600887a8", Component.options)
+  } else {
+    hotAPI.reload("data-v-600887a8", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 86 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      show: false
+    };
+  },
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    stateID: 'getCurrentStateID'
+  })),
+  methods: {
+    showForm: function showForm(event) {
+      this.show = !this.show;
+    },
+    submitEntry: function submitEntry(event) {
+      var _this = this;
+
+      var action = { type: 'suggestion', detail: this.entry,
+        state_id: this.stateID, time: Date.now() };
+      axios.post('../api/student/actions', action).then(function (results) {
+        _this.$store.dispatch('setMessage', 'Thanks for sharing your suggestion!');
+        _this.show = !_this.show;
+        _this.entry = '';
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
+    cancel: function cancel(event) {
+      var action = { type: 'suggestion', detail: 'null',
+        state_id: this.stateID, time: Date.now() };
+      axios.post('../api/student/actions', action).catch(function (error) {
+        console.log(error);
+      });
+      this.show = !this.show;
+    }
+  }
+});
+
+/***/ }),
+/* 87 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.show),
+      expression: "!show"
+    }],
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.showForm
+    }
+  }, [_vm._v("Make a suggestion")]), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.show),
+      expression: "show"
+    }],
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._v("Suggestion")]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_c('div', [_vm._v("Cool! Please describe below:")]), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_c('textarea', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.entry),
+      expression: "entry"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "autofocus": "",
+      "type": "text"
+    },
+    domProps: {
+      "value": (_vm.entry)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.entry = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('div', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default btn-block",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit suggestion")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default btn-block",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.cancel
+    }
+  }, [_vm._v("Cancel")])])])])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-600887a8", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

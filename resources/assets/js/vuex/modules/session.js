@@ -8,7 +8,8 @@ const state = {
   questionSetTime: 0,
   frustrationCount: 0, //counts how many times user indicates frustrationCount
   hintCount: 0, //counts how many times user requests hint
-  errors: "" //collects session errors for display
+  errors: "", //collects session errors for display
+  message: ''
 }
 
 // getters
@@ -25,6 +26,9 @@ const actions = {
   },
   setQuestionStart ({commit}) {
     commit(types.SET_QUESTION_START, Date.now())
+  },
+  setMessage ({commit}, message) {
+    commit(types.SET_MESSAGE, message)
   }
 }
 
@@ -35,6 +39,9 @@ const mutations = {
   },
   [types.SET_QUESTION_START] (state, time) {
     state.questionSetTime = time;
+  },
+  [types.SET_MESSAGE] (state, message) {
+    state.message = message;
   }
 }
 
