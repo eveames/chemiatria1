@@ -18,24 +18,27 @@ const getters = {
 // actions
 const actions = {
   setupFacts ({commit}) {
-    axios.get('../api/student/facts')
-    .then(function (response) {
-      //console.log("facts data is ", + response.data);
-      //console.log(response.data[1])
-      //console.log(response.data.length);
-      let temp = response.data;
-      let facts = [];
-      //console.log(typeof(words));
-      for(let i = 0; i < temp.length; i++ ) {
-        facts.push(temp[i]);
-      }
-      //console.log(words);
-      //console.log(typeof(words));
-        commit(types.INITIALIZE_FACTS, facts);
-    })
-    .catch(function (error) {
-        console.log(error);
-    });
+    return new Promise((resolve, reject) => {
+      axios.get('../api/student/facts')
+      .then((response) => {
+        //console.log("facts data is ", + response.data);
+        //console.log(response.data[1])
+        //console.log(response.data.length);
+        let temp = response.data;
+        let facts = [];
+        //console.log(typeof(words));
+        for(let i = 0; i < temp.length; i++ ) {
+          facts.push(temp[i]);
+        }
+        //console.log(words);
+        //console.log(typeof(words));
+          commit(types.INITIALIZE_FACTS, facts);
+          resolve()
+      }).catch((error) => {
+          console.log(error);
+          reject();
+        });
+      })
   }
 }
 

@@ -12160,6 +12160,8 @@ Vue.component('example', __webpack_require__(41));
 Vue.component('test1', __webpack_require__(47));
 Vue.component('study-session', __webpack_require__(50));
 Vue.component('word-question', __webpack_require__(72));
+Vue.component('fact-question', __webpack_require__(88));
+Vue.component('polyatomic-ion-question', __webpack_require__(93));
 Vue.component('bug-report', __webpack_require__(79));
 Vue.component('frustration-report', __webpack_require__(82));
 Vue.component('suggestion-box', __webpack_require__(85));
@@ -12169,6 +12171,17 @@ Vue.component('suggestion-box', __webpack_require__(85));
 Vue.use(__WEBPACK_IMPORTED_MODULE_1__plugins_RandomGeneratorPlugin_js__["a" /* default */]);
 Vue.use(__WEBPACK_IMPORTED_MODULE_2__plugins_FactPriorityPlugin_js__["a" /* default */]);
 //console.log('did something');
+Vue.filter('formatFormula', function (value) {
+  var str = String(value);
+  var escapeRE = /\/|&|<|>|'|"/;
+  if (escapeRE.test(str)) return "Please enter a correctly formatted formula (see example)";else {
+    str = str.replace(/([\w)\]])(\d)/g, '$1<sub>$2</sub>');
+    str = str.replace(/([+])(\d+)/, '<sup>$2$1</sup>');
+    str = str.replace(/([-])(\d+)/, '<sup>$2&minus;</sup>');
+    str = str.replace(/(<sup>)(1)([+&])/, '$1$3');
+    return str;
+  }
+});
 
 var app = new Vue({
   el: '#app',
@@ -43420,7 +43433,7 @@ exports = module.exports = __webpack_require__(12)(undefined);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -43434,6 +43447,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+//
+//
 //
 //
 //
@@ -43478,7 +43493,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [(_vm.ready === true) ? _c('word-question') : _vm._e(), _vm._v(" "), _c('bug-report'), _c('frustration-report'), _c('suggestion-box')], 1)
+  return _c('div', [(_vm.ready === true && _vm.currentQuestionState[2] === 'word') ? _c('word-question') : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'fact') ? _c('fact-question') : _vm._e(), _vm._v(" "), _c('bug-report'), _c('frustration-report'), _c('suggestion-box')], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -43582,21 +43597,25 @@ var actions = {
   setupFacts: function setupFacts(_ref) {
     var commit = _ref.commit;
 
-    axios.get('../api/student/facts').then(function (response) {
-      //console.log("facts data is ", + response.data);
-      //console.log(response.data[1])
-      //console.log(response.data.length);
-      var temp = response.data;
-      var facts = [];
-      //console.log(typeof(words));
-      for (var i = 0; i < temp.length; i++) {
-        facts.push(temp[i]);
-      }
-      //console.log(words);
-      //console.log(typeof(words));
-      commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["a" /* INITIALIZE_FACTS */], facts);
-    }).catch(function (error) {
-      console.log(error);
+    return new Promise(function (resolve, reject) {
+      axios.get('../api/student/facts').then(function (response) {
+        //console.log("facts data is ", + response.data);
+        //console.log(response.data[1])
+        //console.log(response.data.length);
+        var temp = response.data;
+        var facts = [];
+        //console.log(typeof(words));
+        for (var i = 0; i < temp.length; i++) {
+          facts.push(temp[i]);
+        }
+        //console.log(words);
+        //console.log(typeof(words));
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["a" /* INITIALIZE_FACTS */], facts);
+        resolve();
+      }).catch(function (error) {
+        console.log(error);
+        reject();
+      });
     });
   }
 };
@@ -44978,6 +44997,680 @@ if (false) {
   module.hot.accept()
   if (module.hot.data) {
      require("vue-hot-reload-api").rerender("data-v-600887a8", module.exports)
+  }
+}
+
+/***/ }),
+/* 88 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(89)
+}
+var Component = __webpack_require__(4)(
+  /* script */
+  __webpack_require__(91),
+  /* template */
+  __webpack_require__(92),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/FactQuestion.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] FactQuestion.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1f3620fe", Component.options)
+  } else {
+    hotAPI.reload("data-v-1f3620fe", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 89 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(90);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(13)("2697d6f9", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-1f3620fe\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FactQuestion.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-1f3620fe\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FactQuestion.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 90 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(12)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 91 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      tries: 0,
+      feedback: '',
+      acc: 0,
+      rts: [],
+      startTime: 0,
+      feedbackType: {
+        "alert-success": true
+      }
+    };
+  },
+  //props: ['questionTypeID'],
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    currentQuestion: 'getCurrent',
+    questionSetTime: 'getQuestionSetTime',
+    stageData: 'getStageData'
+  }), {
+    fact: function fact() {
+      return this.$store.getters.getFactById(this.currentQuestion[1]);
+    },
+    answers: function answers() {
+      var temp = [{ alt: this.word.word, correct: 'correct' }];
+      temp = temp.concat(this.word.altwords);
+      return temp;
+    }
+  }),
+  created: function created() {},
+
+  methods: {
+
+    submitEntry: function submitEntry(event) {
+      this.tries += 1;
+      var answerDetail = this.checkEntry();
+      if (this.startTime === 0) {
+        this.startTime = this.questionSetTime;
+      }
+      answerDetail.timeStamp = Date.now();
+
+      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
+      console.log('rts is set to ', this.rts);
+      this.startTime = Date.now();
+
+      var correct = answerDetail.correct;
+      var moveOn = false;
+      var gotIt = false;
+
+      if (correct === 'correct') {
+        answerDetail.messageSent += ' Correct!';
+        moveOn = true;
+        gotIt = true;
+        this.acc = this.tries - 1;
+        this.feedbackType = { "alert-success": true };
+
+        //console.log('acc is set to ', this.acc)
+      } else if (correct === 'dontKnow') {
+        moveOn = true;
+      } else {
+        if (this.tries < 3) {
+          answerDetail.messageSent += "Try again!";
+        } else moveOn = true;
+      }
+      if (moveOn === true && gotIt === false) {
+        answerDetail.messageSent = 'Answer to "' + this.word.prompts[0] + '" is\n        "' + this.answers[0].alt + '". We\'ll come back to it.';
+        this.acc = 4;
+      }
+      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
+        this.feedbackType = { "alert-warning": true };
+      } else if (gotIt === false) this.feedbackType = { "alert-danger": true };
+      this.feedback = answerDetail.messageSent;
+      var action = {};
+      action.state_id = this.currentQuestion[4];
+      action.type = 'answer given-' + correct;
+      action.detail = answerDetail;
+      action.time = answerDetail.timeStamp;
+
+      //this code gives a 500 error now, should check laravel side
+      //console.log("action is ", action);
+      axios.post('../api/student/actions', action).catch(function (error) {
+        console.log(error);
+      });
+
+      if (moveOn) {
+        //update states
+
+        var updatedState = { rts: this.rts, accs: this.acc };
+        console.log("updatedState is", updatedState);
+        this.$store.dispatch('updateRtsAccs', updatedState);
+        updatedState = Vue.factPriorityHelper(this.stageData);
+        this.$store.dispatch('updateStage', updatedState);
+
+        //set new question
+        //console.log('about to set new question');
+        this.$store.dispatch('setQuestion');
+        this.$store.dispatch('setQuestionStart');
+
+        //update props
+        this.entry = '';
+        this.tries = 0;
+        this.acc = 0;
+        this.rts = [];
+      }
+    },
+
+    //checks the entry, returns answerDetail
+    checkEntry: function checkEntry() {
+      var answerDetailToReturn = { messageSent: '' };
+      //console.log('this.entry: ', this.entry);
+      //console.log('this.answer: ', this.answers);
+      if (this.entry === '') {
+        answerDetailToReturn.correct = 'noAnswer';
+        answerDetailToReturn.messageSent += 'If you don\'t know the answer to a vocab question, enter zero. ';
+      } else if (Number(this.entry) === 0) {
+        answerDetailToReturn.correct = 'dontKnow';
+      } else {
+        for (var i = 0; i < this.answers.length; i++) {
+          if (this.entry === this.answers[i].alt) {
+            answerDetailToReturn.correct = this.answers[i].correct;
+            if (this.answers[i].message) {
+              answerDetailToReturn.messageSent += this.answers[i].message + ' ';
+            }
+            break;
+          } else if (this.entry.toLowerCase() === this.answers[i].alt.toLowerCase()) {
+            if (this.answers[i].correct === 'correct') {
+              answerDetailToReturn.correct = 'formatError';
+              answerDetailToReturn.messageSent += 'Almost there, please check your capitalization. ';
+              break;
+            }
+          }
+        }
+        if (!answerDetailToReturn.correct) {
+          answerDetailToReturn.correct = 'unknownWrong';
+          answerDetailToReturn.messageSent += 'I don\'t recognize your answer. Spell carefully! ';
+        }
+      }
+      return answerDetailToReturn;
+    }
+  }
+});
+
+/***/ }),
+/* 92 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "container"
+  }, [_c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-md-8 col-md-offset-2"
+  }, [(_vm.fact.group_name === 'polyatomic ions') ? _c('polyatomic-ion-question') : _vm._e()], 1)])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-1f3620fe", module.exports)
+  }
+}
+
+/***/ }),
+/* 93 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(94)
+}
+var Component = __webpack_require__(4)(
+  /* script */
+  __webpack_require__(96),
+  /* template */
+  __webpack_require__(97),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/PolyatomicIonQuestion.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] PolyatomicIonQuestion.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-4eb7e7d0", Component.options)
+  } else {
+    hotAPI.reload("data-v-4eb7e7d0", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 94 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(95);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(13)("7300aa3e", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-4eb7e7d0\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./PolyatomicIonQuestion.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-4eb7e7d0\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./PolyatomicIonQuestion.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 95 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(12)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 96 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      tries: 0,
+      feedback: '',
+      acc: 0,
+      rts: [],
+      startTime: 0,
+      feedbackType: {
+        "alert-success": true
+      }
+    };
+  },
+  //props: ['questionTypeID'],
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    currentQuestion: 'getCurrent',
+    questionSetTime: 'getQuestionSetTime',
+    stageData: 'getStageData'
+  }), {
+    fact: function fact() {
+      return this.$store.getters.getFactById(this.currentQuestion[1]);
+    },
+    answers: function answers() {
+      var temp = [{ alt: this.word.word, correct: 'correct' }];
+      temp = temp.concat(this.word.altwords);
+      return temp;
+    },
+    coinFlip: function coinFlip() {
+      return Math.random() >= 0.5;
+    }
+  }),
+  created: function created() {},
+
+  methods: {
+
+    submitEntry: function submitEntry(event) {
+      this.tries += 1;
+      var answerDetail = this.checkEntry();
+      if (this.startTime === 0) {
+        this.startTime = this.questionSetTime;
+      }
+      answerDetail.timeStamp = Date.now();
+
+      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
+      console.log('rts is set to ', this.rts);
+      this.startTime = Date.now();
+
+      var correct = answerDetail.correct;
+      var moveOn = false;
+      var gotIt = false;
+
+      if (correct === 'correct') {
+        answerDetail.messageSent += ' Correct!';
+        moveOn = true;
+        gotIt = true;
+        this.acc = this.tries - 1;
+        this.feedbackType = { "alert-success": true };
+
+        //console.log('acc is set to ', this.acc)
+      } else if (correct === 'dontKnow') {
+        moveOn = true;
+      } else {
+        if (this.tries < 3) {
+          answerDetail.messageSent += "Try again!";
+        } else moveOn = true;
+      }
+      if (moveOn === true && gotIt === false) {
+        answerDetail.messageSent = 'Answer to "' + this.word.prompts[0] + '" is\n        "' + this.answers[0].alt + '". We\'ll come back to it.';
+        this.acc = 4;
+      }
+      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
+        this.feedbackType = { "alert-warning": true };
+      } else if (gotIt === false) this.feedbackType = { "alert-danger": true };
+      this.feedback = answerDetail.messageSent;
+      var action = {};
+      action.state_id = this.currentQuestion[4];
+      action.type = 'answer given-' + correct;
+      action.detail = answerDetail;
+      action.time = answerDetail.timeStamp;
+
+      //this code gives a 500 error now, should check laravel side
+      //console.log("action is ", action);
+      axios.post('../api/student/actions', action).catch(function (error) {
+        console.log(error);
+      });
+
+      if (moveOn) {
+        //update states
+
+        var updatedState = { rts: this.rts, accs: this.acc };
+        console.log("updatedState is", updatedState);
+        this.$store.dispatch('updateRtsAccs', updatedState);
+        updatedState = Vue.factPriorityHelper(this.stageData);
+        this.$store.dispatch('updateStage', updatedState);
+
+        //set new question
+        //console.log('about to set new question');
+        this.$store.dispatch('setQuestion');
+        this.$store.dispatch('setQuestionStart');
+
+        //update props
+        this.entry = '';
+        this.tries = 0;
+        this.acc = 0;
+        this.rts = [];
+      }
+    },
+
+    //checks the entry, returns answerDetail
+    checkEntry: function checkEntry() {
+      var answerDetailToReturn = { messageSent: '' };
+      //console.log('this.entry: ', this.entry);
+      //console.log('this.answer: ', this.answers);
+      if (this.entry === '') {
+        answerDetailToReturn.correct = 'noAnswer';
+        answerDetailToReturn.messageSent += 'If you don\'t know the answer to a vocab question, enter zero. ';
+      } else if (Number(this.entry) === 0) {
+        answerDetailToReturn.correct = 'dontKnow';
+      } else {
+        for (var i = 0; i < this.answers.length; i++) {
+          if (this.entry === this.answers[i].alt) {
+            answerDetailToReturn.correct = this.answers[i].correct;
+            if (this.answers[i].message) {
+              answerDetailToReturn.messageSent += this.answers[i].message + ' ';
+            }
+            break;
+          } else if (this.entry.toLowerCase() === this.answers[i].alt.toLowerCase()) {
+            if (this.answers[i].correct === 'correct') {
+              answerDetailToReturn.correct = 'formatError';
+              answerDetailToReturn.messageSent += 'Almost there, please check your capitalization. ';
+              break;
+            }
+          }
+        }
+        if (!answerDetailToReturn.correct) {
+          answerDetailToReturn.correct = 'unknownWrong';
+          answerDetailToReturn.messageSent += 'I don\'t recognize your answer. Spell carefully! ';
+        }
+      }
+      return answerDetailToReturn;
+    }
+  }
+});
+
+/***/ }),
+/* 97 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._v("Polyatomic Ions Practice!")]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_vm._v("\n          Instructions: fill in the missing information. If you are asked for a formula,\n          use the following format: write 'VO2+1' for " + _vm._s(_vm._f("formatFormula")("VO2+1")) + ".\n          "), _c('br'), _vm._v(" "), (_vm.coinFlip) ? _c('div', [_vm._v("\n            What is the formula of " + _vm._s(_vm.fact.prop) + "?\n\n            Your answer is: "), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.entry))
+    }
+  }), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.entry),
+      expression: "entry"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "autofocus": "",
+      "type": "text"
+    },
+    domProps: {
+      "value": (_vm.entry)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.entry = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.feedback),
+      expression: "feedback"
+    }],
+    staticClass: "alert",
+    class: _vm.feedbackType
+  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])]) : _vm._e(), _vm._v(" "), (!(_vm.coinFlip)) ? _c('div', [_vm._v("\n          What is the name of " + _vm._s(_vm._f("formatFormula")(_vm.fact.key)) + "?\n\n          "), _c('br'), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.entry),
+      expression: "entry"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "autofocus": "",
+      "type": "text"
+    },
+    domProps: {
+      "value": (_vm.entry)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.entry = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.feedback),
+      expression: "feedback"
+    }],
+    staticClass: "alert",
+    class: _vm.feedbackType
+  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])]) : _vm._e()])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-4eb7e7d0", module.exports)
   }
 }
 

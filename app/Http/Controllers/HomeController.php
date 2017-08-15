@@ -85,7 +85,7 @@ class HomeController extends Controller
       //unseen:
       $statesToSet1 = [];
       $statesToSet0 = [];
-      if(is_array($data['unseen']))
+      if(isset($data['unseen']) && is_array($data['unseen']))
         {
           $unseenUnset = array_diff_key($input['unseen'], $data['unseen']);
           foreach($unseenUnset as $arr)
@@ -93,7 +93,7 @@ class HomeController extends Controller
             $statesToSet0 = array_merge($statesToSet0, array_keys($arr));
           }
         }
-      if(is_array($data['due']))
+      if(isset($data['due']) && is_array($data['due']))
         {
           $dueSet = array_intersect_key($input['due'], $data['due']);
           foreach ($dueSet as $arr) {
@@ -104,14 +104,14 @@ class HomeController extends Controller
             $statesToSet0 = array_merge($statesToSet0, array_keys($arr));
           }
         }
-      if(is_array($data['prev']))
+      if(isset($data['prev']) && is_array($data['prev']))
         {
           $prevUnset = array_diff_key($input['prev'], $data['prev']);
           foreach ($prevUnset as $arr) {
             $statesToSet0 = array_merge($statesToSet0, array_keys($arr));
           }
         }
-      if(is_array($data['other']))
+      if(isset($data['other']) && is_array($data['other']))
         {
           $otherSet = array_intersect_key($input['other'], $data['other']);
           foreach ($otherSet as $arr) {

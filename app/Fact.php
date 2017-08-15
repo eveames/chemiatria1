@@ -25,4 +25,9 @@ class Fact extends Model
     {
       return ['name' =>$this->key, 'type_id' => $this->id, 'type' => 'fact', 'subtype' => $this->group_name];
     }
+    public function detail()
+    {
+      return ['name' =>$this->key . $this->key_name . $this->prop . $this->prop_name, 
+      'type_id' => $this->id, 'type' => 'fact', 'subtype' => $this->group_name];
+    }
 }

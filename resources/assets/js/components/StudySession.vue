@@ -1,7 +1,9 @@
 <template>
 <div>
-  <word-question v-if="ready === true">
+  <word-question v-if="ready === true && currentQuestionState[2] === 'word'">
   </word-question>
+  <fact-question v-if="ready === true && currentQuestionState[2] === 'fact'">
+  </fact-question>
   <bug-report></bug-report><frustration-report></frustration-report><suggestion-box></suggestion-box>
 </div>
 </template>

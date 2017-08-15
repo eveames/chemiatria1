@@ -38,6 +38,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'api/student'], function () {
 	  Route::get('words', 'ApiController@getWords');
     Route::get('words/{topic_id}', 'ApiController@getWordsByTopic');
     Route::get('facts', 'ApiController@getFacts');
+    Route::get('facts/{topic_id}', 'ApiController@getFactsByTopic');
+    Route::get('skills', 'ApiController@getSkills');
     Route::get('topics', 'ApiController@getTopics');
     Route::get('states', 'ApiController@getStates');
     Route::get('states/active', 'ApiController@getActiveStates');

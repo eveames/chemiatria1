@@ -20,6 +20,8 @@ Vue.component('example', require('./components/Example.vue'));
 Vue.component('test1', require('./components/Test.vue'));
 Vue.component('study-session', require('./components/StudySession.vue'));
 Vue.component('word-question', require('./components/WordQuestion.vue'));
+Vue.component('fact-question', require('./components/FactQuestion.vue'));
+Vue.component('polyatomic-ion-question', require('./components/PolyatomicIonQuestion.vue'));
 Vue.component('bug-report', require('./components/BugReport.vue'));
 Vue.component('frustration-report', require('./components/FrustrationReport.vue'));
 Vue.component('suggestion-box', require('./components/SuggestionBox.vue'));
@@ -29,8 +31,21 @@ import FactPriorityPlugin from './plugins/FactPriorityPlugin.js';
 Vue.use(RandomGeneratorPlugin);
 Vue.use(FactPriorityPlugin);
 //console.log('did something');
+Vue.filter('formatFormula', function(value) {
+  let str = String(value);
+  let escapeRE = /\/|&|<|>|'|"/;
+  if (escapeRE.test(str)) return "Please enter a correctly formatted formula (see example)";
+  else {
+    str = str.replace(/([\w)\]])(\d)/g, '$1<sub>$2</sub>');
+    str = str.replace(/([+])(\d+)/, '<sup>$2$1</sup>');
+    str = str.replace(/([-])(\d+)/, '<sup>$2&minus;</sup>');
+    str = str.replace(/(<sup>)(1)([+&])/, '$1$3');
+    return str;
+  }
+});
+
 
 const app = new Vue({
     el: '#app',
-    store: store
+    store: store,
 });

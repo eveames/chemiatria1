@@ -76,6 +76,20 @@ class ApiController extends Controller
     	return $typesList;
     }
 
+    public function getSkills() {
+    	//returns json object list all available skills
+    	//maybe someday sorts them by course, student progress?
+      try {
+            $skills = Skill::all();
+            return $skills;
+        }
+        catch (Exception $e) {
+            $errorMessage = 'Caught exception: ' . $e->getMessage();
+
+            return $errorMessage;
+        }
+    }
+
     public function getStates() {
     	//returns full list of states for all items in study array, by user
     	$user = Auth::user();

@@ -75,18 +75,55 @@ class SessionPlanHelper
   public function addStatesByTopic($topicIDsToAdd, User $user)
   {
     $topics = Topic::find($topicIDsToAdd);
+    $studyables = $user->states()->with('studyable')->get();
+    $oldWords = $studyables->map(function($item) {
+      if ($item->studyable_type == "chemiatria\Word") return $item->studyable;
+    });
+    $oldFacts = $studyables->map(function($item) {
+      if ($item->studyable_type == "chemiatria\Fact") return $item->studyable;
+    });
+    $oldSkills = $studyables->map(function($item) {
+      if ($item->studyable_type == "chemiatria\Skill") return $item->studyable;
+    });
+
+    $oldWords = $oldWords->filter(function($item) {
+      return !is_null($item);
+    });
+    $oldFacts = $oldFacts->filter(function($item) {
+      return !is_null($item);
+    });
+       $oldSkills = $oldSkills->filter(function($item) {
+      return !is_null($item);
+    });
+
+    //dd($studyables);
+    //need to find a way to check if each word/fact/skill is already a state for this user
 
     foreach($topics as $topic){
       //add words
       $words = $topic->words()->get();
-      foreach($words as $word){
+      if ($oldWords->isNotEmpty()) {$wordsToAdd = $words->diff($oldWords);}
+      else $wordsToAdd = $words;
+      foreach($wordsToAdd as $word){
         //dd($word);
+
         State::storeWord($user, $topic, $word);
       }
       //add skills
       $skills = $topic->skills();
-      foreach($skills as $skill){
+      //dd($oldSkills);
+      if ($oldSkills->isNotEmpty()) {$skillsToAdd = $skills->diff($oldSkills);}
+      else $skillsToAdd = $skills;
+      foreach($skillsToAdd as $skill){
         State::storeSkill($user, $topic, $skill);
+      }
+      //add facts
+      $facts = $topic->facts()->get();
+      if ($oldFacts->isNotEmpty()) {$factsToAdd = $facts->diff($oldFacts);}
+      else $factsToAdd = $facts;
+      foreach($factsToAdd as $fact){
+        //dd($word);
+        State::storeFact($user, $topic, $fact);
       }
     }
   }

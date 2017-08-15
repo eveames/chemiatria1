@@ -7,6 +7,7 @@ use chemiatria\Topic;
 use chemiatria\Skill;
 use chemiatria\Word;
 use chemiatria\Action;
+use chemiatria\Fact;
 
 class State extends Model
 {
@@ -59,6 +60,23 @@ class State extends Model
         //dd('back in storeWord');
         //$state->studyable_type = "word";
         $state->studyable()->associate($word);
+        $state->user()->associate($user);
+        $state->priority = $topic->id;
+        //dd('about to save', $state);
+        $state->save();
+        $state->topics()->attach($topic->id);
+        return;
+
+    }
+    public static function storeFact(User $user, Topic $topic, Fact $fact)
+    {
+        // Validate the request...
+
+        $state = new State;
+        $state->setupNew($state);
+        //dd('back in storeWord');
+        //$state->studyable_type = "word";
+        $state->studyable()->associate($fact);
         $state->user()->associate($user);
         $state->priority = $topic->id;
         //dd('about to save', $state);
