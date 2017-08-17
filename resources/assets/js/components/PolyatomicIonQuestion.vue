@@ -3,10 +3,11 @@
       <div class="panel-heading">Polyatomic Ions Practice!</div>
 
         <div class="panel-body">
-          Instructions: fill in the missing information. If you are asked for a formula,
-          use the following format: write 'VO2+1' for {{"VO2+1" | formatFormula }}.
+          Instructions: If you don't have any guesses, enter zero to see the answer.
+          If you are asked for a formula,
+          use the following format: write 'VO2+1' for <span v-html="this.$options.filters.formatFormula('VO2+1')"></span>.
           <br>
-          <div v-if="coinFlip">
+          <div v-if="requestFormula">
             What is the formula of {{fact.prop}}?
 
             Your answer is: <span v-html="this.$options.filters.formatFormula(entry)"></span>
@@ -21,8 +22,8 @@
             <br>
             <div v-show="feedback" class="alert" v-bind:class="feedbackType"><p>{{feedback}}</p></div>
         </div>
-        <div v-if="!(coinFlip)">
-          What is the name of {{fact.key | formatFormula}}?
+        <div v-if="!(requestFormula)">
+          What is the name of <span v-html="this.$options.filters.formatFormula(fact.key)"></span>?
 
           <br>
           <div class="input-group">
@@ -63,19 +64,22 @@ export default {
     ...mapGetters({
       currentQuestion: 'getCurrent',
       questionSetTime: 'getQuestionSetTime',
-      stageData: 'getStageData'
+      stageData: 'getStageData',
+      facts: 'getFacts'
     }),
     fact: function () {
       return this.$store.getters.getFactById(this.currentQuestion[1]);
     },
-    answers: function() {
-      let temp = [{alt: this.word.word, correct: 'correct'}];
-      temp = temp.concat(this.word.altwords);
+    //determines whether name or formula is given
+    requestFormula: function() {
+      return (Math.random() >= 0.5);
+    },
+    answer: function() {
+      let temp;
+      if (this.requestFormula) {temp = this.fact.key;}
+      else {temp = this.fact.prop;}
       return temp;
     },
-    coinFlip: function() {
-      return (Math.random() >= 0.5);
-    }
   },
   created () {
   },
@@ -88,7 +92,7 @@ export default {
     	answerDetail.timeStamp = Date.now();
 
       this.rts.push(answerDetail.timeStamp - this.questionSetTime);
-      console.log('rts is set to ', this.rts)
+      //console.log('rts is set to ', this.rts)
       this.startTime = Date.now();
 
     	let correct = answerDetail.correct;
@@ -109,13 +113,20 @@ export default {
     	}
 
     	else {
-        if (this.tries < 3) {answerDetail.messageSent += "Try again!"}
+        if (this.tries < 3) {answerDetail.messageSent += " Try again!"}
         else moveOn = true;
     	}
       if (moveOn === true && gotIt === false) {
-        answerDetail.messageSent = `Answer to "${this.word.prompts[0]}" is
-        "${this.answers[0].alt}". We\'ll come back to it.`;
-        this.acc = 4;
+        if (this.requestFormula) {
+          answerDetail.messageSent = `The formula of "${this.fact.key}" is
+          "${this.answer}". We\'ll come back to it.`;
+          this.acc = 4;
+        }
+        else {
+          answerDetail.messageSent = `The name of "${this.fact.prop}" is
+          "${this.answer}". We\'ll come back to it.`;
+          this.acc = 4;
+        }
       }
       if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close'
         || answerDetail.correct === 'dontKnow') {
@@ -160,34 +171,55 @@ export default {
 
     //checks the entry, returns answerDetail
     checkEntry: function() {
-      let answerDetailToReturn = {messageSent: ''};
+      let answerDetailToReturn = {messageSent: '', correct: ''};
       //console.log('this.entry: ', this.entry);
       //console.log('this.answer: ', this.answers);
       if (this.entry === '') {
             answerDetailToReturn.correct = 'noAnswer';
-            answerDetailToReturn.messageSent += 'If you don\'t know the answer to a vocab question, enter zero. ';
+            answerDetailToReturn.messageSent += 'If you don\'t know the answer, enter zero. ';
           }
           else if (Number(this.entry) === 0) {
             answerDetailToReturn.correct = 'dontKnow';
           }
-          else {
-            for (var i = 0; i < this.answers.length ; i++){
-              if (this.entry === this.answers[i].alt) {
-                answerDetailToReturn.correct = this.answers[i].correct;
-                if (this.answers[i].message) {answerDetailToReturn.messageSent += this.answers[i].message + ' ';}
-                break;
-              }
-              else if (this.entry.toLowerCase() === this.answers[i].alt.toLowerCase()) {
-                if (this.answers[i].correct === 'correct') {
-                  answerDetailToReturn.correct = 'formatError';
-                  answerDetailToReturn.messageSent += 'Almost there, please check your capitalization. ';
+          //if answer is formula:
+          if (this.requestFormula) {
+            if (this.entry === this.answer) {
+              answerDetailToReturn.correct = 'correct';
+            }
+            else {
+              for (let fact of this.facts) {
+                console.log(this.facts, fact)
+                console.log(this.entry, fact.key);
+                if (this.entry === fact.key) {
+                  answerDetailToReturn.correct = 'knownWrong';
+                  answerDetailToReturn.messageSent = `${this.entry} is ${fact.prop}.`;
                   break;
                 }
               }
             }
-            if (!answerDetailToReturn.correct) {
+            if (answerDetailToReturn.correct === '') {
               answerDetailToReturn.correct = 'unknownWrong';
-              answerDetailToReturn.messageSent += 'I don\'t recognize your answer. Spell carefully! ';
+              answerDetailToReturn.messageSent = 'Make sure your answer is formatted correctly.';
+            }
+          }
+          //if answer is name:
+          else {
+            if (this.entry === this.answer) {
+              answerDetailToReturn.correct = 'correct';
+            }
+            else {
+              for (let fact of this.facts) {
+                console.log(this.entry, fact.prop);
+                if (this.entry === fact.prop) {
+                  answerDetailToReturn.correct = 'knownWrong';
+                  answerDetailToReturn.messageSent = `${this.entry} is  ${fact.key}.`;
+                  break;
+                }
+              }
+            }
+            if (answerDetailToReturn.correct === '') {
+              answerDetailToReturn.correct = 'unknownWrong';
+              answerDetailToReturn.messageSent = 'Spell carefully! ';
             }
           }
           return answerDetailToReturn;

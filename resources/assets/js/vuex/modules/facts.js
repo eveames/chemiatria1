@@ -12,7 +12,8 @@ const getters = {
   getFactById: (state, getters) => (id) => {
     return state.facts[id - 1]
   },
-  checkFactsReady: (state) => state.factsReady
+  checkFactsReady: (state) => state.factsReady,
+  getFacts: (state) => state.facts
 }
 
 // actions

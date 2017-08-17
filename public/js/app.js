@@ -43589,6 +43589,9 @@ var getters = {
   },
   checkFactsReady: function checkFactsReady(state) {
     return state.factsReady;
+  },
+  getFacts: function getFacts(state) {
+    return state.facts;
   }
 };
 
@@ -45352,7 +45355,7 @@ exports = module.exports = __webpack_require__(12)(undefined);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -45366,6 +45369,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+//
 //
 //
 //
@@ -45430,18 +45434,24 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
   computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
     currentQuestion: 'getCurrent',
     questionSetTime: 'getQuestionSetTime',
-    stageData: 'getStageData'
+    stageData: 'getStageData',
+    facts: 'getFacts'
   }), {
     fact: function fact() {
       return this.$store.getters.getFactById(this.currentQuestion[1]);
     },
-    answers: function answers() {
-      var temp = [{ alt: this.word.word, correct: 'correct' }];
-      temp = temp.concat(this.word.altwords);
-      return temp;
-    },
-    coinFlip: function coinFlip() {
+    //determines whether name or formula is given
+    requestFormula: function requestFormula() {
       return Math.random() >= 0.5;
+    },
+    answer: function answer() {
+      var temp = void 0;
+      if (this.requestFormula) {
+        temp = this.fact.key;
+      } else {
+        temp = this.fact.prop;
+      }
+      return temp;
     }
   }),
   created: function created() {},
@@ -45457,7 +45467,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       answerDetail.timeStamp = Date.now();
 
       this.rts.push(answerDetail.timeStamp - this.questionSetTime);
-      console.log('rts is set to ', this.rts);
+      //console.log('rts is set to ', this.rts)
       this.startTime = Date.now();
 
       var correct = answerDetail.correct;
@@ -45476,12 +45486,17 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         moveOn = true;
       } else {
         if (this.tries < 3) {
-          answerDetail.messageSent += "Try again!";
+          answerDetail.messageSent += " Try again!";
         } else moveOn = true;
       }
       if (moveOn === true && gotIt === false) {
-        answerDetail.messageSent = 'Answer to "' + this.word.prompts[0] + '" is\n        "' + this.answers[0].alt + '". We\'ll come back to it.';
-        this.acc = 4;
+        if (this.requestFormula) {
+          answerDetail.messageSent = 'The formula of "' + this.fact.key + '" is\n          "' + this.answer + '". We\'ll come back to it.';
+          this.acc = 4;
+        } else {
+          answerDetail.messageSent = 'The name of "' + this.fact.prop + '" is\n          "' + this.answer + '". We\'ll come back to it.';
+          this.acc = 4;
+        }
       }
       if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
         this.feedbackType = { "alert-warning": true };
@@ -45523,35 +45538,96 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
     //checks the entry, returns answerDetail
     checkEntry: function checkEntry() {
-      var answerDetailToReturn = { messageSent: '' };
+      var answerDetailToReturn = { messageSent: '', correct: '' };
       //console.log('this.entry: ', this.entry);
       //console.log('this.answer: ', this.answers);
       if (this.entry === '') {
         answerDetailToReturn.correct = 'noAnswer';
-        answerDetailToReturn.messageSent += 'If you don\'t know the answer to a vocab question, enter zero. ';
+        answerDetailToReturn.messageSent += 'If you don\'t know the answer, enter zero. ';
       } else if (Number(this.entry) === 0) {
         answerDetailToReturn.correct = 'dontKnow';
-      } else {
-        for (var i = 0; i < this.answers.length; i++) {
-          if (this.entry === this.answers[i].alt) {
-            answerDetailToReturn.correct = this.answers[i].correct;
-            if (this.answers[i].message) {
-              answerDetailToReturn.messageSent += this.answers[i].message + ' ';
+      }
+      //if answer is formula:
+      if (this.requestFormula) {
+        if (this.entry === this.answer) {
+          answerDetailToReturn.correct = 'correct';
+        } else {
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = this.facts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var fact = _step.value;
+
+              console.log(this.facts, fact);
+              console.log(this.entry, fact.key);
+              if (this.entry === fact.key) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent = this.entry + ' is ' + fact.prop + '.';
+                break;
+              }
             }
-            break;
-          } else if (this.entry.toLowerCase() === this.answers[i].alt.toLowerCase()) {
-            if (this.answers[i].correct === 'correct') {
-              answerDetailToReturn.correct = 'formatError';
-              answerDetailToReturn.messageSent += 'Almost there, please check your capitalization. ';
-              break;
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
             }
           }
         }
-        if (!answerDetailToReturn.correct) {
+        if (answerDetailToReturn.correct === '') {
           answerDetailToReturn.correct = 'unknownWrong';
-          answerDetailToReturn.messageSent += 'I don\'t recognize your answer. Spell carefully! ';
+          answerDetailToReturn.messageSent = 'Make sure your answer is formatted correctly.';
         }
       }
+      //if answer is name:
+      else {
+          if (this.entry === this.answer) {
+            answerDetailToReturn.correct = 'correct';
+          } else {
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+              for (var _iterator2 = this.facts[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                var _fact = _step2.value;
+
+                console.log(this.entry, _fact.prop);
+                if (this.entry === _fact.prop) {
+                  answerDetailToReturn.correct = 'knownWrong';
+                  answerDetailToReturn.messageSent = this.entry + ' is  ' + _fact.key + '.';
+                  break;
+                }
+              }
+            } catch (err) {
+              _didIteratorError2 = true;
+              _iteratorError2 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                  _iterator2.return();
+                }
+              } finally {
+                if (_didIteratorError2) {
+                  throw _iteratorError2;
+                }
+              }
+            }
+          }
+          if (answerDetailToReturn.correct === '') {
+            answerDetailToReturn.correct = 'unknownWrong';
+            answerDetailToReturn.messageSent = 'Spell carefully! ';
+          }
+        }
       return answerDetailToReturn;
     }
   }
@@ -45568,7 +45644,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "panel-heading"
   }, [_vm._v("Polyatomic Ions Practice!")]), _vm._v(" "), _c('div', {
     staticClass: "panel-body"
-  }, [_vm._v("\n          Instructions: fill in the missing information. If you are asked for a formula,\n          use the following format: write 'VO2+1' for " + _vm._s(_vm._f("formatFormula")("VO2+1")) + ".\n          "), _c('br'), _vm._v(" "), (_vm.coinFlip) ? _c('div', [_vm._v("\n            What is the formula of " + _vm._s(_vm.fact.prop) + "?\n\n            Your answer is: "), _c('span', {
+  }, [_vm._v("\n          Instructions: If you don't have any guesses, enter zero to see the answer.\n          If you are asked for a formula,\n          use the following format: write 'VO2+1' for "), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula('VO2+1'))
+    }
+  }), _vm._v(".\n          "), _c('br'), _vm._v(" "), (_vm.requestFormula) ? _c('div', [_vm._v("\n            What is the formula of " + _vm._s(_vm.fact.prop) + "?\n\n            Your answer is: "), _c('span', {
     domProps: {
       "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.entry))
     }
@@ -45618,7 +45698,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }],
     staticClass: "alert",
     class: _vm.feedbackType
-  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])]) : _vm._e(), _vm._v(" "), (!(_vm.coinFlip)) ? _c('div', [_vm._v("\n          What is the name of " + _vm._s(_vm._f("formatFormula")(_vm.fact.key)) + "?\n\n          "), _c('br'), _vm._v(" "), _c('div', {
+  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])]) : _vm._e(), _vm._v(" "), (!(_vm.requestFormula)) ? _c('div', [_vm._v("\n          What is the name of "), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.fact.key))
+    }
+  }), _vm._v("?\n\n          "), _c('br'), _vm._v(" "), _c('div', {
     staticClass: "input-group"
   }, [_c('input', {
     directives: [{
