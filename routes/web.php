@@ -19,6 +19,8 @@ Route::resource('facts', 'FactController');
 
 Route::get('/words/topics/{id}', 'WordController@topic_search');
 Route::get('/facts/topics/{id}', 'FactController@topic_search');
+Route::get('/facts/group/{name}', 'FactController@show_by_group');
+Route::post('/facts/group/{name}', 'FactController@update_group');
 
 Auth::routes();
 

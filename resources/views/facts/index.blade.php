@@ -37,25 +37,15 @@
 <table class="table table-striped table-bordered">
     <thead>
         <tr>
-            <td>id</td>
             <td>group_name</td>
-            <td>key</td>
-            <td>key_name</td>
-            <td>prop</td>
-            <td>prop_name</td>
         </tr>
     </thead>
     <tbody>
-    @foreach($facts as $key => $value)
+    @foreach($groups as $group)
         <tr>
-            <td>{{ $value->id }}</td>
-            <td>{{ $value->group_name }}</td>
-            <td>{{ $value->key }}</td>
-            <td>{{ $value->key_name }}</td>
-            <td>{{ $value->prop }}</td>
-            <td>{{ $value->prop_name }}</td>
+            <td>{{ $group }}</td>
             <td>
-                <a class="btn btn-small btn-info" href="{{ URL::to('facts/' . $value->id . '/edit') }}">Edit this fact</a>
+                <a class="btn btn-small btn-info" href="{{ URL::to('facts/group/' . $group) }}">View this group</a>
             </td>
         </tr>
     @endforeach

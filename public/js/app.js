@@ -12162,6 +12162,8 @@ Vue.component('study-session', __webpack_require__(50));
 Vue.component('word-question', __webpack_require__(72));
 Vue.component('fact-question', __webpack_require__(88));
 Vue.component('polyatomic-ion-question', __webpack_require__(93));
+Vue.component('element-symbol-question', __webpack_require__(100));
+Vue.component('element-charge-question', __webpack_require__(105));
 Vue.component('bug-report', __webpack_require__(79));
 Vue.component('frustration-report', __webpack_require__(82));
 Vue.component('suggestion-box', __webpack_require__(85));
@@ -12181,6 +12183,12 @@ Vue.filter('formatFormula', function (value) {
     str = str.replace(/(<sup>)(1)([+&])/, '$1$3');
     return str;
   }
+});
+Vue.filter('chargeFormat', function (value) {
+  var plus = value > 0;
+  var str = String(value);
+  if (plus) str = '+' + str;
+  return str;
 });
 
 var app = new Vue({
@@ -43521,6 +43529,8 @@ if (false) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__modules_states__ = __webpack_require__(60);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__modules_words__ = __webpack_require__(61);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__modules_session__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__modules_elements__ = __webpack_require__(98);
+
 
 
 
@@ -43541,7 +43551,8 @@ __WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_1_vuex
     words: __WEBPACK_IMPORTED_MODULE_7__modules_words__["a" /* default */],
     facts: __WEBPACK_IMPORTED_MODULE_5__modules_facts__["a" /* default */],
     session: __WEBPACK_IMPORTED_MODULE_8__modules_session__["a" /* default */],
-    states: __WEBPACK_IMPORTED_MODULE_6__modules_states__["a" /* default */]
+    states: __WEBPACK_IMPORTED_MODULE_6__modules_states__["a" /* default */],
+    elements: __WEBPACK_IMPORTED_MODULE_9__modules_elements__["a" /* default */]
   }
 }));
 
@@ -45082,7 +45093,7 @@ exports = module.exports = __webpack_require__(12)(undefined);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -45096,6 +45107,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+//
+//
+//
 //
 //
 //
@@ -45266,7 +45280,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "row"
   }, [_c('div', {
     staticClass: "col-md-8 col-md-offset-2"
-  }, [(_vm.fact.group_name === 'polyatomic ions') ? _c('polyatomic-ion-question') : _vm._e()], 1)])])
+  }, [(_vm.fact.group_name === 'polyatomic ions' ||
+    _vm.fact.group_name === 'acids') ? _c('polyatomic-ion-question') : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'elementSymbol') ? _c('element-symbol-question') : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'elementCharge') ? _c('element-charge-question') : _vm._e()], 1)])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -45355,7 +45370,7 @@ exports = module.exports = __webpack_require__(12)(undefined);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -45413,6 +45428,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
+//
+//
+//
 
 
 
@@ -45425,6 +45443,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       acc: 0,
       rts: [],
       startTime: 0,
+      //determines whether name or formula is given
+      requestFormula: true,
       feedbackType: {
         "alert-success": true
       }
@@ -45440,10 +45460,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     fact: function fact() {
       return this.$store.getters.getFactById(this.currentQuestion[1]);
     },
-    //determines whether name or formula is given
-    requestFormula: function requestFormula() {
-      return Math.random() >= 0.5;
-    },
+
     answer: function answer() {
       var temp = void 0;
       if (this.requestFormula) {
@@ -45454,7 +45471,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       return temp;
     }
   }),
-  created: function created() {},
+  created: function created() {
+    this.requestFormula = Math.random() >= 0.5;
+  },
 
   methods: {
 
@@ -45533,6 +45552,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         this.tries = 0;
         this.acc = 0;
         this.rts = [];
+        this.requestFormula = Math.random() >= 0.5;
       }
     },
 
@@ -45642,13 +45662,17 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "panel panel-default"
   }, [_c('div', {
     staticClass: "panel-heading"
-  }, [_vm._v("Polyatomic Ions Practice!")]), _vm._v(" "), _c('div', {
+  }, [_vm._v("Formulas Practice!")]), _vm._v(" "), _c('div', {
     staticClass: "panel-body"
-  }, [_vm._v("\n          Instructions: If you don't have any guesses, enter zero to see the answer.\n          If you are asked for a formula,\n          use the following format: write 'VO2+1' for "), _c('span', {
+  }, [(_vm.fact.group_name === 'polyatomic ions') ? _c('div', [_vm._v("Instructions: If you don't have any guesses, enter zero to see the answer.\n          If you are asked for a formula,\n          use the following format: write 'VO2+1' for "), _c('span', {
     domProps: {
       "innerHTML": _vm._s(this.$options.filters.formatFormula('VO2+1'))
     }
-  }), _vm._v(".\n          "), _c('br'), _vm._v(" "), (_vm.requestFormula) ? _c('div', [_vm._v("\n            What is the formula of " + _vm._s(_vm.fact.prop) + "?\n\n            Your answer is: "), _c('span', {
+  }), _vm._v(".")]) : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'acids') ? _c('div', [_vm._v("Instructions: If you don't have any guesses, enter zero to see the answer.\n          If you are asked for a formula, put the acidic hydrogens at the front and\n          use the following format: write 'H3C6H5O7' for "), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula('H3C6H5O7'))
+    }
+  }), _vm._v(".")]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.requestFormula) ? _c('div', [_vm._v("\n            What is the formula of " + _vm._s(_vm.fact.prop) + "?\n\n            Your answer is: "), _c('span', {
     domProps: {
       "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.entry))
     }
@@ -45755,6 +45779,874 @@ if (false) {
   module.hot.accept()
   if (module.hot.data) {
      require("vue-hot-reload-api").rerender("data-v-4eb7e7d0", module.exports)
+  }
+}
+
+/***/ }),
+/* 98 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var state = {
+  elementsList: [{ name: 'hydrogen', symbol: 'H', family: 'non-metal', location: '1', charge: 1, valence: 1, findex: 8 }, { name: 'helium', symbol: 'He', family: 'noble gas', location: '2', charge: 0, valence: 2, findex: 4 }, { name: 'lithium', symbol: 'Li', family: 'alkali metal', location: '3', charge: 1, valence: 1, findex: 2 }, { name: 'beryllium', symbol: 'Be', family: 'alkaline earth metal', location: '4', charge: 2, valence: 2, findex: 3 }, { name: 'boron', symbol: 'B', family: 'Boron group', location: '5', charge: 3, valence: 3, findex: 8 }, { name: 'carbon', symbol: 'C', family: 'Carbon group', location: '6', charge: 0, valence: 4, findex: 8 }, { name: 'nitrogen', symbol: 'N', family: 'Nitrogen group (pnictogen)', location: '7', charge: -3, valence: 5, findex: 8 }, { name: 'oxygen', symbol: 'O', family: 'chalcogen', location: '8', charge: -2, valence: 6, findex: 1 }, { name: 'fluorine', symbol: 'F', family: 'halogen', location: '9', charge: -1, valence: 7, findex: 0 }, { name: 'bromine', symbol: 'Br', family: 'halogen', location: 'Hal', charge: -1, valence: 7, findex: 0 }, { name: 'iodine', symbol: 'I', family: 'halogen', location: 'Hal', charge: -1, valence: 7, findex: 0 }, { name: 'sodium', symbol: 'Na', family: 'alkali metal', location: '11', charge: 1, valence: 1, findex: 2 }, { name: 'magnesium', symbol: 'Mg', family: 'alkaline earth metal', location: '12', charge: 2, valence: 2, findex: 3 }, { name: 'aluminum', symbol: 'Al', family: 'Boron group', location: '13', charge: 3, valence: 3, findex: 9 }, { name: 'silicon', symbol: 'Si', family: 'Carbon group', location: '14', charge: 4, valence: 4, findex: 8 }, { name: 'phosphorus', symbol: 'P', family: 'Nitrogen group (pnictogen)', location: '15', charge: -3, valence: 5, findex: 8 }, { name: 'sulfur', symbol: 'S', family: 'chalcogen', location: '16', charge: -2, valence: 6, findex: 1 }, { name: 'chlorine', symbol: 'Cl', family: 'halogen', location: '17', charge: -1, valence: 7, findex: 0 }, { name: 'argon', symbol: 'Ar', family: 'noble gas', location: 'NG', charge: 0, valence: 8, findex: 4 }, { name: 'potassium', symbol: 'K', family: 'alkali metal', location: '19', charge: 1, valence: 1, findex: 2 }, { name: 'calcium', symbol: 'Ca', family: 'alkaline earth metal', location: '20', charge: 2, valence: 2, findex: 3 }, { name: 'titanium', symbol: 'Ti', family: 'transition metal', location: 'ETM', charge: 4, findex: 7 }, { name: 'iron', symbol: 'Fe', family: 'transition metal', location: 'MTM', charge: [3, 2], findex: 7 }, { name: 'copper', symbol: 'Cu', family: 'coinage metal', location: 'CM', charge: [2, 1], findex: 6 }, { name: 'mercury', symbol: 'Hg', family: '(post-)transition metal', location: 'PTM', charge: [2, 1], findex: 57 }, { name: 'zinc', symbol: 'Zn', family: '(post-)transition metal', location: 'PTM', charge: [2], findex: 57 }, { name: 'silver', symbol: 'Ag', family: 'coinage metal', location: 'CM', charge: [2, 1], findex: 6 }, { name: 'gold', symbol: 'Au', family: 'coinage metal', location: 'CM', charge: [3, 1], findex: 6 }, { name: 'tin', symbol: 'Sn', family: 'post-transition metal', location: 'PTM', charge: [2, 4], valence: 4, findex: 5 }, { name: 'lead', symbol: 'Pb', family: 'post-transition metal', location: 'PTM', charge: [2, 4], valence: 4, findex: 5 }],
+  elementsCharges: [[{ alt: 1, correct: 'correct', message: '', op: 'equals' }, { alt: -1, correct: 'close', message: 'Possible, but in special circumstances. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'H only has one electron to lose, so it can\'t have a charge above +1. ', op: 'greater' }, { alt: -1, correct: 'knownWrong', message: 'It would be almost impossible to add more than 1 electron to H. ', op: 'less' }], [{ alt: 0, correct: 'correct', message: 'Noble gases pretty much never have charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Noble gases pretty much never have charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 3, correct: 'correct', message: 'Boron often has a +3 charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Like carbon, boron forms many compounds in which it shares electrons, but it does form ionic compounds also. ', op: 'equals' }], [{ alt: 0, correct: 'correct', message: 'Carbon usually shares electrons, rather than forming ions. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Carbon usually shares electrons, and rarely forms ions. ', op: 'notEqual' }], [{ alt: -3, correct: 'correct', message: 'When nitrogen forms an ion, it\'s usually -3 charge. ', op: 'equals' }, { alt: -3, correct: 'close', message: 'In more complicated situations, N can have many different charges. ', op: 'notEqual' }], [{ alt: -2, correct: 'correct', message: 'O almost always has a -2 charge. ', op: 'equals' }, { alt: -2, correct: 'knownWrong', message: 'O almost always has a -2 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'F always has a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'F almost always has a -1 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Halogens almost always have a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Halogens almost always have a -1 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Halogens almost always have a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Halogens almost always have a -1 charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 3, correct: 'correct', message: 'Aluminum always has +3 charge. ', op: 'equals' }, { alt: 3, correct: 'knownWrong', message: 'Aluminum always has +3 charge. ', op: 'notEqual' }], [{ alt: 4, correct: 'correct', message: 'Si often has a 4+ charge when it occurs in rocks. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Si doesn\'t share electrons as much as C. ', op: 'equals' }], [{ alt: -3, correct: 'correct', message: 'When P forms an ion, it\'s usually -3 charge. ', op: 'equals' }, { alt: -3, correct: 'close', message: 'In more complicated situations, P can have many different charges. ', op: 'notEqual' }], [{ alt: -2, correct: 'correct', message: 'S usually has a -2 charge. ', op: 'equals' }, { alt: -2, correct: 'knownWrong', message: 'In more complicated situations, S can have many different charges. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Cl almost always has a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Cl almost always has a -1 charge. ', op: 'notEqual' }], [{ alt: 0, correct: 'correct', message: 'Noble gases pretty much never have charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Noble gases pretty much never have charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 4, correct: 'correct', message: 'Ti usually has a 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Transition elements often have multiple charges, but Ti is usually +4. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 3, correct: 'correct', message: 'Fe usually has a 3+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Fe usually has a 3+ or 2+ charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Fe can have a range of charges, but is +2 or +3 normally. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Cu usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 1, correct: 'correct', message: 'Cu usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Cu rarely has a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 1, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Hg does\'t have a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Zn always has a 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Zn does\'t have a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 1, correct: 'correct', message: 'Ag usually has a 1+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Ag occasionally has a 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Ag rarely has a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 1, correct: 'correct', message: 'Au usually has a 1+ or +3 charge. ', op: 'equals' }, { alt: 3, correct: 'correct', message: 'Au usually has a 1+ or 3+ charge. ', op: 'equals' }, { alt: 3, correct: 'close', message: 'Au rarely has a charge above 3+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 4, correct: 'correct', message: 'Sn and Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Sn and Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less' }], [{ alt: 4, correct: 'correct', message: 'Sn and Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Sn and Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less' }]]
+};
+
+// getters
+var getters = {
+  getElementByIndex: function getElementByIndex(state, getters) {
+    return function (index) {
+      console.log('in getElementByIndex', index);
+      return state.elementsList[index];
+    };
+  },
+  getElementChargesByIndex: function getElementChargesByIndex(state, getters) {
+    return function (index) {
+      console.log('in getElementChargesByIndex', index);
+      return state.elementsCharges[index];
+    };
+  },
+  getElements: function getElements(state) {
+    return state.elementsList;
+  }
+};
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  state: state,
+  getters: getters
+});
+
+/***/ }),
+/* 99 */,
+/* 100 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(101)
+}
+var Component = __webpack_require__(4)(
+  /* script */
+  __webpack_require__(103),
+  /* template */
+  __webpack_require__(104),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/ElementSymbolQuestion.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] ElementSymbolQuestion.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-76bfbfbb", Component.options)
+  } else {
+    hotAPI.reload("data-v-76bfbfbb", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 101 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(102);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(13)("e7ccfafe", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-76bfbfbb\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./ElementSymbolQuestion.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-76bfbfbb\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./ElementSymbolQuestion.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 102 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(12)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 103 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      tries: 0,
+      feedback: '',
+      acc: 0,
+      rts: [],
+      startTime: 0,
+      //determines whether name or formula is given
+      requestSymbol: true,
+      feedbackType: {
+        "alert-success": true
+      }
+    };
+  },
+  //props: ['questionTypeID'],
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    currentQuestion: 'getCurrent',
+    questionSetTime: 'getQuestionSetTime',
+    stageData: 'getStageData',
+    facts: 'getFacts',
+    elements: 'getElements'
+  }), {
+    fact: function fact() {
+      return this.$store.getters.getFactById(this.currentQuestion[1]);
+    },
+    answer: function answer() {
+      var temp = void 0;
+      if (this.requestSymbol) {
+        temp = this.fact.key;
+      } else {
+        temp = this.fact.prop;
+      }
+      return temp;
+    }
+  }),
+  created: function created() {
+    this.requestSymbol = Math.random() >= 0.5;
+  },
+
+  methods: {
+
+    submitEntry: function submitEntry(event) {
+      this.tries += 1;
+      var answerDetail = this.checkEntry();
+      if (this.startTime === 0) {
+        this.startTime = this.questionSetTime;
+      }
+      answerDetail.timeStamp = Date.now();
+
+      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
+      //console.log('rts is set to ', this.rts)
+      this.startTime = Date.now();
+
+      var correct = answerDetail.correct;
+      var moveOn = false;
+      var gotIt = false;
+
+      if (correct === 'correct') {
+        answerDetail.messageSent += ' Correct!';
+        moveOn = true;
+        gotIt = true;
+        this.acc = this.tries - 1;
+        this.feedbackType = { "alert-success": true };
+
+        //console.log('acc is set to ', this.acc)
+      } else if (correct === 'dontKnow') {
+        moveOn = true;
+      } else {
+        if (this.tries === 1) {
+          answerDetail.messageSent += " Try again!";
+        } else if (this.tries === 2) {
+          answerDetail.messageSent += " One more try!";
+        } else moveOn = true;
+      }
+      if (moveOn === true && gotIt === false) {
+        if (this.requestSymbol) {
+          answerDetail.messageSent = 'The symbol of "' + this.fact.key + '" is\n          "' + this.answer + '". We\'ll come back to it.';
+          this.acc = 4;
+        } else {
+          answerDetail.messageSent = this.fact.prop + ' is\n          the symbol for ' + this.answer + '. We\'ll come back to it.';
+          this.acc = 4;
+        }
+      }
+      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
+        this.feedbackType = { "alert-warning": true };
+      } else if (gotIt === false) this.feedbackType = { "alert-danger": true };
+      this.feedback = answerDetail.messageSent;
+      var action = {};
+      action.state_id = this.currentQuestion[4];
+      action.type = 'answer given-' + correct;
+      action.detail = answerDetail;
+      action.time = answerDetail.timeStamp;
+
+      //this code gives a 500 error now, should check laravel side
+      //console.log("action is ", action);
+      axios.post('../api/student/actions', action).catch(function (error) {
+        console.log(error);
+      });
+
+      if (moveOn) {
+        //update states
+
+        var updatedState = { rts: this.rts, accs: this.acc };
+        console.log("updatedState is", updatedState);
+        this.$store.dispatch('updateRtsAccs', updatedState);
+        updatedState = Vue.factPriorityHelper(this.stageData);
+        this.$store.dispatch('updateStage', updatedState);
+
+        //set new question
+        //console.log('about to set new question');
+        this.$store.dispatch('setQuestion');
+        this.$store.dispatch('setQuestionStart');
+
+        //update props
+        this.entry = '';
+        this.tries = 0;
+        this.acc = 0;
+        this.rts = [];
+        this.requestSymbol = Math.random() >= 0.5;
+      }
+    },
+
+    //checks the entry, returns answerDetail
+    checkEntry: function checkEntry() {
+      var answerDetailToReturn = { messageSent: '', correct: '' };
+      //console.log('this.entry: ', this.entry);
+      //console.log('this.answer: ', this.answers);
+      if (this.entry === '') {
+        answerDetailToReturn.correct = 'noAnswer';
+        answerDetailToReturn.messageSent += 'If you don\'t know the answer, enter zero. ';
+      } else if (Number(this.entry) === 0) {
+        answerDetailToReturn.correct = 'dontKnow';
+      } else if (this.entry === this.answer) {
+        answerDetailToReturn.correct = 'correct';
+      } else if (this.entry.toLowerCase() === this.answer.toLowerCase()) {
+        answerDetailToReturn.correct = 'formatError';
+        answerDetailToReturn.messageSent += 'Almost there, please check your capitalization. ';
+      } else {
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = this.facts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var fact = _step.value;
+
+            //console.log(this.facts, fact)
+            //console.log(this.entry, fact.key);
+            if (this.requestSymbol) {
+              if (this.entry === fact.key) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent = this.entry + ' is ' + fact.prop + '.';
+                break;
+              }
+            } else {
+              if (this.entry === fact.prop) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent = 'The symbol for ' + this.entry + ' is  ' + fact.key + '.';
+                break;
+              }
+            }
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+      }
+      if (answerDetailToReturn.correct === '') {
+        answerDetailToReturn.correct = 'unknownWrong';
+        if (!this.requestFormula) {
+          answerDetailToReturn.messageSent = 'Spell carefully! ';
+        }
+      }
+      return answerDetailToReturn;
+    }
+  }
+});
+
+/***/ }),
+/* 104 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._v("Elements Practice!")]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_c('div', [_vm._v("Instructions: If you don't have any guesses, enter zero to see the answer.\n          Don't capitalize names, but use correct capitalization for symbols.")]), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.requestSymbol) ? _c('div', [_vm._v("\n            What is the symbol of " + _vm._s(_vm.fact.prop) + "?")]) : _vm._e(), _vm._v(" "), (!(_vm.requestSymbol)) ? _c('div', [_vm._v("\n            What is the name of " + _vm._s(_vm.fact.key) + "?")]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.entry),
+      expression: "entry"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "autofocus": "",
+      "type": "text"
+    },
+    domProps: {
+      "value": (_vm.entry)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.entry = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.feedback),
+      expression: "feedback"
+    }],
+    staticClass: "alert",
+    class: _vm.feedbackType
+  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-76bfbfbb", module.exports)
+  }
+}
+
+/***/ }),
+/* 105 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(106)
+}
+var Component = __webpack_require__(4)(
+  /* script */
+  __webpack_require__(108),
+  /* template */
+  __webpack_require__(109),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/ElementChargeQuestion.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] ElementChargeQuestion.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-48b6a2d7", Component.options)
+  } else {
+    hotAPI.reload("data-v-48b6a2d7", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 106 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(107);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(13)("51903fda", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-48b6a2d7\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./ElementChargeQuestion.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-48b6a2d7\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./ElementChargeQuestion.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 107 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(12)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 108 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      tries: 0,
+      feedback: '',
+      acc: 0,
+      rts: [],
+      startTime: 0,
+      //determines whether name or formula is given
+      chargeGiven: true,
+      useSymbol: true,
+      chargesArray: [-3, -2, -1, 1, 2, 3, 4, 5],
+      feedbackType: {
+        "alert-success": true
+      }
+    };
+  },
+  //props: ['questionTypeID'],
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    currentQuestion: 'getCurrent',
+    questionSetTime: 'getQuestionSetTime',
+    stageData: 'getStageData'
+  }), {
+    fact: function fact() {
+      return this.$store.getters.getFactById(this.currentQuestion[1]);
+    },
+    element: function element() {
+      console.log(Number(this.fact.key_name) - 1);
+      return this.$store.getters.getElementByIndex(Number(this.fact.key_name) - 1);
+    },
+    charges: function charges() {
+      return this.$store.getters.getElementChargesByIndex(Number(this.fact.key_name) - 1);
+    },
+    charge: function charge() {
+      if (this.chargeGiven) {
+        return this.chargesArray[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 7)];
+      } else return 0;
+    },
+    answers: function answers() {
+      var temp = void 0;
+      if (this.chargeGiven) {
+        temp = this.setupAnswersYN();
+      } else {
+        temp = this.setupAnswersCharge();
+      }
+      return temp;
+    },
+    nameOrSymbol: function nameOrSymbol() {
+      if (this.useSymbol) return this.fact.key;else return this.fact.prop;
+    }
+  }),
+  created: function created() {
+    this.chargeGiven = Math.random() >= 0.5;
+    this.useSymbol = Math.random() >= 0.5;
+  },
+
+  methods: {
+
+    submitEntry: function submitEntry(event) {
+      this.tries += 1;
+      var answerDetail = this.checkEntry();
+      if (this.startTime === 0) {
+        this.startTime = this.questionSetTime;
+      }
+      answerDetail.timeStamp = Date.now();
+
+      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
+      //console.log('rts is set to ', this.rts)
+      this.startTime = Date.now();
+
+      var correct = answerDetail.correct;
+      var moveOn = false;
+      var gotIt = false;
+
+      if (correct === 'correct') {
+        answerDetail.messageSent += ' Correct!';
+        moveOn = true;
+        gotIt = true;
+        this.acc = this.tries - 1;
+        this.feedbackType = { "alert-success": true };
+
+        //console.log('acc is set to ', this.acc)
+      } else if (correct === 'dontKnow') {
+        moveOn = true;
+      } else {
+        if (this.tries === 1) {
+          answerDetail.messageSent += " Try again!";
+        } else if (answerDetail.correct === 'formatError' || answerDetail.correct === 'noAnswer') {
+          answerDetail.messageSent += " Try again!";
+        } else moveOn = true;
+      }
+      if (moveOn === true && gotIt === false) this.acc = 4;
+      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
+        this.feedbackType = { "alert-warning": true };
+      } else if (gotIt === false) this.feedbackType = { "alert-danger": true };
+      this.feedback = answerDetail.messageSent;
+      var action = {};
+      action.state_id = this.currentQuestion[4];
+      action.type = 'answer given-' + correct;
+      action.detail = answerDetail;
+      action.time = answerDetail.timeStamp;
+
+      //this code gives a 500 error now, should check laravel side
+      //console.log("action is ", action);
+      axios.post('../api/student/actions', action).catch(function (error) {
+        console.log(error);
+      });
+
+      if (moveOn) {
+        //update states
+
+        var updatedState = { rts: this.rts, accs: this.acc };
+        //console.log("updatedState is", updatedState)
+        this.$store.dispatch('updateRtsAccs', updatedState);
+        updatedState = Vue.factPriorityHelper(this.stageData);
+        this.$store.dispatch('updateStage', updatedState);
+
+        //set new question
+        //console.log('about to set new question');
+        this.$store.dispatch('setQuestion');
+        this.$store.dispatch('setQuestionStart');
+
+        //update props
+        this.entry = '';
+        this.tries = 0;
+        this.acc = 0;
+        this.rts = [];
+        this.chargeGiven = Math.random() >= 0.5;
+        this.useSymbol = Math.random() >= 0.5;
+      }
+    },
+
+    //checks the entry, returns answerDetail
+    checkEntry: function checkEntry() {
+      var answerDetailToReturn = { messageSent: '', correct: '' };
+      var entryTemp = this.entry.toLowerCase();
+      //console.log('this.entry: ', this.entry);
+      //console.log('this.answer: ', this.answers);
+      if (entryTemp === '') {
+        answerDetailToReturn.correct = 'noAnswer';
+        answerDetailToReturn.messageSent += 'Please enter an answer. ';
+      } else if (this.chargeGiven) {
+        var yArray = ['y', 'yes', 't', 'true'];
+        var nArray = ['n', 'no', 'f', 'false'];
+        if (yArray.indexOf(entryTemp) > -1) {
+          entryTemp = 'y';
+        } else if (nArray.indexOf(entryTemp) > -1) {
+          entryTemp = 'n';
+        } else {
+          answerDetailToReturn.correct = 'formatError';
+          answerDetailToReturn.messageSent = 'Please check the format of your answer. ';
+        }
+      } else {
+        var regex = /(\d+)([+-])/;
+        entryTemp = entryTemp.replace(regex, '$2$1');
+        entryTemp = Number(entryTemp);
+        if (isNaN(entryTemp)) {
+          answerDetailToReturn.correct = 'formatError';
+          answerDetailToReturn.messageSent = 'Please check the format of your answer. ';
+        }
+      }
+      console.log(entryTemp, answerDetailToReturn);
+
+      if (answerDetailToReturn.correct === "") {
+        console.log('inside if');
+        for (var i = 0; i < this.answers.length; i++) {
+          console.log(this.answers[i], this.answers[i].alt.indexOf(entryTemp));
+          if (this.answers[i].alt.indexOf(entryTemp) !== -1) {
+            answerDetailToReturn.correct = this.answers[i].correct;
+            answerDetailToReturn.messageSent = this.answers[i].message;
+            break;
+          }
+        }
+      }
+      return answerDetailToReturn;
+    },
+    setupAnswersYN: function setupAnswersYN() {
+      var answerTemp = [{ alt: '', correct: '', message: '' }];
+      // y is correct
+      console.log(this.charge, this.element.charge);
+      var correct = false;
+      if (this.element.charge === this.charge) correct = true;else if (Array.isArray(this.element.charge) && this.element.charge.indexOf(this.charge) > -1) {
+        correct = true;
+      }
+      if (correct) {
+        for (var i = 0; i < this.charges.length; i++) {
+          if (this.charges[i].alt === this.charge && this.charges[i].op === 'equals') {
+            answerTemp.push({ alt: 'y', correct: 'correct', message: this.charges[i].message });
+          }
+        }
+        answerTemp.push({ alt: 'n', correct: 'knownWrong', message: answerTemp[0].message });
+      }
+      //n is correct
+      else {
+          //console.log(this.charges)
+          for (var _i = 0; _i < this.charges.length; _i++) {
+            //console.log(i)
+            //console.log(this.charges[i])
+            //check for equals, greater or less match to this.charge
+            if (this.charges[_i].alt === this.charge && this.charges[_i].op === 'equals') {
+              //console.log("one", this.charges[i])
+              answerTemp.push({ alt: 'y', correct: this.charges[_i].correct, message: this.charges[_i].message });
+            } else if (this.charge > this.charges[_i].alt && this.charges[_i].op === 'greater') {
+              //console.log("two", this.charges[i])
+              answerTemp.push({ alt: 'y', correct: this.charges[_i].correct, message: this.charges[_i].message });
+            } else if (this.charge < this.charges[_i].alt && this.charges[_i].op === 'less') {
+              //console.log("three", this.charges[i])
+              answerTemp.push({ alt: 'y', correct: this.charges[_i].correct, message: this.charges[_i].message });
+            } else if (this.charge != this.charges[_i].alt && this.charges[_i].op === 'notEqual') {
+              //console.log("four", this.charges[i])
+              answerTemp.push({ alt: 'y', correct: this.charges[_i].correct, message: this.charges[_i].message });
+            } else if (this.charges[_i].correct === 'correct' && answerTemp[0].correct !== 'correct') {
+              //console.log("five", this.charges[i])
+              answerTemp.unshift({ alt: 'n', correct: this.charges[_i].correct, message: this.charges[_i].message });
+            }
+          }
+        }
+      //console.log(answerTemp)
+      return answerTemp;
+    },
+    setupAnswersCharge: function setupAnswersCharge() {
+      var answerTemp = [];
+      var correctAlt = { alt: [], correct: 'correct', message: '' };
+      var chargesTemp = [-3, -2, -1, 1, 2, 3, 4, 5];
+      for (var i = 0; i < this.charges.length; i++) {
+        if (this.charges[i].correct === 'correct') {
+          correctAlt.alt.push(this.charges[i].alt);
+          correctAlt.message += this.charges[i].message;
+          var k = chargesTemp.indexOf(this.charges[i].alt);
+          if (k !== -1) chargesTemp.splice(k, 1);
+        } else if (this.charges[i].op === 'equals') {
+          var _k = chargesTemp.indexOf(this.charges[i].alt);
+          if (_k !== -1) chargesTemp.splice(_k, 1);
+          answerTemp.push({ alt: [this.charges[i].alt], correct: this.charges[i].correct, message: this.charges[i].message });
+        } else if (this.charges[i].op === 'greater') {
+          var _k2 = chargesTemp.indexOf(this.charges[i].alt);
+          var n = chargesTemp.length - _k2;
+          var altTemp = chargesTemp.splice(_k2 + 1, n);
+          answerTemp.push({ alt: altTemp, correct: this.charges[i].correct, message: this.charges[i].message });
+        } else if (this.charges[i].op === 'less') {
+          var _k3 = chargesTemp.indexOf(this.charges[i].alt);
+          var _altTemp = chargesTemp.splice(0, _k3);
+          answerTemp.push({ alt: _altTemp, correct: this.charges[i].correct, message: this.charges[i].message });
+        } else {
+          answerTemp.push({ alt: chargesTemp, correct: this.charges[i].correct, message: this.charges[i].message });
+        }
+      }
+      answerTemp.unshift(correctAlt);
+      return answerTemp;
+    }
+  }
+});
+
+/***/ }),
+/* 109 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._v("Elements Practice!")]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [(_vm.chargeGiven) ? _c('div', [_vm._v("\n            Instructions: Enter y or n. By reasonable charge, I mean one of the two most common charges\n                when the given element forms single-atom ions under normal circumstances. If the element\n                does not form single-atom ions normally, then answer n.\n            "), _c('br'), _c('br'), _vm._v("\n            Is " + _vm._s(_vm._f("chargeFormat")(_vm.charge)) + " a reasonable charge for " + _vm._s(_vm.nameOrSymbol) + "?")]) : _vm._e(), _vm._v(" "), (!(_vm.chargeGiven)) ? _c('div', [_vm._v("\n            Instructions: Enter a number (with sign). By reasonable charge, I mean one of the two most common charges\n                when the given element forms single-atom ions under normal circumstances. If the element\n                does not form single-atom ions normally, then answer 0.\n            "), _c('br'), _c('br'), _vm._v("\n            Enter a reasonable charge for " + _vm._s(_vm.nameOrSymbol) + ":")]) : _vm._e(), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.entry),
+      expression: "entry"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "autofocus": "",
+      "type": "text"
+    },
+    domProps: {
+      "value": (_vm.entry)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.entry = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.feedback),
+      expression: "feedback"
+    }],
+    staticClass: "alert",
+    class: _vm.feedbackType
+  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-48b6a2d7", module.exports)
   }
 }
 

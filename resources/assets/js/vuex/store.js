@@ -7,6 +7,7 @@ import facts from './modules/facts'
 import states from './modules/states'
 import words from './modules/words'
 import session from './modules/session'
+import elements from './modules/elements'
 
 Vue.use(Vuex)
 
@@ -18,6 +19,7 @@ export default new Vuex.Store({
     words,
     facts,
     session,
-    states
+    states,
+    elements
   },
 })

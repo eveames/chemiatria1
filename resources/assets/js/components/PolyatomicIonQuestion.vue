@@ -1,11 +1,14 @@
 <template>
   <div class="panel panel-default">
-      <div class="panel-heading">Polyatomic Ions Practice!</div>
+      <div class="panel-heading">Formulas Practice!</div>
 
         <div class="panel-body">
-          Instructions: If you don't have any guesses, enter zero to see the answer.
+          <div v-if="fact.group_name === 'polyatomic ions'">Instructions: If you don't have any guesses, enter zero to see the answer.
           If you are asked for a formula,
-          use the following format: write 'VO2+1' for <span v-html="this.$options.filters.formatFormula('VO2+1')"></span>.
+          use the following format: write 'VO2+1' for <span v-html="this.$options.filters.formatFormula('VO2+1')"></span>.</div>
+          <div v-if="fact.group_name === 'acids'">Instructions: If you don't have any guesses, enter zero to see the answer.
+          If you are asked for a formula, put the acidic hydrogens at the front and
+          use the following format: write 'H3C6H5O7' for <span v-html="this.$options.filters.formatFormula('H3C6H5O7')"></span>.</div>
           <br>
           <div v-if="requestFormula">
             What is the formula of {{fact.prop}}?
@@ -54,6 +57,8 @@ export default {
       acc: 0,
       rts: [],
       startTime: 0,
+      //determines whether name or formula is given
+      requestFormula: true,
       feedbackType: {
         "alert-success": true,
       }
@@ -70,10 +75,8 @@ export default {
     fact: function () {
       return this.$store.getters.getFactById(this.currentQuestion[1]);
     },
-    //determines whether name or formula is given
-    requestFormula: function() {
-      return (Math.random() >= 0.5);
-    },
+
+
     answer: function() {
       let temp;
       if (this.requestFormula) {temp = this.fact.key;}
@@ -82,6 +85,7 @@ export default {
     },
   },
   created () {
+    this.requestFormula = Math.random() >= 0.5;
   },
   methods: {
 
@@ -166,6 +170,7 @@ export default {
         this.tries = 0
         this.acc = 0
         this.rts = []
+        this.requestFormula = Math.random() >= 0.5;
     	}
     },
 

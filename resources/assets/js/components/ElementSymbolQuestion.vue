@@ -1,17 +1,28 @@
 <template>
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-          <polyatomic-ion-question v-if="fact.group_name === 'polyatomic ions' ||
-            fact.group_name === 'acids' "></polyatomic-ion-question>
-          <element-symbol-question v-if="fact.group_name === 'elementSymbol'"></element-symbol-question>
-          <element-charge-question v-if="fact.group_name === 'elementCharge'"></element-charge-question>
+  <div class="panel panel-default">
+      <div class="panel-heading">Elements Practice!</div>
 
-      </div>
-  </div>
+        <div class="panel-body">
+          <div>Instructions: If you don't have any guesses, enter zero to see the answer.
+          Don't capitalize names, but use correct capitalization for symbols.</div>
+          <br>
+          <div v-if="requestSymbol">
+            What is the symbol of {{fact.prop}}?</div>
+          <div v-if="!(requestSymbol)">
+            What is the name of {{fact.key}}?</div>
+            <br>
+            <div class="input-group">
+              <input autofocus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
+              <span class="input-group-btn">
+                <button @click="submitEntry" class="btn btn-default"
+                  type="button">Submit answer!</button>
+              </span>
+            </div>
+            <br>
+            <div v-show="feedback" class="alert" v-bind:class="feedbackType"><p>{{feedback}}</p></div>
+    </div>
 </div>
 </template>
-
 
 <style>
 </style>
@@ -27,6 +38,8 @@ export default {
       acc: 0,
       rts: [],
       startTime: 0,
+      //determines whether name or formula is given
+      requestSymbol: true,
       feedbackType: {
         "alert-success": true,
       }
@@ -37,18 +50,22 @@ export default {
     ...mapGetters({
       currentQuestion: 'getCurrent',
       questionSetTime: 'getQuestionSetTime',
-      stageData: 'getStageData'
+      stageData: 'getStageData',
+      facts: 'getFacts',
+      elements: 'getElements'
     }),
     fact: function () {
       return this.$store.getters.getFactById(this.currentQuestion[1]);
     },
-    answers: function() {
-      let temp = [{alt: this.word.word, correct: 'correct'}];
-      temp = temp.concat(this.word.altwords);
+    answer: function() {
+      let temp;
+      if (this.requestSymbol) {temp = this.fact.key;}
+      else {temp = this.fact.prop;}
       return temp;
-    }
+    },
   },
   created () {
+    this.requestSymbol = Math.random() >= 0.5;
   },
   methods: {
 
@@ -59,7 +76,7 @@ export default {
     	answerDetail.timeStamp = Date.now();
 
       this.rts.push(answerDetail.timeStamp - this.questionSetTime);
-      console.log('rts is set to ', this.rts)
+      //console.log('rts is set to ', this.rts)
       this.startTime = Date.now();
 
     	let correct = answerDetail.correct;
@@ -80,13 +97,21 @@ export default {
     	}
 
     	else {
-        if (this.tries < 3) {answerDetail.messageSent += "Try again!"}
+        if (this.tries === 1) {answerDetail.messageSent += " Try again!"}
+        else if (this.tries === 2) {answerDetail.messageSent += " One more try!"}
         else moveOn = true;
     	}
       if (moveOn === true && gotIt === false) {
-        answerDetail.messageSent = `Answer to "${this.word.prompts[0]}" is
-        "${this.answers[0].alt}". We\'ll come back to it.`;
-        this.acc = 4;
+        if (this.requestSymbol) {
+          answerDetail.messageSent = `The symbol of "${this.fact.key}" is
+          "${this.answer}". We\'ll come back to it.`;
+          this.acc = 4;
+        }
+        else {
+          answerDetail.messageSent = `${this.fact.prop} is
+          the symbol for ${this.answer}. We\'ll come back to it.`;
+          this.acc = 4;
+        }
       }
       if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close'
         || answerDetail.correct === 'dontKnow') {
@@ -126,40 +151,53 @@ export default {
         this.tries = 0
         this.acc = 0
         this.rts = []
+        this.requestSymbol = Math.random() >= 0.5;
     	}
     },
 
     //checks the entry, returns answerDetail
     checkEntry: function() {
-      let answerDetailToReturn = {messageSent: ''};
+      let answerDetailToReturn = {messageSent: '', correct: ''};
       //console.log('this.entry: ', this.entry);
       //console.log('this.answer: ', this.answers);
       if (this.entry === '') {
             answerDetailToReturn.correct = 'noAnswer';
-            answerDetailToReturn.messageSent += 'If you don\'t know the answer to a vocab question, enter zero. ';
+            answerDetailToReturn.messageSent += 'If you don\'t know the answer, enter zero. ';
           }
           else if (Number(this.entry) === 0) {
             answerDetailToReturn.correct = 'dontKnow';
           }
+          else if (this.entry === this.answer) {
+            answerDetailToReturn.correct = 'correct';
+          }
+          else if (this.entry.toLowerCase() === this.answer.toLowerCase()) {
+            answerDetailToReturn.correct = 'formatError';
+            answerDetailToReturn.messageSent += 'Almost there, please check your capitalization. ';
+          }
           else {
-            for (var i = 0; i < this.answers.length ; i++){
-              if (this.entry === this.answers[i].alt) {
-                answerDetailToReturn.correct = this.answers[i].correct;
-                if (this.answers[i].message) {answerDetailToReturn.messageSent += this.answers[i].message + ' ';}
-                break;
+            for (let fact of this.facts) {
+              //console.log(this.facts, fact)
+              //console.log(this.entry, fact.key);
+              if (this.requestSymbol) {
+                if (this.entry === fact.key) {
+                  answerDetailToReturn.correct = 'knownWrong';
+                  answerDetailToReturn.messageSent = `${this.entry} is ${fact.prop}.`;
+                  break;
+                }
               }
-              else if (this.entry.toLowerCase() === this.answers[i].alt.toLowerCase()) {
-                if (this.answers[i].correct === 'correct') {
-                  answerDetailToReturn.correct = 'formatError';
-                  answerDetailToReturn.messageSent += 'Almost there, please check your capitalization. ';
+              else {
+                if (this.entry === fact.prop) {
+                  answerDetailToReturn.correct = 'knownWrong';
+                  answerDetailToReturn.messageSent = `The symbol for ${this.entry} is  ${fact.key}.`;
                   break;
                 }
               }
             }
-            if (!answerDetailToReturn.correct) {
-              answerDetailToReturn.correct = 'unknownWrong';
-              answerDetailToReturn.messageSent += 'I don\'t recognize your answer. Spell carefully! ';
-            }
+          }
+          if (answerDetailToReturn.correct === '') {
+            answerDetailToReturn.correct = 'unknownWrong';
+            if (!this.requestFormula) {
+              answerDetailToReturn.messageSent = 'Spell carefully! ';}
           }
           return answerDetailToReturn;
         },

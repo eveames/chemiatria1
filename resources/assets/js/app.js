@@ -22,6 +22,8 @@ Vue.component('study-session', require('./components/StudySession.vue'));
 Vue.component('word-question', require('./components/WordQuestion.vue'));
 Vue.component('fact-question', require('./components/FactQuestion.vue'));
 Vue.component('polyatomic-ion-question', require('./components/PolyatomicIonQuestion.vue'));
+Vue.component('element-symbol-question', require('./components/ElementSymbolQuestion.vue'));
+Vue.component('element-charge-question', require('./components/ElementChargeQuestion.vue'));
 Vue.component('bug-report', require('./components/BugReport.vue'));
 Vue.component('frustration-report', require('./components/FrustrationReport.vue'));
 Vue.component('suggestion-box', require('./components/SuggestionBox.vue'));
@@ -42,6 +44,12 @@ Vue.filter('formatFormula', function(value) {
     str = str.replace(/(<sup>)(1)([+&])/, '$1$3');
     return str;
   }
+});
+Vue.filter('chargeFormat', function(value) {
+  let plus = value > 0;
+  let str = String(value);
+  if (plus) str = '+' + str;
+  return str;
 });
 
 

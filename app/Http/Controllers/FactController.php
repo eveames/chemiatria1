@@ -21,9 +21,18 @@ class FactController extends Controller
     public function index()
     {
         // show only matches to search
-        $facts = Fact::orderBy('group_name')->get();
+        $groups = DB::table('facts')->pluck('group_name')->unique();
+        //dd($groups);
         $topics = Topic::orderBy('id')->get();
-        return view('facts.index')->with('facts', $facts)->with('topics', $topics);
+        return view('facts.index')->with('groups', $groups)->with('topics', $topics);
+    }
+
+    public function show_by_group($name)
+    {
+        // show only matches to search
+        $facts = Fact::where('group_name', $name)->get();
+        $topics = Topic::orderBy('id')->get();
+        return view('facts.group')->with('facts', $facts)->with('topics', $topics);
     }
 
     /**
@@ -169,6 +178,33 @@ class FactController extends Controller
         // redirect
         Session::flash('message', 'Successfully updated!');
         return redirect(url('facts/' . $fact->id . '/edit/'));
+    }
+
+    public function update_group(Request $request)
+    {
+      $user = Auth::user();
+      if($user->cant('edit_word')){
+          return redirect(url('facts/' . $fact->id));
+      }
+
+      if (isset($request->topic)){
+          $topicIDs = array_keys($request->topic);
+
+          $path = $request->path();
+          $array = explode('/',$path);
+          $group_name = array_pop($array);
+          $facts = Fact::where('group_name', $group_name);
+          $facts->each(function($item, $key) use (&$topicIDs) {
+            foreach($topicIDs as $id)
+            {
+              $item->topics()->attach($id);
+            }
+          });
+          Session::flash('message', 'Successfully updated!');
+          return redirect(url('facts/group/' . $group_name));
+      }
+      else return redirect(url('facts/group/' . $group_name));
+      //dd($request);
     }
 
     /**
