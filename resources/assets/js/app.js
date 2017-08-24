@@ -24,6 +24,7 @@ Vue.component('fact-question', require('./components/FactQuestion.vue'));
 Vue.component('polyatomic-ion-question', require('./components/PolyatomicIonQuestion.vue'));
 Vue.component('element-symbol-question', require('./components/ElementSymbolQuestion.vue'));
 Vue.component('element-charge-question', require('./components/ElementChargeQuestion.vue'));
+Vue.component('element-group-question', require('./components/ElementGroupQuestion.vue'));
 Vue.component('bug-report', require('./components/BugReport.vue'));
 Vue.component('frustration-report', require('./components/FrustrationReport.vue'));
 Vue.component('suggestion-box', require('./components/SuggestionBox.vue'));

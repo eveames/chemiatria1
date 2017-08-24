@@ -6,7 +6,7 @@
             fact.group_name === 'acids' "></polyatomic-ion-question>
           <element-symbol-question v-if="fact.group_name === 'elementSymbol'"></element-symbol-question>
           <element-charge-question v-if="fact.group_name === 'elementCharge'"></element-charge-question>
-
+          <element-group-question v-if="fact.group_name === 'elementGroup'"></element-group-question>
       </div>
   </div>
 </div>

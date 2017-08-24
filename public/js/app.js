@@ -12164,6 +12164,7 @@ Vue.component('fact-question', __webpack_require__(88));
 Vue.component('polyatomic-ion-question', __webpack_require__(93));
 Vue.component('element-symbol-question', __webpack_require__(100));
 Vue.component('element-charge-question', __webpack_require__(105));
+Vue.component('element-group-question', __webpack_require__(110));
 Vue.component('bug-report', __webpack_require__(79));
 Vue.component('frustration-report', __webpack_require__(82));
 Vue.component('suggestion-box', __webpack_require__(85));
@@ -44230,7 +44231,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
     //checks the entry, returns answerDetail
     checkEntry: function checkEntry() {
-      var answerDetailToReturn = { messageSent: '' };
+      var answerDetailToReturn = { answer: this.entry, messageSent: '' };
       //console.log('this.entry: ', this.entry);
       //console.log('this.answer: ', this.answers);
       if (this.entry === '') {
@@ -45281,7 +45282,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('div', {
     staticClass: "col-md-8 col-md-offset-2"
   }, [(_vm.fact.group_name === 'polyatomic ions' ||
-    _vm.fact.group_name === 'acids') ? _c('polyatomic-ion-question') : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'elementSymbol') ? _c('element-symbol-question') : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'elementCharge') ? _c('element-charge-question') : _vm._e()], 1)])])
+    _vm.fact.group_name === 'acids') ? _c('polyatomic-ion-question') : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'elementSymbol') ? _c('element-symbol-question') : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'elementCharge') ? _c('element-charge-question') : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'elementGroup') ? _c('element-group-question') : _vm._e()], 1)])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -45558,7 +45559,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
     //checks the entry, returns answerDetail
     checkEntry: function checkEntry() {
-      var answerDetailToReturn = { messageSent: '', correct: '' };
+      var answerDetailToReturn = { answer: this.entry, messageSent: '', correct: '' };
       //console.log('this.entry: ', this.entry);
       //console.log('this.answer: ', this.answers);
       if (this.entry === '') {
@@ -45788,8 +45789,8 @@ if (false) {
 
 "use strict";
 var state = {
-  elementsList: [{ name: 'hydrogen', symbol: 'H', family: 'non-metal', location: '1', charge: 1, valence: 1, findex: 8 }, { name: 'helium', symbol: 'He', family: 'noble gas', location: '2', charge: 0, valence: 2, findex: 4 }, { name: 'lithium', symbol: 'Li', family: 'alkali metal', location: '3', charge: 1, valence: 1, findex: 2 }, { name: 'beryllium', symbol: 'Be', family: 'alkaline earth metal', location: '4', charge: 2, valence: 2, findex: 3 }, { name: 'boron', symbol: 'B', family: 'Boron group', location: '5', charge: 3, valence: 3, findex: 8 }, { name: 'carbon', symbol: 'C', family: 'Carbon group', location: '6', charge: 0, valence: 4, findex: 8 }, { name: 'nitrogen', symbol: 'N', family: 'Nitrogen group (pnictogen)', location: '7', charge: -3, valence: 5, findex: 8 }, { name: 'oxygen', symbol: 'O', family: 'chalcogen', location: '8', charge: -2, valence: 6, findex: 1 }, { name: 'fluorine', symbol: 'F', family: 'halogen', location: '9', charge: -1, valence: 7, findex: 0 }, { name: 'bromine', symbol: 'Br', family: 'halogen', location: 'Hal', charge: -1, valence: 7, findex: 0 }, { name: 'iodine', symbol: 'I', family: 'halogen', location: 'Hal', charge: -1, valence: 7, findex: 0 }, { name: 'sodium', symbol: 'Na', family: 'alkali metal', location: '11', charge: 1, valence: 1, findex: 2 }, { name: 'magnesium', symbol: 'Mg', family: 'alkaline earth metal', location: '12', charge: 2, valence: 2, findex: 3 }, { name: 'aluminum', symbol: 'Al', family: 'Boron group', location: '13', charge: 3, valence: 3, findex: 9 }, { name: 'silicon', symbol: 'Si', family: 'Carbon group', location: '14', charge: 4, valence: 4, findex: 8 }, { name: 'phosphorus', symbol: 'P', family: 'Nitrogen group (pnictogen)', location: '15', charge: -3, valence: 5, findex: 8 }, { name: 'sulfur', symbol: 'S', family: 'chalcogen', location: '16', charge: -2, valence: 6, findex: 1 }, { name: 'chlorine', symbol: 'Cl', family: 'halogen', location: '17', charge: -1, valence: 7, findex: 0 }, { name: 'argon', symbol: 'Ar', family: 'noble gas', location: 'NG', charge: 0, valence: 8, findex: 4 }, { name: 'potassium', symbol: 'K', family: 'alkali metal', location: '19', charge: 1, valence: 1, findex: 2 }, { name: 'calcium', symbol: 'Ca', family: 'alkaline earth metal', location: '20', charge: 2, valence: 2, findex: 3 }, { name: 'titanium', symbol: 'Ti', family: 'transition metal', location: 'ETM', charge: 4, findex: 7 }, { name: 'iron', symbol: 'Fe', family: 'transition metal', location: 'MTM', charge: [3, 2], findex: 7 }, { name: 'copper', symbol: 'Cu', family: 'coinage metal', location: 'CM', charge: [2, 1], findex: 6 }, { name: 'mercury', symbol: 'Hg', family: '(post-)transition metal', location: 'PTM', charge: [2, 1], findex: 57 }, { name: 'zinc', symbol: 'Zn', family: '(post-)transition metal', location: 'PTM', charge: [2], findex: 57 }, { name: 'silver', symbol: 'Ag', family: 'coinage metal', location: 'CM', charge: [2, 1], findex: 6 }, { name: 'gold', symbol: 'Au', family: 'coinage metal', location: 'CM', charge: [3, 1], findex: 6 }, { name: 'tin', symbol: 'Sn', family: 'post-transition metal', location: 'PTM', charge: [2, 4], valence: 4, findex: 5 }, { name: 'lead', symbol: 'Pb', family: 'post-transition metal', location: 'PTM', charge: [2, 4], valence: 4, findex: 5 }],
-  elementsCharges: [[{ alt: 1, correct: 'correct', message: '', op: 'equals' }, { alt: -1, correct: 'close', message: 'Possible, but in special circumstances. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'H only has one electron to lose, so it can\'t have a charge above +1. ', op: 'greater' }, { alt: -1, correct: 'knownWrong', message: 'It would be almost impossible to add more than 1 electron to H. ', op: 'less' }], [{ alt: 0, correct: 'correct', message: 'Noble gases pretty much never have charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Noble gases pretty much never have charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 3, correct: 'correct', message: 'Boron often has a +3 charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Like carbon, boron forms many compounds in which it shares electrons, but it does form ionic compounds also. ', op: 'equals' }], [{ alt: 0, correct: 'correct', message: 'Carbon usually shares electrons, rather than forming ions. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Carbon usually shares electrons, and rarely forms ions. ', op: 'notEqual' }], [{ alt: -3, correct: 'correct', message: 'When nitrogen forms an ion, it\'s usually -3 charge. ', op: 'equals' }, { alt: -3, correct: 'close', message: 'In more complicated situations, N can have many different charges. ', op: 'notEqual' }], [{ alt: -2, correct: 'correct', message: 'O almost always has a -2 charge. ', op: 'equals' }, { alt: -2, correct: 'knownWrong', message: 'O almost always has a -2 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'F always has a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'F almost always has a -1 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Halogens almost always have a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Halogens almost always have a -1 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Halogens almost always have a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Halogens almost always have a -1 charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 3, correct: 'correct', message: 'Aluminum always has +3 charge. ', op: 'equals' }, { alt: 3, correct: 'knownWrong', message: 'Aluminum always has +3 charge. ', op: 'notEqual' }], [{ alt: 4, correct: 'correct', message: 'Si often has a 4+ charge when it occurs in rocks. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Si doesn\'t share electrons as much as C. ', op: 'equals' }], [{ alt: -3, correct: 'correct', message: 'When P forms an ion, it\'s usually -3 charge. ', op: 'equals' }, { alt: -3, correct: 'close', message: 'In more complicated situations, P can have many different charges. ', op: 'notEqual' }], [{ alt: -2, correct: 'correct', message: 'S usually has a -2 charge. ', op: 'equals' }, { alt: -2, correct: 'knownWrong', message: 'In more complicated situations, S can have many different charges. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Cl almost always has a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Cl almost always has a -1 charge. ', op: 'notEqual' }], [{ alt: 0, correct: 'correct', message: 'Noble gases pretty much never have charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Noble gases pretty much never have charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 4, correct: 'correct', message: 'Ti usually has a 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Transition elements often have multiple charges, but Ti is usually +4. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 3, correct: 'correct', message: 'Fe usually has a 3+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Fe usually has a 3+ or 2+ charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Fe can have a range of charges, but is +2 or +3 normally. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Cu usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 1, correct: 'correct', message: 'Cu usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Cu rarely has a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 1, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Hg does\'t have a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Zn always has a 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Zn does\'t have a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 1, correct: 'correct', message: 'Ag usually has a 1+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Ag occasionally has a 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Ag rarely has a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 1, correct: 'correct', message: 'Au usually has a 1+ or +3 charge. ', op: 'equals' }, { alt: 3, correct: 'correct', message: 'Au usually has a 1+ or 3+ charge. ', op: 'equals' }, { alt: 3, correct: 'close', message: 'Au rarely has a charge above 3+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 4, correct: 'correct', message: 'Sn and Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Sn and Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less' }], [{ alt: 4, correct: 'correct', message: 'Sn and Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Sn and Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less' }]]
+  elementsList: [{ name: 'hydrogen', symbol: 'H', family: 'non-metal', location: '1', charge: 1, valence: 1, findex: 8 }, { name: 'helium', symbol: 'He', family: 'noble gas', location: '2', charge: 0, valence: 2, findex: 4 }, { name: 'lithium', symbol: 'Li', family: 'alkali metal', location: '3', charge: 1, valence: 1, findex: 2 }, { name: 'beryllium', symbol: 'Be', family: 'alkaline earth metal', location: '4', charge: 2, valence: 2, findex: 3 }, { name: 'boron', symbol: 'B', family: 'Boron group', location: '5', charge: 3, valence: 3, findex: 8 }, { name: 'carbon', symbol: 'C', family: 'Carbon group', location: '6', charge: 0, valence: 4, findex: 8 }, { name: 'nitrogen', symbol: 'N', family: 'Nitrogen group (pnictogen)', location: '7', charge: -3, valence: 5, findex: 8 }, { name: 'oxygen', symbol: 'O', family: 'chalcogen', location: '8', charge: -2, valence: 6, findex: 1 }, { name: 'fluorine', symbol: 'F', family: 'halogen', location: '9', charge: -1, valence: 7, findex: 0 }, { name: 'bromine', symbol: 'Br', family: 'halogen', location: 'Hal', charge: -1, valence: 7, findex: 0 }, { name: 'iodine', symbol: 'I', family: 'halogen', location: 'Hal', charge: -1, valence: 7, findex: 0 }, { name: 'sodium', symbol: 'Na', family: 'alkali metal', location: '11', charge: 1, valence: 1, findex: 2 }, { name: 'magnesium', symbol: 'Mg', family: 'alkaline earth metal', location: '12', charge: 2, valence: 2, findex: 3 }, { name: 'aluminum', symbol: 'Al', family: 'Boron group', location: '13', charge: 3, valence: 3, findex: 9 }, { name: 'silicon', symbol: 'Si', family: 'Carbon group', location: '14', charge: 4, valence: 4, findex: 8 }, { name: 'phosphorus', symbol: 'P', family: 'Nitrogen group (pnictogen)', location: '15', charge: -3, valence: 5, findex: 8 }, { name: 'sulfur', symbol: 'S', family: 'chalcogen', location: '16', charge: -2, valence: 6, findex: 1 }, { name: 'chlorine', symbol: 'Cl', family: 'halogen', location: '17', charge: -1, valence: 7, findex: 0 }, { name: 'argon', symbol: 'Ar', family: 'noble gas', location: 'NG', charge: 0, valence: 8, findex: 4 }, { name: 'potassium', symbol: 'K', family: 'alkali metal', location: '19', charge: 1, valence: 1, findex: 2 }, { name: 'calcium', symbol: 'Ca', family: 'alkaline earth metal', location: '20', charge: 2, valence: 2, findex: 3 }, { name: 'titanium', symbol: 'Ti', family: 'transition metal', location: 'ETM', charge: 4, findex: 7 }, { name: 'iron', symbol: 'Fe', family: 'transition metal', location: 'MTM', charge: [3, 2], findex: 7 }, { name: 'copper', symbol: 'Cu', family: 'coinage metal', location: 'CM', charge: [2, 1], findex: 6 }, { name: 'mercury', symbol: 'Hg', family: '(post-)transition metal', location: 'PTM', charge: [2, 1], findex: 57 }, { name: 'silver', symbol: 'Ag', family: 'coinage metal', location: 'CM', charge: [2, 1], findex: 6 }, { name: 'gold', symbol: 'Au', family: 'coinage metal', location: 'CM', charge: [3, 1], findex: 6 }, { name: 'tin', symbol: 'Sn', family: 'post-transition metal', location: 'PTM', charge: [2, 4], valence: 4, findex: 5 }, { name: 'lead', symbol: 'Pb', family: 'post-transition metal', location: 'PTM', charge: [2, 4], valence: 4, findex: 5 }, { name: 'zinc', symbol: 'Zn', family: '(post-)transition metal', location: 'PTM', charge: [2], findex: 57 }],
+  elementsCharges: [[{ alt: 1, correct: 'correct', message: '', op: 'equals' }, { alt: -1, correct: 'close', message: 'Possible, but in special circumstances. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'H only has one electron to lose, so it can\'t have a charge above +1. ', op: 'greater' }, { alt: -1, correct: 'knownWrong', message: 'It would be almost impossible to add more than 1 electron to H. ', op: 'less' }], [{ alt: 0, correct: 'correct', message: 'Noble gases pretty much never have charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Noble gases pretty much never have charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 3, correct: 'correct', message: 'Boron often has a +3 charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Like carbon, boron forms many compounds in which it shares electrons, but it does form ionic compounds also. ', op: 'equals' }], [{ alt: 0, correct: 'correct', message: 'Carbon usually shares electrons, rather than forming ions. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Carbon usually shares electrons, and rarely forms ions. ', op: 'notEqual' }], [{ alt: -3, correct: 'correct', message: 'When nitrogen forms an ion, it\'s usually -3 charge. ', op: 'equals' }, { alt: -3, correct: 'close', message: 'In more complicated situations, N can have many different charges. ', op: 'notEqual' }], [{ alt: -2, correct: 'correct', message: 'O almost always has a -2 charge. ', op: 'equals' }, { alt: -2, correct: 'knownWrong', message: 'O almost always has a -2 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'F always has a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'F almost always has a -1 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Halogens almost always have a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Halogens almost always have a -1 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Halogens almost always have a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Halogens almost always have a -1 charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 3, correct: 'correct', message: 'Aluminum always has +3 charge. ', op: 'equals' }, { alt: 3, correct: 'knownWrong', message: 'Aluminum always has +3 charge. ', op: 'notEqual' }], [{ alt: 4, correct: 'correct', message: 'Si often has a 4+ charge when it occurs in rocks. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Si doesn\'t share electrons as much as C. ', op: 'equals' }], [{ alt: -3, correct: 'correct', message: 'When P forms an ion, it\'s usually -3 charge. ', op: 'equals' }, { alt: -3, correct: 'close', message: 'In more complicated situations, P can have many different charges. ', op: 'notEqual' }], [{ alt: -2, correct: 'correct', message: 'S usually has a -2 charge. ', op: 'equals' }, { alt: -2, correct: 'knownWrong', message: 'In more complicated situations, S can have many different charges. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Cl almost always has a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Cl almost always has a -1 charge. ', op: 'notEqual' }], [{ alt: 0, correct: 'correct', message: 'Noble gases pretty much never have charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Noble gases pretty much never have charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 4, correct: 'correct', message: 'Ti usually has a 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Transition elements often have multiple charges, but Ti is usually +4. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 3, correct: 'correct', message: 'Fe usually has a 3+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Fe usually has a 3+ or 2+ charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Fe can have a range of charges, but is +2 or +3 normally. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Cu usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 1, correct: 'correct', message: 'Cu usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Cu rarely has a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 1, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Hg does\'t have a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 1, correct: 'correct', message: 'Ag usually has a 1+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Ag occasionally has a 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Ag rarely has a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 1, correct: 'correct', message: 'Au usually has a 1+ or +3 charge. ', op: 'equals' }, { alt: 3, correct: 'correct', message: 'Au usually has a 1+ or 3+ charge. ', op: 'equals' }, { alt: 3, correct: 'close', message: 'Au rarely has a charge above 3+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 4, correct: 'correct', message: 'Sn usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Sn usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less' }], [{ alt: 4, correct: 'correct', message: 'Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Zn always has a 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Zn does\'t have a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }]]
 };
 
 // getters
@@ -46067,7 +46068,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
     //checks the entry, returns answerDetail
     checkEntry: function checkEntry() {
-      var answerDetailToReturn = { messageSent: '', correct: '' };
+      var answerDetailToReturn = { answer: this.entry, messageSent: '', correct: '' };
       //console.log('this.entry: ', this.entry);
       //console.log('this.answer: ', this.answers);
       if (this.entry === '') {
@@ -46340,6 +46341,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       startTime: 0,
       //determines whether name or formula is given
       chargeGiven: true,
+      charge: 0,
       useSymbol: true,
       chargesArray: [-3, -2, -1, 1, 2, 3, 4, 5],
       feedbackType: {
@@ -46363,11 +46365,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     charges: function charges() {
       return this.$store.getters.getElementChargesByIndex(Number(this.fact.key_name) - 1);
     },
-    charge: function charge() {
-      if (this.chargeGiven) {
-        return this.chargesArray[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 7)];
-      } else return 0;
-    },
     answers: function answers() {
       var temp = void 0;
       if (this.chargeGiven) {
@@ -46384,6 +46381,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
   created: function created() {
     this.chargeGiven = Math.random() >= 0.5;
     this.useSymbol = Math.random() >= 0.5;
+    if (this.chargeGiven) this.charge = this.chargesArray[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 7)];
   },
 
   methods: {
@@ -46459,12 +46457,13 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         this.rts = [];
         this.chargeGiven = Math.random() >= 0.5;
         this.useSymbol = Math.random() >= 0.5;
+        if (this.chargeGiven) this.charge = this.chargesArray[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 7)];else this.charge = 0;
       }
     },
 
     //checks the entry, returns answerDetail
     checkEntry: function checkEntry() {
-      var answerDetailToReturn = { messageSent: '', correct: '' };
+      var answerDetailToReturn = { answer: this.entry, messageSent: '', correct: '' };
       var entryTemp = this.entry.toLowerCase();
       //console.log('this.entry: ', this.entry);
       //console.log('this.answer: ', this.answers);
@@ -46647,6 +46646,724 @@ if (false) {
   module.hot.accept()
   if (module.hot.data) {
      require("vue-hot-reload-api").rerender("data-v-48b6a2d7", module.exports)
+  }
+}
+
+/***/ }),
+/* 110 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(111)
+}
+var Component = __webpack_require__(4)(
+  /* script */
+  __webpack_require__(113),
+  /* template */
+  __webpack_require__(114),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/ElementGroupQuestion.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] ElementGroupQuestion.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-479f9c78", Component.options)
+  } else {
+    hotAPI.reload("data-v-479f9c78", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 111 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(112);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(13)("374f6bdc", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-479f9c78\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./ElementGroupQuestion.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-479f9c78\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./ElementGroupQuestion.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 112 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(12)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n.table-cell-bordered {\n  border: none;\n  width: 100%;\n  margin-bottom: 20px;\n  border-collapse: separate;\n  border-spacing: 10px;\n}\n.table-cell-bordered > tbody > col {\n    min-width: 5.5%; /* 100%/18 cols */\n}\n.table-cell-bordered > tbody > tr >td {\n  border: solid 2px;\n  border-color: black;\n  padding: 5px;\n}\n.table-cell-bordered > tbody > tr {\n  height: 1em;\n}\n.table-cell-bordered > tbody > tr >td.no-border {\n  border: none;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 113 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      tries: 0,
+      feedback: '',
+      acc: 0,
+      rts: [],
+      startTime: 0,
+      //determines whether name or formula is given
+      tableFormat: false,
+      useSymbol: true,
+      feedbackType: {
+        "alert-success": true
+      },
+      families: ['halogen', 'chalcogen', 'alkali metal', 'alkaline earth metal', 'noble gas', 'post-transition metal', 'coinage metal', 'transition metal', 'non-metal', 'metal']
+    };
+  },
+  //props: ['questionTypeID'],
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    currentQuestion: 'getCurrent',
+    questionSetTime: 'getQuestionSetTime',
+    stageData: 'getStageData',
+    facts: 'getFacts'
+  }), {
+    fact: function fact() {
+      return this.$store.getters.getFactById(this.currentQuestion[1]);
+    },
+    element: function element() {
+      //console.log(Number(this.fact.key_name)-1)
+      return this.$store.getters.getElementByIndex(Number(this.fact.key_name) - 1);
+    },
+    answers: function answers() {
+      var temp = [];
+      if (this.tableFormat) temp = [{ alt: this.element.location, correct: 'correct', message: '' }];else {
+        temp = [{ alt: this.element.findex, correct: 'correct', message: '' }];
+        if (this.element.findex === 57) {
+          temp[0].alt = 5;
+          temp[0].message = 'Zn, Cd and Hg are considered either transition or post-transition metals. ';
+          temp.push({ alt: 7, correct: 'correct',
+            message: 'Zn, Cd and Hg are considered either transition or post-transition metals. ' });
+        }
+        if (this.element.findex === 0 || this.element.findex === 1 || this.element.findex === 4) {
+          temp.push({ alt: 8, correct: 'close', message: 'It is a non-metal, but be more specific!' });
+        } else if (this.element.findex === 2 || this.element.findex === 3 || this.element.findex === 5 || this.element.findex === 6 || this.element.findex === 7) {
+          temp.push({ alt: 9, correct: 'close', message: 'It is a metal, but be more specific!' });
+          if (this.element.findex === 6) {
+            temp.push({ alt: 7, correct: 'close', message: 'It is a transition metal, but be more specific!' });
+          }
+        }
+      }
+      return temp;
+    },
+    nameOrSymbol: function nameOrSymbol() {
+      if (this.useSymbol) return this.fact.key;else return this.fact.prop;
+    }
+  }),
+  created: function created() {
+    this.tableFormat = Math.random() >= 0.5;
+    this.useSymbol = Math.random() >= 0.5;
+  },
+
+  methods: {
+
+    submitEntry: function submitEntry(event) {
+      this.tries += 1;
+      var answerDetail = this.checkEntry();
+      if (this.startTime === 0) {
+        this.startTime = this.questionSetTime;
+      }
+      answerDetail.timeStamp = Date.now();
+
+      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
+      //console.log('rts is set to ', this.rts)
+      this.startTime = Date.now();
+
+      var correct = answerDetail.correct;
+      var moveOn = false;
+      var gotIt = false;
+
+      if (correct === 'correct') {
+        answerDetail.messageSent += ' Correct!';
+        moveOn = true;
+        gotIt = true;
+        this.acc = this.tries - 1;
+        this.feedbackType = { "alert-success": true };
+
+        //console.log('acc is set to ', this.acc)
+      } else if (correct === 'dontKnow') {
+        moveOn = true;
+      } else {
+        if (this.tries === 1) {
+          answerDetail.messageSent += " Try again!";
+        } else if (this.tries === 2) {
+          answerDetail.messageSent += " One more try!";
+        } else moveOn = true;
+      }
+      if (moveOn === true && gotIt === false) {
+        if (this.tableFormat) {
+          answerDetail.messageSent = this.fact.key + ' is\n          in ' + this.answers[0].alt + '. We\'ll come back to it.';
+          this.acc = 4;
+        } else {
+          answerDetail.messageSent = this.fact.prop + ' is\n          the symbol for ' + this.answer + '. We\'ll come back to it.';
+          this.acc = 4;
+        }
+      }
+      if (answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
+        this.feedbackType = { "alert-warning": true };
+      } else if (gotIt === false) this.feedbackType = { "alert-danger": true };
+      this.feedback = answerDetail.messageSent;
+      var action = {};
+      action.state_id = this.currentQuestion[4];
+      action.type = 'answer given-' + correct;
+      action.detail = answerDetail;
+      action.time = answerDetail.timeStamp;
+
+      //this code gives a 500 error now, should check laravel side
+      //console.log("action is ", action);
+      axios.post('../api/student/actions', action).catch(function (error) {
+        console.log(error);
+      });
+
+      if (moveOn) {
+        //update states
+
+        var updatedState = { rts: this.rts, accs: this.acc };
+        console.log("updatedState is", updatedState);
+        this.$store.dispatch('updateRtsAccs', updatedState);
+        updatedState = Vue.factPriorityHelper(this.stageData);
+        this.$store.dispatch('updateStage', updatedState);
+
+        //set new question
+        //console.log('about to set new question');
+        this.$store.dispatch('setQuestion');
+        this.$store.dispatch('setQuestionStart');
+
+        //update props
+        this.entry = '';
+        this.tries = 0;
+        this.acc = 0;
+        this.rts = [];
+        this.useSymbol = Math.random() >= 0.5;
+        this.tableFormat = Math.random() >= 0.5;
+      }
+    },
+
+    //checks the entry, returns answerDetail
+    checkEntry: function checkEntry() {
+      var answerDetailToReturn = { answer: this.entry, messageSent: '', correct: '' };
+      //console.log('this.entry: ', this.entry);
+      //console.log('this.answer: ', this.answers);
+      if (this.entry === '') {
+        answerDetailToReturn.correct = 'noAnswer';
+        answerDetailToReturn.messageSent += 'If you don\'t know the answer, enter zero. ';
+      } else if (this.tableFormat && Number(this.entry) === 0) {
+        answerDetailToReturn.correct = 'dontKnow';
+      }
+      for (var i = 0; i < this.answers.length; i++) {
+        if (this.tableFormat && this.entry.toLowerCase() === this.answers[i].alt.toLowerCase()) {
+          answerDetailToReturn.correct = this.answers[i].correct;
+          answerDetailToReturn.messageSent += this.answers[i].message;
+          break;
+        } else if (!this.tableFormat && Number(this.entry) === Number(this.answers[i].alt)) {
+          answerDetailToReturn.correct = this.answers[i].correct;
+          answerDetailToReturn.messageSent += this.answers[i].message;
+          break;
+        }
+      }
+      if (answerDetailToReturn.correct === '') {
+        answerDetailToReturn.correct = 'unknownWrong';
+      }
+      return answerDetailToReturn;
+    }
+  }
+});
+
+/***/ }),
+/* 114 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._v("Elements Practice!")]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [(_vm.tableFormat) ? _c('div', [_c('div', [_vm._v("Instructions: Either click inside the correct box, or enter the correct box's label\n              (not case-sensitive). Then hit return/enter. If you don't know the answer,\n              you can enter 0. The correct answer will be displayed and you'll see it again soon.")]), _vm._v(" "), _c('br'), _vm._v(" "), _c('h4', [_vm._v("Select the location of "), _c('strong', [_vm._v(_vm._s(_vm.nameOrSymbol))]), _vm._v(" in the periodic table:")]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', [_c('table', {
+    staticClass: "table-cell-bordered",
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      }
+    },
+    model: {
+      value: (_vm.entry),
+      callback: function($$v) {
+        _vm.entry = $$v
+      },
+      expression: "entry"
+    }
+  }, [_c('tbody', [_c('col', {
+    attrs: {
+      "span": "18"
+    }
+  }), _vm._v(" "), _c('tr', [_c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '1';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("1")]), _vm._v(" "), _c('td', {
+    staticClass: "no-border",
+    attrs: {
+      "colspan": "16"
+    }
+  }), _vm._v(" "), _c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '2';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("2")])]), _vm._v(" "), _c('tr', [_c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '3';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("3")]), _vm._v(" "), _c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '4';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("4")]), _vm._v(" "), _c('td', {
+    staticClass: "no-border",
+    attrs: {
+      "colspan": "10",
+      "rowspan": "2"
+    }
+  }), _vm._v(" "), _c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '5';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("5")]), _vm._v(" "), _c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '6';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("6")]), _vm._v(" "), _c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '7';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("7")]), _vm._v(" "), _c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '8';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("8")]), _vm._v(" "), _c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '9';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("9")]), _vm._v(" "), _c('td', {
+    attrs: {
+      "rowspan": "5"
+    },
+    on: {
+      "click": function($event) {
+        _vm.entry = 'NG';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("NG")])]), _vm._v(" "), _c('tr', [_c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '11';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("11")]), _vm._v(" "), _c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '12';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("12")]), _vm._v(" "), _c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '13';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("13")]), _vm._v(" "), _c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '14';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("14")]), _vm._v(" "), _c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '15';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("15")]), _vm._v(" "), _c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '16';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("16")]), _vm._v(" "), _c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '17';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("17")])]), _vm._v(" "), _c('tr', [_c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '19';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("19")]), _vm._v(" "), _c('td', {
+    on: {
+      "click": function($event) {
+        _vm.entry = '20';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("20")]), _vm._v(" "), _c('td', {
+    attrs: {
+      "colspan": "3",
+      "rowspan": "3"
+    },
+    on: {
+      "click": function($event) {
+        _vm.entry = 'ETM';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("ETM")]), _vm._v(" "), _c('td', {
+    attrs: {
+      "colspan": "3",
+      "rowspan": "3"
+    },
+    on: {
+      "click": function($event) {
+        _vm.entry = 'MTM';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("MTM")]), _vm._v(" "), _c('td', {
+    attrs: {
+      "colspan": "2",
+      "rowspan": "3"
+    },
+    on: {
+      "click": function($event) {
+        _vm.entry = 'LTM';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("LTM")]), _vm._v(" "), _c('td', {
+    attrs: {
+      "rowspan": "3"
+    },
+    on: {
+      "click": function($event) {
+        _vm.entry = 'CM';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("CM")]), _vm._v(" "), _c('td', {
+    attrs: {
+      "colspan": "3",
+      "rowspan": "3"
+    },
+    on: {
+      "click": function($event) {
+        _vm.entry = 'PTM';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("PTM")]), _vm._v(" "), _c('td', {
+    attrs: {
+      "colspan": "2",
+      "rowspan": "3"
+    },
+    on: {
+      "click": function($event) {
+        _vm.entry = 'NM';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("NM")]), _vm._v(" "), _c('td', {
+    attrs: {
+      "rowspan": "3"
+    },
+    on: {
+      "click": function($event) {
+        _vm.entry = 'Hal';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("Hal")])]), _vm._v(" "), _c('tr', [_c('td', {
+    attrs: {
+      "rowspan": "2"
+    },
+    on: {
+      "click": function($event) {
+        _vm.entry = 'AM';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("AM")]), _vm._v(" "), _c('td', {
+    attrs: {
+      "rowspan": "2"
+    },
+    on: {
+      "click": function($event) {
+        _vm.entry = 'AEM';
+        _vm.submitEntry()
+      }
+    }
+  }, [_vm._v("AEM")])]), _vm._v(" "), _c('tr')])])])]) : _vm._e(), _vm._v(" "), (!(_vm.tableFormat)) ? _c('div', [_c('div', [_vm._v("Instructions: Enter the number of your answer, or click on the answer and hit enter.\n              Don't type in the word! Make sure you choose the most specific description.")]), _vm._v(" "), _c('br'), _vm._v(" "), _c('h4', [_vm._v("Choose the most specific correct classification for "), _c('strong', [_vm._v(_vm._s(_vm.nameOrSymbol))]), _vm._v(":")]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      }
+    }
+  }, _vm._l((_vm.families), function(group, index) {
+    return _c('p', {
+      staticClass: "input-group",
+      staticStyle: {
+        "padding": "5px 10px"
+      },
+      on: {
+        "click": function($event) {
+          _vm.entry = index;
+          _vm.submitEntry()
+        }
+      }
+    }, [_vm._v("\n                " + _vm._s(index) + ". " + _vm._s(group) + "\n              ")])
+  }))]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.entry),
+      expression: "entry"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "autofocus": "",
+      "type": "text"
+    },
+    domProps: {
+      "value": (_vm.entry)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.entry = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.feedback),
+      expression: "feedback"
+    }],
+    staticClass: "alert",
+    class: _vm.feedbackType
+  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-479f9c78", module.exports)
   }
 }
 

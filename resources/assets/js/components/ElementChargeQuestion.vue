@@ -45,6 +45,7 @@ export default {
       startTime: 0,
       //determines whether name or formula is given
       chargeGiven: true,
+      charge: 0,
       useSymbol: true,
       chargesArray: [-3, -2, -1, 1, 2, 3, 4, 5],
       feedbackType: {
@@ -69,12 +70,6 @@ export default {
     charges: function() {
       return this.$store.getters.getElementChargesByIndex(Number(this.fact.key_name) -1);
     },
-    charge: function() {
-      if (this.chargeGiven) {
-        return this.chargesArray[_.random(0, 7)];
-      }
-      else return 0;
-    },
     answers: function() {
       let temp;
       if (this.chargeGiven) {
@@ -93,6 +88,7 @@ export default {
   created () {
     this.chargeGiven = Math.random() >= 0.5;
     this.useSymbol = Math.random() >= 0.5;
+    if (this.chargeGiven) this.charge = this.chargesArray[_.random(0, 7)];
   },
   methods: {
 
@@ -170,12 +166,14 @@ export default {
         this.rts = []
         this.chargeGiven = Math.random() >= 0.5;
         this.useSymbol = Math.random() >= 0.5;
+        if (this.chargeGiven) this.charge = this.chargesArray[_.random(0, 7)];
+        else this.charge = 0;
     	}
     },
 
     //checks the entry, returns answerDetail
     checkEntry: function() {
-      let answerDetailToReturn = {messageSent: '', correct: ''};
+      let answerDetailToReturn = {answer: this.entry, messageSent: '', correct: ''};
       let entryTemp = this.entry.toLowerCase();
       //console.log('this.entry: ', this.entry);
       //console.log('this.answer: ', this.answers);

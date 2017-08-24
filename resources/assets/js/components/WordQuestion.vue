@@ -151,7 +151,7 @@ export default {
 
     //checks the entry, returns answerDetail
     checkEntry: function() {
-      let answerDetailToReturn = {messageSent: ''};
+      let answerDetailToReturn = {answer: this.entry, messageSent: ''};
       //console.log('this.entry: ', this.entry);
       //console.log('this.answer: ', this.answers);
       if (this.entry === '') {

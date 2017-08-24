@@ -24,11 +24,11 @@ const state = {
       {name: 'iron', symbol: 'Fe', family: 'transition metal', location: 'MTM', charge: [3, 2], findex: 7},
       {name: 'copper', symbol: 'Cu', family: 'coinage metal', location: 'CM', charge: [2, 1], findex: 6},
       {name: 'mercury', symbol: 'Hg', family: '(post-)transition metal', location: 'PTM', charge: [2, 1], findex: 57},
-      {name: 'zinc', symbol: 'Zn', family: '(post-)transition metal', location: 'PTM', charge: [2], findex: 57},
       {name: 'silver', symbol: 'Ag', family: 'coinage metal', location: 'CM', charge: [2, 1], findex: 6},
       {name: 'gold', symbol: 'Au', family: 'coinage metal', location: 'CM', charge: [3, 1], findex: 6},
       {name: 'tin', symbol: 'Sn', family: 'post-transition metal', location: 'PTM', charge: [2, 4], valence: 4, findex: 5},
       {name: 'lead', symbol: 'Pb', family: 'post-transition metal', location: 'PTM', charge: [2, 4], valence: 4, findex: 5},
+      {name: 'zinc', symbol: 'Zn', family: '(post-)transition metal', location: 'PTM', charge: [2], findex: 57}
     ],
     elementsCharges: [
     [{alt: 1, correct: 'correct', message: '', op: 'equals'},
@@ -90,9 +90,6 @@ const state = {
     {alt: 1, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals'},
     {alt: 2, correct: 'close', message: 'Hg does\'t have a charge above 2+. ', op: 'greater'},
     {alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less'}],
-    [{alt: 2, correct: 'correct', message: 'Zn always has a 2+ charge. ', op: 'equals'},
-    {alt: 2, correct: 'close', message: 'Zn does\'t have a charge above 2+. ', op: 'greater'},
-    {alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less'}],
     [{alt: 1, correct: 'correct', message: 'Ag usually has a 1+ charge. ', op: 'equals'},
     {alt: 2, correct: 'correct', message: 'Ag occasionally has a 2+ charge. ', op: 'equals'},
     {alt: 2, correct: 'close', message: 'Ag rarely has a charge above 2+. ', op: 'greater'},
@@ -101,12 +98,15 @@ const state = {
     {alt: 3, correct: 'correct', message: 'Au usually has a 1+ or 3+ charge. ', op: 'equals'},
     {alt: 3, correct: 'close', message: 'Au rarely has a charge above 3+. ', op: 'greater'},
     {alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less'}],
-    [{alt: 4, correct: 'correct', message: 'Sn and Pb usually has a 2+ or 4+ charge. ', op: 'equals'},
-    {alt: 2, correct: 'correct', message: 'Sn and Pb usually has a 2+ or 4+ charge. ', op: 'equals'},
+    [{alt: 4, correct: 'correct', message: 'Sn usually has a 2+ or 4+ charge. ', op: 'equals'},
+    {alt: 2, correct: 'correct', message: 'Sn usually has a 2+ or 4+ charge. ', op: 'equals'},
     {alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less'}],
-    [{alt: 4, correct: 'correct', message: 'Sn and Pb usually has a 2+ or 4+ charge. ', op: 'equals'},
-    {alt: 2, correct: 'correct', message: 'Sn and Pb usually has a 2+ or 4+ charge. ', op: 'equals'},
-    {alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less'}]]
+    [{alt: 4, correct: 'correct', message: 'Pb usually has a 2+ or 4+ charge. ', op: 'equals'},
+    {alt: 2, correct: 'correct', message: 'Pb usually has a 2+ or 4+ charge. ', op: 'equals'},
+    {alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less'}],
+    [{alt: 2, correct: 'correct', message: 'Zn always has a 2+ charge. ', op: 'equals'},
+    {alt: 2, correct: 'close', message: 'Zn does\'t have a charge above 2+. ', op: 'greater'},
+    {alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less'}]]
 }
 
 // getters
