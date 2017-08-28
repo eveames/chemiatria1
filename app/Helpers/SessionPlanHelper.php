@@ -11,6 +11,7 @@ use chemiatria\Topic;
 use chemiatria\User;
 use chemiatria\Word;
 use chemiatria\Skill;
+use Illuminate\Support\Facades\DB;
 
 class SessionPlanHelper
 {
@@ -50,20 +51,14 @@ class SessionPlanHelper
   //
   public function organizeNew(User $user)
   {
-    $studiedTopics = $user->topics();
+    //$studiedTopics = $user->topics();
     $topics = Topic::all();
-    $newTopics = $topics->diff($studiedTopics);
+    //$newTopics = $topics->diff($studiedTopics);
+    //I think it's better to just list all topics and allow editing
+    $newTopics = $topics;
     $topicDetailsArray = [];
     foreach($newTopics as $topic){
-      $topicDetail = [
-        'id' => $topic->id,
-        'name' => $topic->topic,
-        'words' => [],
-        'skills' => [],
-        'selected' => false,
-      ];
-      $topicDetail['words'] = $topic->words()->pluck('word');
-      $topicDetail['skills'] = $topic->skills()->pluck('skill');
+      $topicDetail = self::topicDetail($topic, false, false);
       //dd($topicDetail['words']);
       $topicDetailsArray[$topicDetail['id']] = $topicDetail;
     }
@@ -71,11 +66,42 @@ class SessionPlanHelper
     return $topicDetailsArray;
   }
 
+  public function topicDetail(Topic $topic, $selectedDefault, $withID)
+  {
+    $topicDetail = [
+      'id' => $topic->id,
+      'name' => $topic->topic,
+      'words' => [],
+      'skills' => [],
+      'facts' => [],
+      'selected' => $selectedDefault,
+    ];
+    if($withID) {
+      $topicDetail['words'] = $topic->words()->pluck('word', 'word_id');
+      $topicDetail['skills'] = $topic->skills()->pluck('skill', 'skill_id');
+      $topicDetail['facts'] = [];
+      $facts = $topic->facts()->orderBy('group_name')->get();
+      $facts->each(function($item) {
+        $topicDetail['facts'][$item->group_name][$item->id] = $item->name();
+      });
+    }
+    else {
+      $topicDetail['words'] = $topic->words()->pluck('word');
+      $topicDetail['skills'] = $topic->skills()->pluck('skill');
+      $topicDetail['facts'] = $topic->facts()->get()->map(function($item) {
+        return $item->name();
+      });
+    }
+    return $topicDetail;
+  }
+
   //$topicIDsToAdd is an array of the topic IDs
   public function addStatesByTopic($topicIDsToAdd, User $user)
   {
     $topics = Topic::find($topicIDsToAdd);
+    $userID = $user->id;
     $studyables = $user->states()->with('studyable')->get();
+
     $oldWords = $studyables->map(function($item) {
       if ($item->studyable_type == "chemiatria\Word") return $item->studyable;
     });
@@ -92,7 +118,7 @@ class SessionPlanHelper
     $oldFacts = $oldFacts->filter(function($item) {
       return !is_null($item);
     });
-       $oldSkills = $oldSkills->filter(function($item) {
+    $oldSkills = $oldSkills->filter(function($item) {
       return !is_null($item);
     });
 
@@ -102,24 +128,48 @@ class SessionPlanHelper
     foreach($topics as $topic){
       //add words
       $words = $topic->words()->get();
-      if ($oldWords->isNotEmpty()) {$wordsToAdd = $words->diff($oldWords);}
+      //dd($words, $oldWords);
+      if ($oldWords->isNotEmpty()) {
+        $wordsToAdd = $words->diff($oldWords);
+        $wordsToActive = $oldWords->intersect($words)->pluck('id');
+        DB::table('states')
+          ->join('users', 'states.user_id', '=', 'users.id')->where('users.id', '=', $userID)
+          ->join('words', 'states.studyable_id', '=', 'words.id')
+          ->whereIn('words.id', $wordsToActive)->where('states.studyable_type', '=', 'chemiatria\Word')
+          ->update(['current' => 1]);
+      }
       else $wordsToAdd = $words;
       foreach($wordsToAdd as $word){
         //dd($word);
-
         State::storeWord($user, $topic, $word);
       }
       //add skills
-      $skills = $topic->skills();
-      //dd($oldSkills);
-      if ($oldSkills->isNotEmpty()) {$skillsToAdd = $skills->diff($oldSkills);}
+      $skills = $topic->skills()->get();
+      //dd($oldSkills, $skills);
+      if ($oldSkills->isNotEmpty()) {
+        $skillsToAdd = $skills->diff($oldSkills);
+        $skillsToActive = $oldSkills->intersect($skills)->pluck('id');
+        DB::table('states')
+          ->join('users', 'states.user_id', '=', 'users.id')->where('users.id', '=', $userID)
+          ->join('skills', 'states.studyable_id', '=', 'skills.id')
+          ->whereIn('skills.id', $skillsToActive)->where('states.studyable_type', '=', 'chemiatria\Skill')
+          ->update(['current' => 1]);
+      }
       else $skillsToAdd = $skills;
       foreach($skillsToAdd as $skill){
         State::storeSkill($user, $topic, $skill);
       }
       //add facts
       $facts = $topic->facts()->get();
-      if ($oldFacts->isNotEmpty()) {$factsToAdd = $facts->diff($oldFacts);}
+      if ($oldFacts->isNotEmpty()) {
+        $factsToAdd = $facts->diff($oldFacts);
+        $factsToActive = $oldFacts->intersect($facts)->pluck('id');
+        DB::table('states')
+          ->join('users', 'states.user_id', '=', 'users.id')->where('users.id', '=', $userID)
+          ->join('facts', 'states.studyable_id', '=', 'facts.id')
+          ->whereIn('facts.id', $factsToActive)->where('states.studyable_type', '=', 'chemiatria\Fact')
+          ->update(['current' => 1]);
+      }
       else $factsToAdd = $facts;
       foreach($factsToAdd as $fact){
         //dd($word);
@@ -136,12 +186,13 @@ class SessionPlanHelper
       $topics = $state->topics()->get();
       //dd($topics);
       $detail = $state->detail();
+      $stateID = $state->id;
       foreach($topics as $topic)
       {
         $id = $topic->id;
         $detailsByTopic[$id]['string'] = isset($detailsByTopic[$id]['string']) ?
           $detailsByTopic[$id]['string'] . ', ' . $detail['name'] : $detail['name'];
-        $detailsByTopic[$id][] = $detail;
+        $detailsByTopic[$id][$stateID] = $detail;
         $detailsByTopic[$id]['name'] = $topic->topic;
       }
     }

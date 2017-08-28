@@ -16,6 +16,7 @@ Route::get('/', function () {
 });
 Route::resource('words', 'WordController');
 Route::resource('facts', 'FactController');
+Route::resource('skills', 'SkillController');
 
 Route::get('/words/topics/{id}', 'WordController@topic_search');
 Route::get('/facts/topics/{id}', 'FactController@topic_search');
@@ -33,6 +34,8 @@ Route::get('/home/play', 'HomeController@play');
 Route::get('/home/play/all', 'HomeController@playall');
 
 Route::get('/home/plan', 'HomeController@plan');
+Route::get('/home/plan/topic/{id}', 'HomeController@detail_plan');
+Route::post('/home/plan/detail', 'HomeController@update_detail_plan');
 
 Route::post('/home/plan', 'HomeController@update_plan');
 

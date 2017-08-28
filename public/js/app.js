@@ -1193,22 +1193,25 @@ var index_esm = {
 
 "use strict";
 const INITIALIZE_WORDS = 'INITIALIZE_WORDS'
-/* harmony export (immutable) */ __webpack_exports__["c"] = INITIALIZE_WORDS;
+/* harmony export (immutable) */ __webpack_exports__["d"] = INITIALIZE_WORDS;
 
 const INITIALIZE_FACTS = 'INITIALIZE_FACTS'
 /* harmony export (immutable) */ __webpack_exports__["a"] = INITIALIZE_FACTS;
 
 const INITIALIZE_STATES = 'INITIALIZE_STATES'
-/* harmony export (immutable) */ __webpack_exports__["b"] = INITIALIZE_STATES;
+/* harmony export (immutable) */ __webpack_exports__["c"] = INITIALIZE_STATES;
+
+const INITIALIZE_SKILLS = 'INITIALIZE_SKILLS'
+/* harmony export (immutable) */ __webpack_exports__["b"] = INITIALIZE_SKILLS;
 
 const SET_USER = 'SET_USER'
 /* unused harmony export SET_USER */
 
 const UPDATE_STAGE = 'UPDATE_STAGE'
-/* harmony export (immutable) */ __webpack_exports__["i"] = UPDATE_STAGE;
+/* harmony export (immutable) */ __webpack_exports__["j"] = UPDATE_STAGE;
 
 const UPDATE_RTS_ACCS = 'UPDATE_RTS_ACCS'
-/* harmony export (immutable) */ __webpack_exports__["h"] = UPDATE_RTS_ACCS;
+/* harmony export (immutable) */ __webpack_exports__["i"] = UPDATE_RTS_ACCS;
 
 const INCREMENT_FRUSTRATION = 'INCREMENT_FRUSTRATION'
 /* unused harmony export INCREMENT_FRUSTRATION */
@@ -1218,16 +1221,16 @@ const INCREMENT_HINTS = 'INCREMENT_HINTS'
 
 //export const NEW_QUESTION = 'NEW_QUESTION'
 const SET_READY = 'SET_READY'
-/* harmony export (immutable) */ __webpack_exports__["g"] = SET_READY;
+/* harmony export (immutable) */ __webpack_exports__["h"] = SET_READY;
 
 const SET_QUESTION = 'SET_QUESTION'
-/* harmony export (immutable) */ __webpack_exports__["e"] = SET_QUESTION;
+/* harmony export (immutable) */ __webpack_exports__["f"] = SET_QUESTION;
 
 const SET_QUESTION_START = 'SET_QUESTION_START'
-/* harmony export (immutable) */ __webpack_exports__["f"] = SET_QUESTION_START;
+/* harmony export (immutable) */ __webpack_exports__["g"] = SET_QUESTION_START;
 
 const SET_MESSAGE = 'SET_MESSAGE'
-/* harmony export (immutable) */ __webpack_exports__["d"] = SET_MESSAGE;
+/* harmony export (immutable) */ __webpack_exports__["e"] = SET_MESSAGE;
 
 
 
@@ -12138,6 +12141,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__vuex_store__ = __webpack_require__(55);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__plugins_RandomGeneratorPlugin_js__ = __webpack_require__(77);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__plugins_FactPriorityPlugin_js__ = __webpack_require__(78);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__plugins_SkillPriorityPlugin_js__ = __webpack_require__(125);
 
 /**
  * First we will load all of this project's JavaScript dependencies which
@@ -12161,18 +12165,22 @@ Vue.component('test1', __webpack_require__(47));
 Vue.component('study-session', __webpack_require__(50));
 Vue.component('word-question', __webpack_require__(72));
 Vue.component('fact-question', __webpack_require__(88));
+Vue.component('skill-question', __webpack_require__(120));
 Vue.component('polyatomic-ion-question', __webpack_require__(93));
 Vue.component('element-symbol-question', __webpack_require__(100));
 Vue.component('element-charge-question', __webpack_require__(105));
 Vue.component('element-group-question', __webpack_require__(110));
+Vue.component('sigfig-question', __webpack_require__(115));
 Vue.component('bug-report', __webpack_require__(79));
 Vue.component('frustration-report', __webpack_require__(82));
 Vue.component('suggestion-box', __webpack_require__(85));
 
 
 
+
 Vue.use(__WEBPACK_IMPORTED_MODULE_1__plugins_RandomGeneratorPlugin_js__["a" /* default */]);
 Vue.use(__WEBPACK_IMPORTED_MODULE_2__plugins_FactPriorityPlugin_js__["a" /* default */]);
+Vue.use(__WEBPACK_IMPORTED_MODULE_3__plugins_SkillPriorityPlugin_js__["a" /* default */]);
 //console.log('did something');
 Vue.filter('formatFormula', function (value) {
   var str = String(value);
@@ -43666,12 +43674,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 // shape: [{ id, quantity }]
 var state = {
   states: [], //stores and organizes facts
+  skills: [],
   statesReady: false,
   currentIndex: 0,
   currentTypeID: 0,
   currentType: '',
   currentStage: 0,
   currentStateID: 0,
+  currentSubtype: false,
+  currentSkill: false,
   finished: false
 };
 // getters
@@ -43684,7 +43695,7 @@ var getters = {
   },
   getCurrent: function getCurrent(state) {
     //console.log("called getCurrent");
-    var curr = [state.currentIndex, state.currentTypeID, state.currentType, state.currentStage, state.currentStateID];
+    var curr = [state.currentIndex, state.currentTypeID, state.currentType, state.currentStage, state.currentStateID, state.currentSubtype];
     //console.log(curr, typeof(curr));
     return curr;
   },
@@ -43706,7 +43717,7 @@ var actions = {
     var commit = _ref.commit;
 
     return new Promise(function (resolve, reject) {
-      axios.get('../api/student/states').then(function (response) {
+      axios.get('../api/student/states/active').then(function (response) {
         //console.log(response.data);
         var temp = response.data;
         var states = [];
@@ -43722,8 +43733,8 @@ var actions = {
           states.push(thisState);
         }
         //console.log(states);
-        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_STATES */], states);
-        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_QUESTION */]);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_STATES */], states);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_QUESTION */]);
         resolve();
       }).catch(function (error) {
         console.log(error);
@@ -43731,18 +43742,38 @@ var actions = {
       });
     });
   },
-  updateRtsAccs: function updateRtsAccs(_ref2, newState) {
+  setupSkills: function setupSkills(_ref2) {
     var commit = _ref2.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* UPDATE_RTS_ACCS */], newState);
+    return new Promise(function (resolve, reject) {
+      axios.get('../api/student/skills').then(function (response) {
+        //console.log(response.data);
+        var temp = response.data;
+        var skills = [];
+        for (var i = 0; i < temp.length; i++) {
+          skills.push(temp[i]);
+        }
+        //console.log(states);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_SKILLS */], skills);
+        resolve();
+      }).catch(function (error) {
+        console.log(error);
+        reject();
+      });
+    });
   },
-  updateStage: function updateStage(_ref3, newState) {
+  updateRtsAccs: function updateRtsAccs(_ref3, newState) {
     var commit = _ref3.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* UPDATE_STAGE */], newState);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* UPDATE_RTS_ACCS */], newState);
   },
-  setQuestion: function setQuestion(_ref4) {
+  updateStage: function updateStage(_ref4, newState) {
     var commit = _ref4.commit;
+
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* UPDATE_STAGE */], newState);
+  },
+  setQuestion: function setQuestion(_ref5) {
+    var commit = _ref5.commit;
 
     var prev = state.currentIndex;
     var state_id = state.currentStateID;
@@ -43753,16 +43784,18 @@ var actions = {
     axios.post(url, state.states[prev]).catch(function (error) {
       console.log(error);
     });
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_QUESTION */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_QUESTION */]);
     //console.log('after SET_QUESTION, prev is ', prev)
   }
 };
 
 // mutations
-var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_STATES */], function (state, states) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_STATES */], function (state, states) {
   state.states = states;
   state.statesReady = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_QUESTION */], function (state) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_SKILLS */], function (state, skills) {
+  state.skill = skills;
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_QUESTION */], function (state) {
   //console.log('before getNext index is ', state.currentIndex)
   state.currentIndex = getNext();
   //console.log('after getNext index is ', state.currentIndex)
@@ -43771,12 +43804,19 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
   state.currentStage = state.states[state.currentIndex].stage;
   state.currentStateID = state.states[state.currentIndex].id;
   state.states[state.currentIndex].lastStudied = Date.now();
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* UPDATE_RTS_ACCS */], function (state, newState) {
+  if (state.currentType === 'skill') {
+    state.currentSubtype = state.skills[currentTypeID - 1].subtype;
+    state.currentSkill = state.skills[currentTypeID - 1].skill;
+  } else {
+    state.currentSubtype = false;
+    state.currentSkill = false;
+  }
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* UPDATE_RTS_ACCS */], function (state, newState) {
   console.log("newState is ", newState);
   state.states[state.currentIndex].accs.push(newState.accs);
   state.states[state.currentIndex].rts.push(newState.rts);
   console.log("state is now ", state.states[state.currentIndex]);
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* UPDATE_STAGE */], function (state, newState) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* UPDATE_STAGE */], function (state, newState) {
   console.log("newState is ", newState);
   state.states[state.currentIndex].priority = newState.priority;
   state.states[state.currentIndex].stage = newState.stage;
@@ -43881,7 +43921,7 @@ var actions = {
           var word = { word: temp[i].word, type_id: temp[i].id, altwords: alts, prompts: prompts };
           words.push(word);
         }
-        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_WORDS */], words);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* INITIALIZE_WORDS */], words);
         resolve();
       }).catch(function (error) {
         console.log(error);
@@ -43892,7 +43932,7 @@ var actions = {
 };
 
 // mutations
-var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_WORDS */], function (state, words) {
+var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* INITIALIZE_WORDS */], function (state, words) {
   //console.log("in INITIALIZE_WORDS, words is: " + words);
   state.words = words;
   //console.log(state.words[1].altwords[0]);
@@ -43946,26 +43986,26 @@ var actions = {
     var commit = _ref.commit;
 
     //console.log('setReady');
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_READY */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_READY */]);
   },
   setQuestionStart: function setQuestionStart(_ref2) {
     var commit = _ref2.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_QUESTION_START */], Date.now());
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_QUESTION_START */], Date.now());
   },
   setMessage: function setMessage(_ref3, message) {
     var commit = _ref3.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* SET_MESSAGE */], message);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_MESSAGE */], message);
   }
 };
 
 // mutations
-var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_READY */], function (state) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_READY */], function (state) {
   state.setupComplete = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_QUESTION_START */], function (state, time) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_QUESTION_START */], function (state, time) {
   state.questionSetTime = time;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* SET_MESSAGE */], function (state, message) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_MESSAGE */], function (state, message) {
   state.message = message;
 }), _mutations);
 
@@ -45129,145 +45169,15 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {
-      entry: '',
-      tries: 0,
-      feedback: '',
-      acc: 0,
-      rts: [],
-      startTime: 0,
-      feedbackType: {
-        "alert-success": true
-      }
-    };
-  },
   //props: ['questionTypeID'],
   computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
-    currentQuestion: 'getCurrent',
-    questionSetTime: 'getQuestionSetTime',
-    stageData: 'getStageData'
+    currentQuestion: 'getCurrent'
   }), {
     fact: function fact() {
       return this.$store.getters.getFactById(this.currentQuestion[1]);
-    },
-    answers: function answers() {
-      var temp = [{ alt: this.word.word, correct: 'correct' }];
-      temp = temp.concat(this.word.altwords);
-      return temp;
     }
   }),
-  created: function created() {},
-
-  methods: {
-
-    submitEntry: function submitEntry(event) {
-      this.tries += 1;
-      var answerDetail = this.checkEntry();
-      if (this.startTime === 0) {
-        this.startTime = this.questionSetTime;
-      }
-      answerDetail.timeStamp = Date.now();
-
-      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
-      console.log('rts is set to ', this.rts);
-      this.startTime = Date.now();
-
-      var correct = answerDetail.correct;
-      var moveOn = false;
-      var gotIt = false;
-
-      if (correct === 'correct') {
-        answerDetail.messageSent += ' Correct!';
-        moveOn = true;
-        gotIt = true;
-        this.acc = this.tries - 1;
-        this.feedbackType = { "alert-success": true };
-
-        //console.log('acc is set to ', this.acc)
-      } else if (correct === 'dontKnow') {
-        moveOn = true;
-      } else {
-        if (this.tries < 3) {
-          answerDetail.messageSent += "Try again!";
-        } else moveOn = true;
-      }
-      if (moveOn === true && gotIt === false) {
-        answerDetail.messageSent = 'Answer to "' + this.word.prompts[0] + '" is\n        "' + this.answers[0].alt + '". We\'ll come back to it.';
-        this.acc = 4;
-      }
-      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
-        this.feedbackType = { "alert-warning": true };
-      } else if (gotIt === false) this.feedbackType = { "alert-danger": true };
-      this.feedback = answerDetail.messageSent;
-      var action = {};
-      action.state_id = this.currentQuestion[4];
-      action.type = 'answer given-' + correct;
-      action.detail = answerDetail;
-      action.time = answerDetail.timeStamp;
-
-      //this code gives a 500 error now, should check laravel side
-      //console.log("action is ", action);
-      axios.post('../api/student/actions', action).catch(function (error) {
-        console.log(error);
-      });
-
-      if (moveOn) {
-        //update states
-
-        var updatedState = { rts: this.rts, accs: this.acc };
-        console.log("updatedState is", updatedState);
-        this.$store.dispatch('updateRtsAccs', updatedState);
-        updatedState = Vue.factPriorityHelper(this.stageData);
-        this.$store.dispatch('updateStage', updatedState);
-
-        //set new question
-        //console.log('about to set new question');
-        this.$store.dispatch('setQuestion');
-        this.$store.dispatch('setQuestionStart');
-
-        //update props
-        this.entry = '';
-        this.tries = 0;
-        this.acc = 0;
-        this.rts = [];
-      }
-    },
-
-    //checks the entry, returns answerDetail
-    checkEntry: function checkEntry() {
-      var answerDetailToReturn = { messageSent: '' };
-      //console.log('this.entry: ', this.entry);
-      //console.log('this.answer: ', this.answers);
-      if (this.entry === '') {
-        answerDetailToReturn.correct = 'noAnswer';
-        answerDetailToReturn.messageSent += 'If you don\'t know the answer to a vocab question, enter zero. ';
-      } else if (Number(this.entry) === 0) {
-        answerDetailToReturn.correct = 'dontKnow';
-      } else {
-        for (var i = 0; i < this.answers.length; i++) {
-          if (this.entry === this.answers[i].alt) {
-            answerDetailToReturn.correct = this.answers[i].correct;
-            if (this.answers[i].message) {
-              answerDetailToReturn.messageSent += this.answers[i].message + ' ';
-            }
-            break;
-          } else if (this.entry.toLowerCase() === this.answers[i].alt.toLowerCase()) {
-            if (this.answers[i].correct === 'correct') {
-              answerDetailToReturn.correct = 'formatError';
-              answerDetailToReturn.messageSent += 'Almost there, please check your capitalization. ';
-              break;
-            }
-          }
-        }
-        if (!answerDetailToReturn.correct) {
-          answerDetailToReturn.correct = 'unknownWrong';
-          answerDetailToReturn.messageSent += 'I don\'t recognize your answer. Spell carefully! ';
-        }
-      }
-      return answerDetailToReturn;
-    }
-  }
+  created: function created() {}
 });
 
 /***/ }),
@@ -47366,6 +47276,629 @@ if (false) {
      require("vue-hot-reload-api").rerender("data-v-479f9c78", module.exports)
   }
 }
+
+/***/ }),
+/* 115 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(116)
+}
+var Component = __webpack_require__(4)(
+  /* script */
+  __webpack_require__(118),
+  /* template */
+  __webpack_require__(119),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/SigfigQuestion.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] SigfigQuestion.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-210ee668", Component.options)
+  } else {
+    hotAPI.reload("data-v-210ee668", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 116 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(117);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(13)("62bf7d00", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-210ee668\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./SigfigQuestion.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-210ee668\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./SigfigQuestion.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 117 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(12)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 118 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      tries: 0,
+      feedback: '',
+      acc: 0,
+      rts: [],
+      startTime: 0,
+      zeroString: '000000000000',
+      feedbackType: {
+        "alert-success": true
+      }
+    };
+  },
+  //props: ['questionTypeID'],
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    currentQuestion: 'getCurrent',
+    questionSetTime: 'getQuestionSetTime',
+    stageData: 'getStageData'
+  }), {
+    question: function question() {
+      var setTime = questionSetTime;
+      var number = String(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(1, 9));
+      var answer = 0;
+      var hint = '';
+      if (currentQuestion.skill === 'SigFigs: no decimal place') {
+        var middleDigits = Vue.randomDigitString(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 2), 3);
+        number += String(middleDigits);
+        number += String(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(1, 9));
+        answer = number.length;
+        var numZeros = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 2);
+        var zeros = zeroString.slice(0, numZeros);
+        number += String(zeros);
+        hint = ['only count zeros in between non-zero digits'];
+        //only show this if wrong
+        message = 'If there is no decimal point, every non-zero digit and every zero between non-zero digits is significant';
+      } else if (currentQuestion.skill === 'SigFigs: decimal places') {
+        var firstDigits = Vue.randomDigitString(_random(1, 2), 3);
+        number += String(firstDigits);
+        number += '.';
+        var afterDigits = Vue.randomDigitString(_random(1, 2), 3);
+        number += String(afterDigits);
+        answer = firstDigits.length + 1 + afterDigits.length;
+        hint = ['Zeros at the end count if there\'s a decimal point'];
+        message = 'Zeros at the end count if there\'s a decimal point';
+      } else if (currentQuestion.skill === 'SigFigs: decimal only') {
+        var numZerosBefore = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 3);
+        var zerosBefore = zeroString.slice(0, numZerosBefore);
+        var _middleDigits = number + String(Vue.getRandomString(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 2), 3));
+        var numZerosAfter = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 2);
+        var zerosAfter = zeroString.slice(0, numZerosAfter);
+        number = '0.' + String(zerosBefore) + String(_middleDigits) + String(zerosAfter);
+        answer = _middleDigits.length + zerosAfter.length;
+        hint = ['Zeros at the end count if there\'s a decimal point'];
+        message = 'Zeros at the end count if there\'s a decimal point';
+      } else if (currentQuestion.skill === 'SigFigs: ends in decimal point') {
+        var _middleDigits2 = Vue.randomDigitString(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 2), 3);
+        number += String(_middleDigits2);
+        number += String(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(1, 9));
+        var _numZeros = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(1, 2);
+        var _zeros = zeroString.slice(0, _numZeros);
+        number += _zeros;
+        answer = number.length;
+        number += '.';
+        hint = ['If there\'s a decimal point but nothing after it, all the digits are significant.'];
+        message = 'If there\'s a decimal point but nothing after it, all the digits are significant.';
+      }
+      return { number: number, answer: answer, hint: hint, message: message, setTime: setTime };
+    }
+
+  }),
+  created: function created() {},
+
+  methods: {
+
+    submitEntry: function submitEntry(event) {
+      this.tries += 1;
+      var answerDetail = this.checkEntry();
+      if (this.startTime === 0) {
+        this.startTime = this.questionSetTime;
+      }
+      answerDetail.timeStamp = Date.now();
+
+      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
+      console.log('rts is set to ', this.rts);
+      this.startTime = Date.now();
+
+      var correct = answerDetail.correct;
+      var moveOn = false;
+      var gotIt = false;
+
+      if (correct === 'correct') {
+        answerDetail.messageSent += ' Correct!';
+        moveOn = true;
+        gotIt = true;
+        this.acc = this.tries - 1;
+        this.feedbackType = { "alert-success": true };
+        //console.log('acc is set to ', this.acc)
+      } else {
+        if (this.tries < 3) {
+          answerDetail.messageSent += "Try again!";
+        } else moveOn = true;
+      }
+      if (moveOn === true && gotIt === false) {
+        answerDetail.messageSent = this.question.message;
+        this.acc = 4;
+      }
+      if (answerDetail.correct === 'formatError') {
+        this.feedbackType = { "alert-warning": true };
+      } else if (gotIt === false) this.feedbackType = { "alert-danger": true };
+      this.feedback = answerDetail.messageSent;
+      var action = {};
+      action.state_id = this.currentQuestion[4];
+      action.type = 'answer given-' + correct;
+      action.detail = answerDetail;
+      action.time = answerDetail.timeStamp;
+
+      //this code gives a 500 error now, should check laravel side
+      //console.log("action is ", action);
+      axios.post('../api/student/actions', action).catch(function (error) {
+        console.log(error);
+      });
+
+      if (moveOn) {
+        //update states
+
+        var updatedState = { rts: this.rts, accs: this.acc };
+        console.log("updatedState is", updatedState);
+        this.$store.dispatch('updateRtsAccs', updatedState);
+        updatedState = Vue.skillPriorityHelper(this.stageData);
+        this.$store.dispatch('updateStage', updatedState);
+
+        //set new question
+        //console.log('about to set new question');
+        this.$store.dispatch('setQuestion');
+        this.$store.dispatch('setQuestionStart');
+
+        //update props
+        this.entry = '';
+        this.tries = 0;
+        this.acc = 0;
+        this.rts = [];
+      }
+    },
+
+    //checks the entry, returns answerDetail
+    checkEntry: function checkEntry() {
+      var answerDetailToReturn = { answer: this.entry, correct: '', messageSent: '' };
+      //console.log('this.entry: ', this.entry);
+      //console.log('this.answer: ', this.answers);
+      if (this.entry === '') {
+        answerDetailToReturn.correct = 'noAnswer';
+        answerDetailToReturn.messageSent += 'Please enter a number. ';
+      } else if (Number(this.entry) === Number(this.question.answer)) {
+        answerDetailToReturn.correct = 'correct';
+      } else {
+        if (isNaN(Number(this.entry))) {
+          answerDetailToReturn.correct = 'formatError';
+          answerDetailToReturn.messageSent = 'Answer should be a number. ';
+        } else if (Number(this.entry) % 1 !== 0) {
+          answerDetailToReturn.correct = 'formatError';
+          answerDetailToReturn.messageSent = 'Answer should be an integer. ';
+        } else {
+          answerDetailToReturn.correct = 'knownWrong';
+        }
+      }
+      return answerDetailToReturn;
+    }
+  }
+});
+
+/***/ }),
+/* 119 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "container"
+  }, [_c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-md-8 col-md-offset-2"
+  }, [_c('div', {
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._v("Significant Figures Practice!")]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_vm._v("\n                    Instructions: Enter the number of significant figures (digits)\n                      in the number displayed.\n                    "), _c('br'), _vm._v(" "), _c('div', [_c('h4', [_vm._v(_vm._s(_vm.word.prompts[0]))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.entry),
+      expression: "entry"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "autofocus": "",
+      "type": "text"
+    },
+    domProps: {
+      "value": (_vm.entry)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.entry = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.feedback),
+      expression: "feedback"
+    }],
+    staticClass: "alert",
+    class: _vm.feedbackType
+  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])])])])])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-210ee668", module.exports)
+  }
+}
+
+/***/ }),
+/* 120 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(121)
+}
+var Component = __webpack_require__(4)(
+  /* script */
+  __webpack_require__(123),
+  /* template */
+  __webpack_require__(124),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/SkillQuestion.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] SkillQuestion.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-8006a850", Component.options)
+  } else {
+    hotAPI.reload("data-v-8006a850", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 121 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(122);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(13)("0fbd3fa6", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-8006a850\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./SkillQuestion.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-8006a850\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./SkillQuestion.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 122 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(12)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 123 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  //props: ['questionTypeID'],
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    currentQuestion: 'getCurrent'
+  })),
+  created: function created() {}
+});
+
+/***/ }),
+/* 124 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "container"
+  }, [_c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-md-8 col-md-offset-2"
+  }, [(_vm.currentQuestion.subtype === 'polyatomic ions') ? _c('sigfig-question') : _vm._e(), _vm._v(" "), (_vm.currentQuestion.subtype === 'ionicFormula') ? _c('ionic-formula-question') : _vm._e()], 1)])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-8006a850", module.exports)
+  }
+}
+
+/***/ }),
+/* 125 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  install: function install(Vue) {
+
+    Vue.skillPriorityHelper = function (stageData) {
+
+      //ms until next to study
+      var delayWrong = 3000;
+      var delayDiscover = 10000;
+      var delayMaster = 240000;
+      var delayReview = 1200000;
+      var timesCriterionForMaster = 10; //must of studied 10x
+      var accCriterionForMaster = 1; //no more than 1 wrong in last 10
+      var timesCriterionForReview = 30;
+      var accCriterionForReview = 1;
+      var rtCriterionForReview = 10;
+      //console.log("in fact priority, stageData is ", stageData)
+      var timesStudied = stageData.accs.length;
+      var correct = stageData.accs[timesStudied - 1];
+      var stage = Number(stageData.stage);
+      var newStage = 0;
+      var newPriority = 0;
+      var metrics = Vue.metricsHelper(stageData);
+      if (timesStudied > timesCriterionForReview && metrics.accuracyLast10 <= accCriterionForReview && metrics.averageRTLast10 < rtCriterionForReview) {
+        if (stage === 'master') {
+          newStage = 'review';
+          //console.log(thisItem.type + ' ' + thisItem.subtype + ' now mastered!');
+        }
+      }
+      if (timesStudied > timesCriterionForMaster && metrics.accuracyLast10 <= accCriterionForMaster) {
+        if (stage === 'discover') {
+          newStage = 'master';
+          //console.log(thisItem.type + ' ' + thisItem.subtype + ' now discovered!');
+        }
+      }
+      stage = newStage;
+      //update priority
+      if (stage === 'discover' && correct) {
+        newPriority = stageData.lastStudied + delayDiscover;
+      } else if (stage === 'master' && correct) {
+        newPriority = stageData.lastStudied + delayMaster;
+      } else if (stage === 'review' && correct) {
+        newPriority = stageData.lastStudied + delayReview;
+      } else newPriority = stageData.lastStudied + delayWrong;
+      //randomize new priority a bit
+      var randomFactor = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 40) * 1000;
+      newPriority += randomFactor;
+      return { priority: newPriority, stage: newStage };
+    };
+
+    Vue.metricsHelper = function (stageData) {
+      var plusStart = function plusStart(start) {
+        return function (a, b, c) {
+          if (c < start) {
+            return 0;
+          }
+          if (isNaN(a)) {
+            a = 0;
+          }
+          if (isNaN(b)) {
+            b = 0;
+          } else {
+            return a + b;
+          }
+        };
+      };
+      var accArray = stageData.accs;
+      //console.log('in get metrics');
+      var rtArray = [];
+      for (var i = 0; i < stageData.rts.length; i++) {
+        rtArray[i] = stageData.rts[i].slice();
+      }
+      var flatRTArray = rtArray.reduce(function (a, b) {
+        return a.concat(b);
+      });
+      //console.log('in get metrics after flat: ', studyArrayItem.rtArray);
+      var lastRTArray = rtArray.reduce(function (a, b) {
+        return a.concat(b.pop());
+      });
+      //console.log('in get metrics after last: ', studyArrayItem.rtArray);
+      var totalAccuracy = accArray.reduce(plusStart(0));
+      var timesStudied = accArray.length;
+      var lastMistake = Math.max(accArray.lastIndexOf(1), accArray.lastIndexOf(2), accArray.lastIndexOf(3), accArray.lastIndexOf(4));
+      var lastStreak = timesStudied - lastMistake;
+      var accuracyLastChunk = accArray.reduce(plusStart(timesStudied - 10));
+      var totalRT = flatRTArray.reduce(plusStart(0)) / flatRTArray.length;
+      var streakRT = lastRTArray.reduce(plusStart(lastMistake + 1)) / lastStreak;
+      //this gives the total time to right answer (adds rt for each response to one q)
+      var rtLastChunk = lastRTArray.reduce(plusStart(timesStudied - 10)) / Math.min(10, timesStudied);
+      //console.log('in get metrics after before return: ', studyArrayItem.rtArray);
+      return {
+        totalAccuracy: totalAccuracy, timesStudied: timesStudied,
+        lastStreak: lastStreak, accuracyLast10: accuracyLastChunk,
+        averageRT: totalRT, streakAverageRT: streakRT, averageRTLast10: rtLastChunk
+      };
+    };
+  }
+});
 
 /***/ })
 /******/ ]);

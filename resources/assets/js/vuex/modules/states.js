@@ -4,12 +4,15 @@ import * as types from '../mutation_types'
 // shape: [{ id, quantity }]
 const state = {
   states: [], //stores and organizes facts
+  skills: [],
   statesReady: false,
   currentIndex: 0,
   currentTypeID: 0,
   currentType: '',
   currentStage: 0,
   currentStateID: 0,
+  currentSubtype: false,
+  currentSkill: false,
   finished: false,
 }
 // getters
@@ -18,7 +21,8 @@ const getters = {
   getCurrentStateID: (state) => state.currentStateID,
   getCurrent: (state) => {
     //console.log("called getCurrent");
-    let curr = [state.currentIndex, state.currentTypeID, state.currentType, state.currentStage, state.currentStateID];
+    let curr = [state.currentIndex, state.currentTypeID, state.currentType,
+      state.currentStage, state.currentStateID, state.currentSubtype];
     //console.log(curr, typeof(curr));
     return curr;
   },
@@ -39,7 +43,7 @@ const getters = {
 const actions = {
   setupStates ({commit}) {
     return new Promise((resolve, reject) => {
-      axios.get('../api/student/states')
+      axios.get('../api/student/states/active')
       .then((response) => {
       //console.log(response.data);
       let temp = response.data;
@@ -60,6 +64,26 @@ const actions = {
       //console.log(states);
       commit(types.INITIALIZE_STATES, states);
       commit(types.SET_QUESTION);
+      resolve();
+      }).catch(function (error) {
+        console.log(error);
+        reject();
+      });
+    })
+  },
+
+  setupSkills ({commit}) {
+    return new Promise((resolve, reject) => {
+      axios.get('../api/student/skills')
+      .then((response) => {
+      //console.log(response.data);
+      let temp = response.data;
+      let skills = [];
+      for(let i = 0; i < temp.length; i++ ) {
+        skills.push(temp[i]);
+      }
+      //console.log(states);
+      commit(types.INITIALIZE_SKILLS, skills);
       resolve();
       }).catch(function (error) {
         console.log(error);
@@ -95,6 +119,9 @@ const mutations = {
     state.states = states;
     state.statesReady = true;
   },
+  [types.INITIALIZE_SKILLS] (state, skills) {
+    state.skill = skills;
+  },
   [types.SET_QUESTION] (state) {
     //console.log('before getNext index is ', state.currentIndex)
     state.currentIndex = getNext();
@@ -104,6 +131,14 @@ const mutations = {
     state.currentStage = state.states[state.currentIndex].stage;
     state.currentStateID = state.states[state.currentIndex].id;
     state.states[state.currentIndex].lastStudied = Date.now();
+    if (state.currentType === 'skill') {
+      state.currentSubtype = state.skills[currentTypeID -1].subtype;
+      state.currentSkill = state.skills[currentTypeID -1].skill;
+    }
+    else {
+      state.currentSubtype = false;
+      state.currentSkill = false;
+    }
   },
   [types.UPDATE_RTS_ACCS] (state, newState) {
     console.log("newState is ", newState);

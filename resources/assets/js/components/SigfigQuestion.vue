@@ -34,6 +34,7 @@
 </style>
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import _ from 'lodash'
 
 export default {
   data: function() {
@@ -44,6 +45,7 @@ export default {
       acc: 0,
       rts: [],
       startTime: 0,
+      zeroString: '000000000000',
       feedbackType: {
         "alert-success": true,
       }
@@ -56,14 +58,59 @@ export default {
       questionSetTime: 'getQuestionSetTime',
       stageData: 'getStageData'
     }),
-    word: function () {
-      return this.$store.getters.getWordById(this.currentQuestion[1]);
-    },
-    answers: function() {
-      let temp = [{alt: this.word.word, correct: 'correct'}];
-      temp = temp.concat(this.word.altwords);
-      return temp;
+    question: function() {
+      let setTime = questionSetTime;
+      let number = String(_.random(1,9));
+      let answer = 0;
+      let hint = '';
+      if (currentQuestion.skill === 'SigFigs: no decimal place') {
+        let middleDigits = Vue.randomDigitString(_.random(0,2), 3);
+        number += String(middleDigits);
+        number += String(_.random(1,9));
+        answer = number.length;
+        let numZeros = _.random(0,2);
+        let zeros = zeroString.slice(0, numZeros);
+        number += String(zeros);
+        hint = ['only count zeros in between non-zero digits'];
+        //only show this if wrong
+        message = 'If there is no decimal point, every non-zero digit and every zero between non-zero digits is significant';
+      }
+      else if (currentQuestion.skill === 'SigFigs: decimal places') {
+        let firstDigits = Vue.randomDigitString(_random(1,2), 3);
+        number += String(firstDigits);
+        number += '.';
+        let afterDigits = Vue.randomDigitString(_random(1,2), 3);
+        number += String(afterDigits);
+        answer = firstDigits.length + 1 + afterDigits.length;
+        hint = ['Zeros at the end count if there\'s a decimal point'];
+        message = 'Zeros at the end count if there\'s a decimal point';
+      }
+      else if (currentQuestion.skill === 'SigFigs: decimal only') {
+        let numZerosBefore = _.random(0,3);
+        let zerosBefore = zeroString.slice(0, numZerosBefore);
+        let middleDigits = number + String(Vue.getRandomString(_.random(0,2), 3));
+        let numZerosAfter = _.random(0,2);
+        let zerosAfter = zeroString.slice(0, numZerosAfter);
+        number = '0.' + String(zerosBefore) + String(middleDigits) + String(zerosAfter);
+        answer = middleDigits.length + zerosAfter.length;
+        hint = ['Zeros at the end count if there\'s a decimal point'];
+        message = 'Zeros at the end count if there\'s a decimal point';
+      }
+      else if (currentQuestion.skill === 'SigFigs: ends in decimal point') {
+        let middleDigits = Vue.randomDigitString(_.random(0,2), 3);
+        number += String(middleDigits);
+        number += String(_.random(1,9));
+        let numZeros = _.random(1,2);
+        let zeros = zeroString.slice(0, numZeros);
+        number += zeros;
+        answer = number.length;
+        number += '.';
+        hint = ['If there\'s a decimal point but nothing after it, all the digits are significant.'];
+        message = 'If there\'s a decimal point but nothing after it, all the digits are significant.';
+      }
+      return {number: number, answer: answer, hint: hint, message: message, setTime: setTime}
     }
+
   },
   created () {
   },
@@ -89,24 +136,17 @@ export default {
         gotIt = true;
         this.acc = this.tries-1;
         this.feedbackType = {"alert-success": true}
-
         //console.log('acc is set to ', this.acc)
     	}
-    	else if (correct === 'dontKnow') {
-    		moveOn = true;
-    	}
-
     	else {
         if (this.tries < 3) {answerDetail.messageSent += "Try again!"}
         else moveOn = true;
     	}
       if (moveOn === true && gotIt === false) {
-        answerDetail.messageSent = `Answer to "${this.word.prompts[0]}" is
-        "${this.answers[0].alt}". We\'ll come back to it.`;
+        answerDetail.messageSent = this.question.message;
         this.acc = 4;
       }
-      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close'
-        || answerDetail.correct === 'dontKnow') {
+      if (answerDetail.correct === 'formatError') {
         this.feedbackType = {"alert-warning": true}
       }
       else if (gotIt === false) this.feedbackType = {"alert-danger": true}
@@ -130,7 +170,7 @@ export default {
         let updatedState = {rts: this.rts, accs: this.acc};
         console.log("updatedState is", updatedState)
         this.$store.dispatch('updateRtsAccs', updatedState);
-        updatedState = Vue.factPriorityHelper(this.stageData);
+        updatedState = Vue.skillPriorityHelper(this.stageData);
         this.$store.dispatch('updateStage', updatedState);
 
         //set new question
@@ -148,38 +188,31 @@ export default {
 
     //checks the entry, returns answerDetail
     checkEntry: function() {
-      let answerDetailToReturn = {messageSent: ''};
+      let answerDetailToReturn = {answer: this.entry, correct: '', messageSent: ''};
       //console.log('this.entry: ', this.entry);
       //console.log('this.answer: ', this.answers);
       if (this.entry === '') {
             answerDetailToReturn.correct = 'noAnswer';
-            answerDetailToReturn.messageSent += 'If you don\'t know the answer to a vocab question, enter zero. ';
+            answerDetailToReturn.messageSent += 'Please enter a number. ';
           }
-          else if (Number(this.entry) === 0) {
-            answerDetailToReturn.correct = 'dontKnow';
-          }
-          else {
-            for (var i = 0; i < this.answers.length ; i++){
-              if (this.entry === this.answers[i].alt) {
-                answerDetailToReturn.correct = this.answers[i].correct;
-                if (this.answers[i].message) {answerDetailToReturn.messageSent += this.answers[i].message + ' ';}
-                break;
-              }
-              else if (this.entry.toLowerCase() === this.answers[i].alt.toLowerCase()) {
-                if (this.answers[i].correct === 'correct') {
-                  answerDetailToReturn.correct = 'formatError';
-                  answerDetailToReturn.messageSent += 'Almost there, please check your capitalization. ';
-                  break;
-                }
-              }
-            }
-            if (!answerDetailToReturn.correct) {
-              answerDetailToReturn.correct = 'unknownWrong';
-              answerDetailToReturn.messageSent += 'I don\'t recognize your answer. Spell carefully! ';
-            }
-          }
-          return answerDetailToReturn;
-        },
-    }
+      else if (Number(this.entry) === Number(this.question.answer)) {
+        answerDetailToReturn.correct = 'correct';
+      }
+      else {
+        if (isNaN(Number(this.entry))) {
+          answerDetailToReturn.correct = 'formatError';
+          answerDetailToReturn.messageSent = 'Answer should be a number. ';
+        }
+        else if (Number(this.entry) % 1 !== 0) {
+          answerDetailToReturn.correct = 'formatError';
+          answerDetailToReturn.messageSent = 'Answer should be an integer. ';
+        }
+        else {
+          answerDetailToReturn.correct = 'knownWrong';
+        }
+      }
+      return answerDetailToReturn;
+    },
   }
+}
 </script>

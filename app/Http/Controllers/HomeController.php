@@ -71,6 +71,7 @@ class HomeController extends Controller
       //create new states
       if(is_array($request->new))
       {
+        //dd($request->new);
         $topicIDsToAdd = array_map('intval', array_keys($request->new));
         $user = auth()->user();
         $formatter->addStatesByTopic($topicIDsToAdd, $user);
@@ -78,9 +79,10 @@ class HomeController extends Controller
 
       //update current on old states
       $input = json_decode($request->input, true);
+      //dd($input);
       $data = $request->data;
 
-      //dd($input);
+      //dd($data, $input);
 
       //unseen:
       $statesToSet1 = [];
@@ -88,10 +90,13 @@ class HomeController extends Controller
       if(isset($data['unseen']) && is_array($data['unseen']))
         {
           $unseenUnset = array_diff_key($input['unseen'], $data['unseen']);
+          //dd($unseenUnset, $input, $data);
           foreach($unseenUnset as $arr)
           {
+            //dd($arr);
             $statesToSet0 = array_merge($statesToSet0, array_keys($arr));
           }
+          //dd($statesToSet0);
         }
       if(isset($data['due']) && is_array($data['due']))
         {
@@ -118,17 +123,40 @@ class HomeController extends Controller
             $statesToSet1 = array_merge($statesToSet1, array_keys($arr));
           }
         }
+      $statesToSet1 = array_filter($statesToSet1, function($item) {
+        return(is_numeric($item));
+      });
+      $statesToSet0 = array_filter($statesToSet0, function($item) {
+        return(is_numeric($item));
+      });
       //dd($statesToSet1, $statesToSet0);
       if($statesToSet1 != [])
       {
-        State::findOrFail($statesToSet1)->update(['current', 1]);
+        //State::findOrFail($statesToSet1)->update(['current', 1]);
+        State::whereIn('id', $statesToSet1)->update(['current' => 1]);
       }
       if($statesToSet0 != [])
       {
-        State::find($statesToSet0)->update(['current', 0]);
+        State::whereIn('id', $statesToSet0)->update(['current' => 0]);
+        //dd($states);
+        //$states;
       }
       //dd($user->states()->get());
       return view('home')->with('user', $user);
 
+    }
+    public function detail_plan($id, SessionPlanHelper $formatter)
+    {
+      $user = auth()->user();
+      $topic = Topic::find($id);
+      $data = $formatter->topicDetail($topic, true, true);
+      //dd($data);
+      return view('home.detail')->with('user', $user)->with('data', $data);
+    }
+
+    public function update_detail_plan(Request $request, SessionPlanHelper $formatter)
+    {
+      $user = auth()->user();
+      dd($request);
     }
 }

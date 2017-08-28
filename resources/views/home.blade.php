@@ -43,6 +43,9 @@
                 <div class="panel-body">
                   <a class="btn btn-small btn-success" href="{{ url('/facts') }}">View Facts</a>
                 </div>
+                <div class="panel-body">
+                  <a class="btn btn-small btn-success" href="{{ url('/skills') }}">View Skills</a>
+                </div>
                 @endcan
             </div>
         </div>

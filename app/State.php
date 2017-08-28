@@ -89,13 +89,12 @@ class State extends Model
     {
       $state = new State;
       $state->setupNew($state);
-      $topic->states()->attach($state->id);
-      $state->studyable_type = "Skill";
-      $state->studable()->associate($skill);
+      $state->studyable()->associate($skill);
       $state->user()->associate($user);
       $state->priority = $topic->id;
-      dd('about to save', $state);
       $state->save();
+      $state->topics()->attach($topic->id);
+      return;
     }
     private function setupNew($state)
     {

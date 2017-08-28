@@ -19,6 +19,7 @@ class CreateSkillsTable extends Migration
             $table->string('skill', 50)->unique();
             $table->text('description')->nullable();
             $table->string('subtype', 30);
+            $table->timestamps();
         });
     }
 
