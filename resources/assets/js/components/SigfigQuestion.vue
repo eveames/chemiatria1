@@ -10,7 +10,7 @@
                       in the number displayed.
                     <br>
                     <div >
-                      <h4>{{word.prompts[0]}}</h4>
+                      <h4>{{question.number}}</h4>
                       <br>
                       <div class="input-group">
                         <input autofocus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
@@ -45,7 +45,6 @@ export default {
       acc: 0,
       rts: [],
       startTime: 0,
-      zeroString: '000000000000',
       feedbackType: {
         "alert-success": true,
       }
@@ -59,12 +58,14 @@ export default {
       stageData: 'getStageData'
     }),
     question: function() {
-      let setTime = questionSetTime;
+      let setTime = this.questionSetTime;
       let number = String(_.random(1,9));
       let answer = 0;
       let hint = '';
-      if (currentQuestion.skill === 'SigFigs: no decimal place') {
-        let middleDigits = Vue.randomDigitString(_.random(0,2), 3);
+      let message ='';
+      let zeroString = '000000000000';
+      if (this.currentQuestion[6] === 'SigFigs: no decimal place') {
+        let middleDigits = Vue.randomDigitString(_.random(0,2), 5);
         number += String(middleDigits);
         number += String(_.random(1,9));
         answer = number.length;
@@ -73,30 +74,30 @@ export default {
         number += String(zeros);
         hint = ['only count zeros in between non-zero digits'];
         //only show this if wrong
-        message = 'If there is no decimal point, every non-zero digit and every zero between non-zero digits is significant';
+        message = 'If there is no decimal point, every non-zero digit and every zero between non-zero digits is significant. ';
       }
-      else if (currentQuestion.skill === 'SigFigs: decimal places') {
-        let firstDigits = Vue.randomDigitString(_random(1,2), 3);
+      else if (this.currentQuestion[6] === 'SigFigs: decimal places') {
+        let firstDigits = Vue.randomDigitString(_.random(1,2), 3);
         number += String(firstDigits);
         number += '.';
-        let afterDigits = Vue.randomDigitString(_random(1,2), 3);
+        let afterDigits = Vue.randomDigitString(_.random(1,2), 3);
         number += String(afterDigits);
         answer = firstDigits.length + 1 + afterDigits.length;
         hint = ['Zeros at the end count if there\'s a decimal point'];
-        message = 'Zeros at the end count if there\'s a decimal point';
+        message = 'Zeros at the end count if there\'s a decimal point. ';
       }
-      else if (currentQuestion.skill === 'SigFigs: decimal only') {
+      else if (this.currentQuestion[6] === 'SigFigs: decimal only') {
         let numZerosBefore = _.random(0,3);
         let zerosBefore = zeroString.slice(0, numZerosBefore);
-        let middleDigits = number + String(Vue.getRandomString(_.random(0,2), 3));
+        let middleDigits = number + String(Vue.randomDigitString(_.random(0,2), 3));
         let numZerosAfter = _.random(0,2);
         let zerosAfter = zeroString.slice(0, numZerosAfter);
         number = '0.' + String(zerosBefore) + String(middleDigits) + String(zerosAfter);
         answer = middleDigits.length + zerosAfter.length;
         hint = ['Zeros at the end count if there\'s a decimal point'];
-        message = 'Zeros at the end count if there\'s a decimal point';
+        message = 'Zeros at the end count if there\'s a decimal point. ';
       }
-      else if (currentQuestion.skill === 'SigFigs: ends in decimal point') {
+      else if (this.currentQuestion[6] === 'SigFigs: ends in decimal point') {
         let middleDigits = Vue.randomDigitString(_.random(0,2), 3);
         number += String(middleDigits);
         number += String(_.random(1,9));
@@ -106,8 +107,9 @@ export default {
         answer = number.length;
         number += '.';
         hint = ['If there\'s a decimal point but nothing after it, all the digits are significant.'];
-        message = 'If there\'s a decimal point but nothing after it, all the digits are significant.';
+        message = 'If there\'s a decimal point but nothing after it, all the digits are significant. ';
       }
+      message += `${number} has ${answer} sig figs.`
       return {number: number, answer: answer, hint: hint, message: message, setTime: setTime}
     }
 

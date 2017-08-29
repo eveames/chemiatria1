@@ -2,8 +2,8 @@
 <div class="container">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
-          <sigfig-question v-if="currentQuestion.subtype === 'polyatomic ions'"></sigfig-question>
-          <ionic-formula-question v-if="currentQuestion.subtype === 'ionicFormula'"></ionic-formula-question>
+          <sigfig-question v-if="currentQuestion[5] === 'sigfig'"></sigfig-question>
+          <ionic-formula-question v-if="currentQuestion[5] === 'ionicFormula'"></ionic-formula-question>
       </div>
   </div>
 </div>

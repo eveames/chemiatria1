@@ -43450,7 +43450,7 @@ exports = module.exports = __webpack_require__(12)(undefined);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -43464,6 +43464,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+//
+//
 //
 //
 //
@@ -43495,7 +43497,10 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
   created: function created() {
     var _this = this;
 
-    Promise.all([this.$store.dispatch('setupWords'), this.$store.dispatch('setupStates'), this.$store.dispatch('setupFacts')]).then(function (results) {
+    Promise.all([this.$store.dispatch('setupWords'), this.$store.dispatch('setupFacts'), this.$store.dispatch('setupSkills')]).then(function (results) {
+      _this.$store.dispatch('setupStates');
+    }).then(function (results) {
+
       //console.log(results);
       //console.log('promise resolved, in then')
       _this.$store.dispatch('setReady');
@@ -43510,7 +43515,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [(_vm.ready === true && _vm.currentQuestionState[2] === 'word') ? _c('word-question') : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'fact') ? _c('fact-question') : _vm._e(), _vm._v(" "), _c('bug-report'), _c('frustration-report'), _c('suggestion-box')], 1)
+  return _c('div', [(_vm.ready === true && _vm.currentQuestionState[2] === 'word') ? _c('word-question') : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'fact') ? _c('fact-question') : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'skill') ? _c('skill-question') : _vm._e(), _vm._v(" "), _c('bug-report'), _c('frustration-report'), _c('suggestion-box')], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -43676,6 +43681,7 @@ var state = {
   states: [], //stores and organizes facts
   skills: [],
   statesReady: false,
+  skillsReady: false,
   currentIndex: 0,
   currentTypeID: 0,
   currentType: '',
@@ -43695,7 +43701,7 @@ var getters = {
   },
   getCurrent: function getCurrent(state) {
     //console.log("called getCurrent");
-    var curr = [state.currentIndex, state.currentTypeID, state.currentType, state.currentStage, state.currentStateID, state.currentSubtype];
+    var curr = [state.currentIndex, state.currentTypeID, state.currentType, state.currentStage, state.currentStateID, state.currentSubtype, state.currentSkill];
     //console.log(curr, typeof(curr));
     return curr;
   },
@@ -43718,7 +43724,7 @@ var actions = {
 
     return new Promise(function (resolve, reject) {
       axios.get('../api/student/states/active').then(function (response) {
-        //console.log(response.data);
+        console.log(response.data);
         var temp = response.data;
         var states = [];
         var thisState = {};
@@ -43732,7 +43738,7 @@ var actions = {
           }
           states.push(thisState);
         }
-        //console.log(states);
+        console.log(states);
         commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_STATES */], states);
         commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_QUESTION */]);
         resolve();
@@ -43753,7 +43759,7 @@ var actions = {
         for (var i = 0; i < temp.length; i++) {
           skills.push(temp[i]);
         }
-        //console.log(states);
+        console.log(skills);
         commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_SKILLS */], skills);
         resolve();
       }).catch(function (error) {
@@ -43794,19 +43800,22 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
   state.states = states;
   state.statesReady = true;
 }), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_SKILLS */], function (state, skills) {
-  state.skill = skills;
+  state.skills = skills;
+  state.skillsReady = true;
 }), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_QUESTION */], function (state) {
-  //console.log('before getNext index is ', state.currentIndex)
+  console.log('before getNext index is ', state.currentIndex);
   state.currentIndex = getNext();
-  //console.log('after getNext index is ', state.currentIndex)
+  console.log('after getNext index is ', state.currentIndex, state.states[state.currentIndex].type_id);
   state.currentTypeID = state.states[state.currentIndex].type_id;
   state.currentType = state.states[state.currentIndex].type;
   state.currentStage = state.states[state.currentIndex].stage;
   state.currentStateID = state.states[state.currentIndex].id;
   state.states[state.currentIndex].lastStudied = Date.now();
   if (state.currentType === 'skill') {
-    state.currentSubtype = state.skills[currentTypeID - 1].subtype;
-    state.currentSkill = state.skills[currentTypeID - 1].skill;
+    console.log('before subtype');
+    state.currentSubtype = state.skills[state.currentTypeID - 1].subtype;
+    console.log('after subtype');
+    state.currentSkill = state.skills[state.currentTypeID - 1].skill;
   } else {
     state.currentSubtype = false;
     state.currentSkill = false;
@@ -43829,9 +43838,9 @@ var getNext = function getNext() {
   //var nextQ;
   var readiest = -1;
   var readiestUnready = -1;
-  //console.log('in selectNextQuestion, ', studyArray);
+
   for (var i = 0; i < state.states.length; i++) {
-    //console.log('state.states[i] is: ', state.states[i]);
+    console.log('state.states[i] is: ', state.states[i]);
     //console.log('state.states[i -1] is: ', state.states[i-1]);
     if (state.states[i].priority === 1) {
       if (readiest !== -1) {
@@ -47419,7 +47428,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       acc: 0,
       rts: [],
       startTime: 0,
-      zeroString: '000000000000',
       feedbackType: {
         "alert-success": true
       }
@@ -47432,12 +47440,14 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     stageData: 'getStageData'
   }), {
     question: function question() {
-      var setTime = questionSetTime;
+      var setTime = this.questionSetTime;
       var number = String(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(1, 9));
       var answer = 0;
       var hint = '';
-      if (currentQuestion.skill === 'SigFigs: no decimal place') {
-        var middleDigits = Vue.randomDigitString(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 2), 3);
+      var message = '';
+      var zeroString = '000000000000';
+      if (this.currentQuestion[6] === 'SigFigs: no decimal place') {
+        var middleDigits = Vue.randomDigitString(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 2), 5);
         number += String(middleDigits);
         number += String(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(1, 9));
         answer = number.length;
@@ -47446,27 +47456,27 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         number += String(zeros);
         hint = ['only count zeros in between non-zero digits'];
         //only show this if wrong
-        message = 'If there is no decimal point, every non-zero digit and every zero between non-zero digits is significant';
-      } else if (currentQuestion.skill === 'SigFigs: decimal places') {
-        var firstDigits = Vue.randomDigitString(_random(1, 2), 3);
+        message = 'If there is no decimal point, every non-zero digit and every zero between non-zero digits is significant. ';
+      } else if (this.currentQuestion[6] === 'SigFigs: decimal places') {
+        var firstDigits = Vue.randomDigitString(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(1, 2), 3);
         number += String(firstDigits);
         number += '.';
-        var afterDigits = Vue.randomDigitString(_random(1, 2), 3);
+        var afterDigits = Vue.randomDigitString(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(1, 2), 3);
         number += String(afterDigits);
         answer = firstDigits.length + 1 + afterDigits.length;
         hint = ['Zeros at the end count if there\'s a decimal point'];
-        message = 'Zeros at the end count if there\'s a decimal point';
-      } else if (currentQuestion.skill === 'SigFigs: decimal only') {
+        message = 'Zeros at the end count if there\'s a decimal point. ';
+      } else if (this.currentQuestion[6] === 'SigFigs: decimal only') {
         var numZerosBefore = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 3);
         var zerosBefore = zeroString.slice(0, numZerosBefore);
-        var _middleDigits = number + String(Vue.getRandomString(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 2), 3));
+        var _middleDigits = number + String(Vue.randomDigitString(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 2), 3));
         var numZerosAfter = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 2);
         var zerosAfter = zeroString.slice(0, numZerosAfter);
         number = '0.' + String(zerosBefore) + String(_middleDigits) + String(zerosAfter);
         answer = _middleDigits.length + zerosAfter.length;
         hint = ['Zeros at the end count if there\'s a decimal point'];
-        message = 'Zeros at the end count if there\'s a decimal point';
-      } else if (currentQuestion.skill === 'SigFigs: ends in decimal point') {
+        message = 'Zeros at the end count if there\'s a decimal point. ';
+      } else if (this.currentQuestion[6] === 'SigFigs: ends in decimal point') {
         var _middleDigits2 = Vue.randomDigitString(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 2), 3);
         number += String(_middleDigits2);
         number += String(__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(1, 9));
@@ -47476,8 +47486,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         answer = number.length;
         number += '.';
         hint = ['If there\'s a decimal point but nothing after it, all the digits are significant.'];
-        message = 'If there\'s a decimal point but nothing after it, all the digits are significant.';
+        message = 'If there\'s a decimal point but nothing after it, all the digits are significant. ';
       }
+      message += number + ' has ' + answer + ' sig figs.';
       return { number: number, answer: answer, hint: hint, message: message, setTime: setTime };
     }
 
@@ -47599,7 +47610,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "panel-heading"
   }, [_vm._v("Significant Figures Practice!")]), _vm._v(" "), _c('div', {
     staticClass: "panel-body"
-  }, [_vm._v("\n                    Instructions: Enter the number of significant figures (digits)\n                      in the number displayed.\n                    "), _c('br'), _vm._v(" "), _c('div', [_c('h4', [_vm._v(_vm._s(_vm.word.prompts[0]))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+  }, [_vm._v("\n                    Instructions: Enter the number of significant figures (digits)\n                      in the number displayed.\n                    "), _c('br'), _vm._v(" "), _c('div', [_c('h4', [_vm._v(_vm._s(_vm.question.number))]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
     staticClass: "input-group"
   }, [_c('input', {
     directives: [{
@@ -47784,7 +47795,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "row"
   }, [_c('div', {
     staticClass: "col-md-8 col-md-offset-2"
-  }, [(_vm.currentQuestion.subtype === 'polyatomic ions') ? _c('sigfig-question') : _vm._e(), _vm._v(" "), (_vm.currentQuestion.subtype === 'ionicFormula') ? _c('ionic-formula-question') : _vm._e()], 1)])])
+  }, [(_vm.currentQuestion[5] === 'sigfig') ? _c('sigfig-question') : _vm._e(), _vm._v(" "), (_vm.currentQuestion[5] === 'ionicFormula') ? _c('ionic-formula-question') : _vm._e()], 1)])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {

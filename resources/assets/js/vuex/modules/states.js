@@ -6,6 +6,7 @@ const state = {
   states: [], //stores and organizes facts
   skills: [],
   statesReady: false,
+  skillsReady: false,
   currentIndex: 0,
   currentTypeID: 0,
   currentType: '',
@@ -22,7 +23,7 @@ const getters = {
   getCurrent: (state) => {
     //console.log("called getCurrent");
     let curr = [state.currentIndex, state.currentTypeID, state.currentType,
-      state.currentStage, state.currentStateID, state.currentSubtype];
+      state.currentStage, state.currentStateID, state.currentSubtype, state.currentSkill];
     //console.log(curr, typeof(curr));
     return curr;
   },
@@ -45,7 +46,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.get('../api/student/states/active')
       .then((response) => {
-      //console.log(response.data);
+      console.log(response.data);
       let temp = response.data;
       let states = [];
       let thisState = {};
@@ -61,7 +62,7 @@ const actions = {
         }
         states.push(thisState);
       }
-      //console.log(states);
+      console.log(states);
       commit(types.INITIALIZE_STATES, states);
       commit(types.SET_QUESTION);
       resolve();
@@ -82,7 +83,7 @@ const actions = {
       for(let i = 0; i < temp.length; i++ ) {
         skills.push(temp[i]);
       }
-      //console.log(states);
+      console.log(skills);
       commit(types.INITIALIZE_SKILLS, skills);
       resolve();
       }).catch(function (error) {
@@ -120,20 +121,23 @@ const mutations = {
     state.statesReady = true;
   },
   [types.INITIALIZE_SKILLS] (state, skills) {
-    state.skill = skills;
+    state.skills = skills;
+    state.skillsReady = true;
   },
   [types.SET_QUESTION] (state) {
-    //console.log('before getNext index is ', state.currentIndex)
+    console.log('before getNext index is ', state.currentIndex)
     state.currentIndex = getNext();
-    //console.log('after getNext index is ', state.currentIndex)
+    console.log('after getNext index is ', state.currentIndex, state.states[state.currentIndex].type_id)
     state.currentTypeID = state.states[state.currentIndex].type_id;
     state.currentType = state.states[state.currentIndex].type;
     state.currentStage = state.states[state.currentIndex].stage;
     state.currentStateID = state.states[state.currentIndex].id;
     state.states[state.currentIndex].lastStudied = Date.now();
     if (state.currentType === 'skill') {
-      state.currentSubtype = state.skills[currentTypeID -1].subtype;
-      state.currentSkill = state.skills[currentTypeID -1].skill;
+      console.log('before subtype')
+      state.currentSubtype = state.skills[state.currentTypeID -1].subtype;
+      console.log('after subtype')
+      state.currentSkill = state.skills[state.currentTypeID -1].skill;
     }
     else {
       state.currentSubtype = false;
@@ -160,9 +164,9 @@ const getNext = () => {
     	//var nextQ;
     	var readiest = -1;
     	var readiestUnready = -1;
-        //console.log('in selectNextQuestion, ', studyArray);
+
     	for (let i = 0; i < state.states.length; i++) {
-        //console.log('state.states[i] is: ', state.states[i]);
+        console.log('state.states[i] is: ', state.states[i]);
         //console.log('state.states[i -1] is: ', state.states[i-1]);
         if (state.states[i].priority === 1) {
     			if (readiest !== -1) { return readiest;}

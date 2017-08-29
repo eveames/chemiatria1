@@ -4,6 +4,8 @@
   </word-question>
   <fact-question v-if="ready === true && currentQuestionState[2] === 'fact'">
   </fact-question>
+  <skill-question v-if="ready === true && currentQuestionState[2] === 'skill'">
+  </skill-question>
   <bug-report></bug-report><frustration-report></frustration-report><suggestion-box></suggestion-box>
 </div>
 </template>
@@ -30,9 +32,11 @@ export default {
   },
   created () {
     Promise.all([this.$store.dispatch('setupWords'),
-    this.$store.dispatch('setupStates'),
-    this.$store.dispatch('setupFacts')])
+    this.$store.dispatch('setupFacts'),
+    this.$store.dispatch('setupSkills')])
+    .then((results) => {this.$store.dispatch('setupStates')})
     .then((results) => {
+
       //console.log(results);
       //console.log('promise resolved, in then')
       this.$store.dispatch('setReady')

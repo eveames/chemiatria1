@@ -107,13 +107,16 @@ class ApiController extends Controller
     	//returns full list of states for all items in study array, by user
     	$user = Auth::user();
       //$states =
-    	$states = $user->states->where('current', 1)->map(function($item)
-        {
-          //dd($item->data());
-          return $item->data();
-        });
-      //dd($states);
-    	return $states;
+      $activeStates = array();
+      $user->states->each(function($item) use (&$activeStates)
+      {
+        if ($item->current === 1) {
+          $activeStates[] = $item->data();
+          //dd($activeStates);
+        }
+      });
+      //dd($activeStates);
+    	return $activeStates;
     }
 
     public function updateAllStates(Request $request) {
