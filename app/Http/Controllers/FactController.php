@@ -18,6 +18,11 @@ class FactController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+     public function __construct()
+     {
+         $this->middleware('auth');
+     }
+
     public function index()
     {
         // show only matches to search
@@ -193,13 +198,18 @@ class FactController extends Controller
           $path = $request->path();
           $array = explode('/',$path);
           $group_name = array_pop($array);
-          $facts = Fact::where('group_name', $group_name);
+          $facts = Fact::where('group_name', $group_name)->get();
           $facts->each(function($item, $key) use (&$topicIDs) {
+            $ids = $item->topics->pluck('id');
+            //dd($ids);
             foreach($topicIDs as $id)
             {
+              if (!$ids->contains($id))
+              //if ($id )
               $item->topics()->attach($id);
             }
           });
+          //dd($facts);
           Session::flash('message', 'Successfully updated!');
           return redirect(url('facts/group/' . $group_name));
       }

@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
           <polyatomic-ion-question v-if="fact.group_name === 'polyatomic ions' ||
-            fact.group_name === 'acids' "></polyatomic-ion-question>
+            fact.group_name === 'acids' || fact.group_name === 'commonCompound'"></polyatomic-ion-question>
           <element-symbol-question v-if="fact.group_name === 'elementSymbol'"></element-symbol-question>
           <element-charge-question v-if="fact.group_name === 'elementCharge'"></element-charge-question>
           <element-group-question v-if="fact.group_name === 'elementGroup'"></element-group-question>

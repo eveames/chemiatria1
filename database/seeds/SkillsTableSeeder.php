@@ -13,7 +13,8 @@ class SkillsTableSeeder extends Seeder
     {
         //
         $skillsList = [['SigFigs: no decimal place','','sigfig'], ['SigFigs: decimal places', '', 'sigfig'],
-      ['SigFigs: decimal only', '', 'sigfig'], ['SigFigs: ends in decimal point', '', 'sigfig']];
+      ['SigFigs: decimal only', '', 'sigfig'], ['SigFigs: ends in decimal point', '', 'sigfig'],
+      ['simple ionic formulas', '', 'ionicFormula'], ['complex ionic formulas', '', 'ionicFormula']];
 
         for ($i = 0 ; $i < count($skillsList) ; ++$i) {
       		DB::table('skills')->insert([

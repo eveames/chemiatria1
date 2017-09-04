@@ -66,7 +66,10 @@
             'conversion factor' => 'conversion factor',
             'polyatomic ions' => 'polyatomic ions',
             'acid' => 'acid',
-            'common compound' => 'common compound'],
+            'common compound' => 'common compound',
+            'elementSymbol' => 'elementSymbol',
+            'elementGroup' => 'elementGroup',
+            'elementCharge' => 'elementCharge'],
             $fact->group_name) !!}
       </div>
 

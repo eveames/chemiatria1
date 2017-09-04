@@ -7,51 +7,58 @@ export default {
       //ms until next to study
       const delayWrong = 3000;
       const delayDiscover = 10000;
-      const delayMaster = 240000;
-      const delayReview = 1200000;
+      const delayMaster = 600000;
+      const delayReview = 2160000000;
       const timesCriterionForMaster = 10; //must of studied 10x
       const accCriterionForMaster = 1; //no more than 1 wrong in last 10
       const timesCriterionForReview = 30;
       const accCriterionForReview = 1;
-      const rtCriterionForReview = 10;
+      //const rtCriterionForReview = 6000;
        //console.log("in fact priority, stageData is ", stageData)
       let timesStudied = stageData.accs.length;
-      let correct = stageData.accs[timesStudied - 1];
+      let incorrect = stageData.accs[timesStudied - 1];
+      console.log('incorrect', incorrect)
       let stage = Number(stageData.stage);
       let newStage = 0;
       let newPriority = 0;
       let metrics = Vue.metricsHelper(stageData);
+      let now = Date.now();
+      console.log(metrics);
       if (timesStudied > timesCriterionForReview &&
-    			metrics.accuracyLast10 <= accCriterionForReview &&
-    			metrics.averageRTLast10 < rtCriterionForReview) {
-    		if (stage === 'master') {
-    				newStage = 'review';
+    			metrics.accuracyLast10 <= accCriterionForReview) {
+    		if (stage === 4) {
+    				newStage = 9;
  					//console.log(thisItem.type + ' ' + thisItem.subtype + ' now mastered!');
     		}
     	}
     	if (timesStudied > timesCriterionForMaster &&
     			metrics.accuracyLast10 <= accCriterionForMaster) {
-    		if (stage === 'discover') {
-    				newStage = 'master';
+    		if (stage === 0) {
+    				newStage = 4;
     				//console.log(thisItem.type + ' ' + thisItem.subtype + ' now discovered!');
     		}
     	}
-    	stage = newStage;
+      //console.log({stage: stage, newStage: newStage});
+    	if (newStage !== 0) stage = newStage;
+      //console.log({stage: stage, newStage: newStage});
+
     	//update priority
-    	if (stage === 'discover' && correct) {
-    		newPriority = stageData.lastStudied + delayDiscover;
+    	if (stage === 0 && !incorrect) {
+    		newPriority = now + delayDiscover;
     	}
-    	else if (stage === 'master' && correct) {
-    		newPriority = stageData.lastStudied + delayMaster;
+    	else if (stage === 4 && !incorrect) {
+    		newPriority = now + delayMaster;
     	}
-    	else if (stage === 'review' && correct) {
-    		newPriority = stageData.lastStudied + delayReview;
+    	else if (stage === 9 && !incorrect) {
+    		newPriority = now + delayReview;
     	}
-      else newPriority = stageData.lastStudied + delayWrong;
+      else newPriority = now + delayWrong;
         //randomize new priority a bit
       let randomFactor = _.random(0,40) * 1000;
     	newPriority += randomFactor;
-      return {priority: newPriority, stage: newStage}
+      console.log({newPriority: newPriority, randomFactor: randomFactor, now: now});
+      //console.log({priority: newPriority, stage: stage})
+      return {priority: newPriority, stage: stage}
     }
 
   Vue.metricsHelper = function(stageData) {

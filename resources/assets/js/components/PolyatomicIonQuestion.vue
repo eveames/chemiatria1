@@ -6,8 +6,8 @@
           <div v-if="fact.group_name === 'polyatomic ions'">Instructions: If you don't have any guesses, enter zero to see the answer.
           If you are asked for a formula,
           use the following format: write 'VO2+1' for <span v-html="this.$options.filters.formatFormula('VO2+1')"></span>.</div>
-          <div v-if="fact.group_name === 'acids'">Instructions: If you don't have any guesses, enter zero to see the answer.
-          If you are asked for a formula, put the acidic hydrogens at the front and
+          <div v-if="fact.group_name === 'acids' || fact.group_name === 'commonCompound'">Instructions: If you don't have any guesses, enter zero to see the answer.
+          If you are asked for an acid formula, put the acidic hydrogens at the front and
           use the following format: write 'H3C6H5O7' for <span v-html="this.$options.filters.formatFormula('H3C6H5O7')"></span>.</div>
           <br>
           <div v-if="requestFormula">
@@ -16,7 +16,7 @@
             Your answer is: <span v-html="this.$options.filters.formatFormula(entry)"></span>
             <br>
             <div class="input-group">
-              <input autofocus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
+              <input v-focus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
               <span class="input-group-btn">
                 <button @click="submitEntry" class="btn btn-default"
                   type="button">Submit answer!</button>
@@ -53,15 +53,11 @@ export default {
     return {
       entry: '',
       tries: 0,
-      feedback: '',
       acc: 0,
       rts: [],
       startTime: 0,
       //determines whether name or formula is given
-      requestFormula: true,
-      feedbackType: {
-        "alert-success": true,
-      }
+      requestFormula: true
     }
   },
   //props: ['questionTypeID'],
@@ -70,7 +66,9 @@ export default {
       currentQuestion: 'getCurrent',
       questionSetTime: 'getQuestionSetTime',
       stageData: 'getStageData',
-      facts: 'getFacts'
+      facts: 'getFacts',
+      feedback: 'getFeedback',
+      feedbackType: 'getFeedbackType'
     }),
     fact: function () {
       return this.$store.getters.getFactById(this.currentQuestion[1]);
@@ -108,7 +106,7 @@ export default {
     		moveOn = true;
         gotIt = true;
         this.acc = this.tries-1;
-        this.feedbackType = {"alert-success": true}
+        this.$store.dispatch('setFeedbackType', {"alert-success": true});
 
         //console.log('acc is set to ', this.acc)
     	}
@@ -134,10 +132,10 @@ export default {
       }
       if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close'
         || answerDetail.correct === 'dontKnow') {
-        this.feedbackType = {"alert-warning": true}
+        this.$store.dispatch('setFeedbackType', {"alert-warning": true});
       }
-      else if (gotIt === false) this.feedbackType = {"alert-danger": true}
-      this.feedback = answerDetail.messageSent;
+      else if (gotIt === false) this.$store.dispatch('setFeedbackType', {"alert-danger": true});
+      this.$store.dispatch('setFeedback', answerDetail.messageSent);
       let action = {};
       action.state_id = this.currentQuestion[4];
       action.type = 'answer given-' + correct;

@@ -12,15 +12,17 @@ class Report extends Mailable
 {
     use Queueable, SerializesModels;
     public $user;
+    public $states;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(User $user)
+    public function __construct(User $user, $states)
     {
         //
         $this->user = $user;
+        $this->states = $states;
     }
 
     /**
@@ -30,6 +32,7 @@ class Report extends Mailable
      */
     public function build()
     {
+      //dd($this->states);
         return $this->subject('Update from Chemiatria on ' . $this->user->name)
             ->view('emails.update');
     }

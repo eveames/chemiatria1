@@ -1,14 +1,12 @@
 <template>
   <div>
-    <button @click="showForm" class="btn btn-default"
-      type="button" v-show="!show">Report Bug</button>
-      <div v-show="show" class="panel panel-default">
+      <div class="panel panel-default">
           <div class="panel-heading">Report Bug</div>
           <div class="panel-body">
             <div>I'm sorry it's not working! Please describe what's gone wrong in detail so I can fix it.</div>
             <div class="input-group">
-              <textarea autofocus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
-              </textarea>
+              <textarea v-focus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
+            </textarea>
               <span class="input-group-btn">
                 <button @click="submitEntry" class="btn btn-default"
                     type="button">Submit bug!</button>
@@ -26,8 +24,7 @@
   export default {
     data: function() {
         return {
-          entry: '',
-          show: false,
+          entry: ''
         }
     },
     computed: {
@@ -45,7 +42,7 @@
         axios.post('../api/student/actions', action)
         .then((results) => {
           this.$store.dispatch('setMessage', 'Thank you for your bug report!');
-          this.show = !this.show;
+          this.$store.dispatch('toggleBug');
           this.entry = ''
         })
         .catch(function (error) {
@@ -59,7 +56,7 @@
         .catch(function (error) {
           console.log(error);
         });
-        this.show = !this.show;
+        this.$store.dispatch('toggleBug');
       }
     }
   }

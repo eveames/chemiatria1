@@ -20,7 +20,7 @@
                     <a class="btn btn-small btn-success" href="{{ URL::to('home/report') }}">Email me my progress</a>
                 </div>
                 <div class="panel-body">
-                    <a class="btn btn-small btn-success" href="{{ URL::to('home/play') }}">Continue previous session</a>
+                    <a class="btn btn-small btn-success" href="{{ URL::to('home/play') }}">Start session</a>
                 </div>
                 <div class="panel-body">
                   <div>Use this button to review your progress, add new material to study, and setup your new study session</div>

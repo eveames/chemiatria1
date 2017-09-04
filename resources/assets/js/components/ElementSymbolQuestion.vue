@@ -12,7 +12,7 @@
             What is the name of {{fact.key}}?</div>
             <br>
             <div class="input-group">
-              <input autofocus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
+              <input v-focus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
               <span class="input-group-btn">
                 <button @click="submitEntry" class="btn btn-default"
                   type="button">Submit answer!</button>
@@ -34,15 +34,11 @@ export default {
     return {
       entry: '',
       tries: 0,
-      feedback: '',
       acc: 0,
       rts: [],
       startTime: 0,
       //determines whether name or formula is given
-      requestSymbol: true,
-      feedbackType: {
-        "alert-success": true,
-      }
+      requestSymbol: true
     }
   },
   //props: ['questionTypeID'],
@@ -52,7 +48,9 @@ export default {
       questionSetTime: 'getQuestionSetTime',
       stageData: 'getStageData',
       facts: 'getFacts',
-      elements: 'getElements'
+      elements: 'getElements',
+      feedback: 'getFeedback',
+      feedbackType: 'getFeedbackType'
     }),
     fact: function () {
       return this.$store.getters.getFactById(this.currentQuestion[1]);
@@ -88,7 +86,7 @@ export default {
     		moveOn = true;
         gotIt = true;
         this.acc = this.tries-1;
-        this.feedbackType = {"alert-success": true}
+        this.$store.dispatch('setFeedbackType', {"alert-success": true});
 
         //console.log('acc is set to ', this.acc)
     	}
@@ -115,10 +113,10 @@ export default {
       }
       if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close'
         || answerDetail.correct === 'dontKnow') {
-        this.feedbackType = {"alert-warning": true}
+        this.$store.dispatch('setFeedbackType', {"alert-warning": true});
       }
-      else if (gotIt === false) this.feedbackType = {"alert-danger": true}
-      this.feedback = answerDetail.messageSent;
+      else if (gotIt === false) this.$store.dispatch('setFeedbackType', {"alert-danger": true});
+      this.$store.dispatch('setFeedback', answerDetail.messageSent);
       let action = {};
       action.state_id = this.currentQuestion[4];
       action.type = 'answer given-' + correct;

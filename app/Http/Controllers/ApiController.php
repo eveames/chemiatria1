@@ -10,6 +10,7 @@ use chemiatria\State;
 use chemiatria\Altword;
 use chemiatria\Fact;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use chemiatria\Helpers\SessionPlanHelper;
 use chemiatria\Action;
 
@@ -54,6 +55,21 @@ class ApiController extends Controller
 
             return $errorMessage;
         }
+    }
+
+    //returns fact ids for polyatomic ions the user is familiar with
+    public function getIons()
+    {
+      $userID = Auth::user()->id;
+      $ions = DB::table('states')->join('users', 'states.user_id', '=', 'users.id')
+        ->where('users.id', '=', $userID)
+        ->join('facts', 'states.studyable_id', '=','facts.id')
+        ->where('states.studyable_type', '=', 'chemiatria\Fact')
+        ->where('facts.group_name', '=', 'polyatomic ions')
+        //->select('states.studyable_id');
+        ->get();
+      $ionIDs = $ions->pluck('studyable_id');
+        return $ionIDs;
     }
 
     //controls API used by angular

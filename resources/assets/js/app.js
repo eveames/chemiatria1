@@ -27,6 +27,7 @@ Vue.component('element-symbol-question', require('./components/ElementSymbolQues
 Vue.component('element-charge-question', require('./components/ElementChargeQuestion.vue'));
 Vue.component('element-group-question', require('./components/ElementGroupQuestion.vue'));
 Vue.component('sigfig-question', require('./components/SigfigQuestion.vue'));
+Vue.component('ionic-formula-question', require('./components/IonicFormulaQuestion'));
 Vue.component('bug-report', require('./components/BugReport.vue'));
 Vue.component('frustration-report', require('./components/FrustrationReport.vue'));
 Vue.component('suggestion-box', require('./components/SuggestionBox.vue'));
@@ -55,6 +56,13 @@ Vue.filter('chargeFormat', function(value) {
   let str = String(value);
   if (plus) str = '+' + str;
   return str;
+});
+Vue.directive('focus', {
+  // When the bound element is inserted into the DOM...
+  inserted: function (el) {
+    // Focus the element
+    el.focus()
+  }
 });
 
 

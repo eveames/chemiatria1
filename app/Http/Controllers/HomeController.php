@@ -37,7 +37,12 @@ class HomeController extends Controller
     public function email_progress()
     {
         $user = auth()->user();
-        Mail::to($user)->send(new Report($user));
+        $states = $user->states->where('lastStudied', '<>', 0)->map(function($item)
+          {
+            return $item->data();
+          })->sortBy('stage');
+        //dd($states);
+        Mail::to($user)->send(new Report($user, $states));
         Session::flash('message', 'Successfully emailed!');
         return view('home')->with('user', auth()->user());
     }
@@ -95,6 +100,10 @@ class HomeController extends Controller
           {
             //dd($arr);
             $statesToSet0 = array_merge($statesToSet0, array_keys($arr));
+          }
+          foreach($data['unseen'] as $arr)
+          {
+            $statesToSet1 = array_merge($statesToSet1, array_keys($arr));
           }
           //dd($statesToSet0);
         }

@@ -1193,25 +1193,28 @@ var index_esm = {
 
 "use strict";
 const INITIALIZE_WORDS = 'INITIALIZE_WORDS'
-/* harmony export (immutable) */ __webpack_exports__["d"] = INITIALIZE_WORDS;
+/* harmony export (immutable) */ __webpack_exports__["e"] = INITIALIZE_WORDS;
 
 const INITIALIZE_FACTS = 'INITIALIZE_FACTS'
 /* harmony export (immutable) */ __webpack_exports__["a"] = INITIALIZE_FACTS;
 
 const INITIALIZE_STATES = 'INITIALIZE_STATES'
-/* harmony export (immutable) */ __webpack_exports__["c"] = INITIALIZE_STATES;
+/* harmony export (immutable) */ __webpack_exports__["d"] = INITIALIZE_STATES;
 
 const INITIALIZE_SKILLS = 'INITIALIZE_SKILLS'
-/* harmony export (immutable) */ __webpack_exports__["b"] = INITIALIZE_SKILLS;
+/* harmony export (immutable) */ __webpack_exports__["c"] = INITIALIZE_SKILLS;
+
+const INITIALIZE_IONS = 'INITIALIZE_IONS'
+/* harmony export (immutable) */ __webpack_exports__["b"] = INITIALIZE_IONS;
 
 const SET_USER = 'SET_USER'
 /* unused harmony export SET_USER */
 
 const UPDATE_STAGE = 'UPDATE_STAGE'
-/* harmony export (immutable) */ __webpack_exports__["j"] = UPDATE_STAGE;
+/* harmony export (immutable) */ __webpack_exports__["p"] = UPDATE_STAGE;
 
 const UPDATE_RTS_ACCS = 'UPDATE_RTS_ACCS'
-/* harmony export (immutable) */ __webpack_exports__["i"] = UPDATE_RTS_ACCS;
+/* harmony export (immutable) */ __webpack_exports__["o"] = UPDATE_RTS_ACCS;
 
 const INCREMENT_FRUSTRATION = 'INCREMENT_FRUSTRATION'
 /* unused harmony export INCREMENT_FRUSTRATION */
@@ -1221,16 +1224,31 @@ const INCREMENT_HINTS = 'INCREMENT_HINTS'
 
 //export const NEW_QUESTION = 'NEW_QUESTION'
 const SET_READY = 'SET_READY'
-/* harmony export (immutable) */ __webpack_exports__["h"] = SET_READY;
+/* harmony export (immutable) */ __webpack_exports__["k"] = SET_READY;
 
 const SET_QUESTION = 'SET_QUESTION'
-/* harmony export (immutable) */ __webpack_exports__["f"] = SET_QUESTION;
+/* harmony export (immutable) */ __webpack_exports__["i"] = SET_QUESTION;
 
 const SET_QUESTION_START = 'SET_QUESTION_START'
-/* harmony export (immutable) */ __webpack_exports__["g"] = SET_QUESTION_START;
+/* harmony export (immutable) */ __webpack_exports__["j"] = SET_QUESTION_START;
 
 const SET_MESSAGE = 'SET_MESSAGE'
-/* harmony export (immutable) */ __webpack_exports__["e"] = SET_MESSAGE;
+/* harmony export (immutable) */ __webpack_exports__["h"] = SET_MESSAGE;
+
+const SET_FEEDBACK = 'SET_FEEDBACK'
+/* harmony export (immutable) */ __webpack_exports__["f"] = SET_FEEDBACK;
+
+const SET_FEEDBACK_TYPE = 'SET_FEEDBACK_TYPE'
+/* harmony export (immutable) */ __webpack_exports__["g"] = SET_FEEDBACK_TYPE;
+
+const TOGGLE_BUG = 'TOGGLE_BUG'
+/* harmony export (immutable) */ __webpack_exports__["l"] = TOGGLE_BUG;
+
+const TOGGLE_FRUSTRATED = 'TOGGLE_FRUSTRATED'
+/* harmony export (immutable) */ __webpack_exports__["m"] = TOGGLE_FRUSTRATED;
+
+const TOGGLE_SUGGESTION = 'TOGGLE_SUGGESTION'
+/* harmony export (immutable) */ __webpack_exports__["n"] = TOGGLE_SUGGESTION;
 
 
 
@@ -12171,6 +12189,7 @@ Vue.component('element-symbol-question', __webpack_require__(100));
 Vue.component('element-charge-question', __webpack_require__(105));
 Vue.component('element-group-question', __webpack_require__(110));
 Vue.component('sigfig-question', __webpack_require__(115));
+Vue.component('ionic-formula-question', __webpack_require__(126));
 Vue.component('bug-report', __webpack_require__(79));
 Vue.component('frustration-report', __webpack_require__(82));
 Vue.component('suggestion-box', __webpack_require__(85));
@@ -12198,6 +12217,13 @@ Vue.filter('chargeFormat', function (value) {
   var str = String(value);
   if (plus) str = '+' + str;
   return str;
+});
+Vue.directive('focus', {
+  // When the bound element is inserted into the DOM...
+  inserted: function inserted(el) {
+    // Focus the element
+    el.focus();
+  }
 });
 
 var app = new Vue({
@@ -43450,7 +43476,7 @@ exports = module.exports = __webpack_require__(12)(undefined);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -43477,6 +43503,22 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -43486,7 +43528,12 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     factsStatus: 'checkFactsReady',
     statesStatus: 'checkStatesReady',
     currentQuestionState: 'getCurrent',
-    setupReady: 'checkSetup'
+    setupReady: 'checkSetup',
+    finished: 'getFinished',
+    frustrated: 'isFrustrated',
+    bug: 'isBug',
+    suggestion: 'hasSuggestion',
+    message: 'getMessage'
   }), {
     ready: function ready() {
       if (this.setupReady === true && typeof this.currentQuestionState !== 'undefined') {
@@ -43499,6 +43546,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
     Promise.all([this.$store.dispatch('setupWords'), this.$store.dispatch('setupFacts'), this.$store.dispatch('setupSkills')]).then(function (results) {
       _this.$store.dispatch('setupStates');
+    }).then(function (results) {
+      _this.$store.dispatch('setupIons');
     }).then(function (results) {
 
       //console.log(results);
@@ -43515,7 +43564,71 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [(_vm.ready === true && _vm.currentQuestionState[2] === 'word') ? _c('word-question') : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'fact') ? _c('fact-question') : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'skill') ? _c('skill-question') : _vm._e(), _vm._v(" "), _c('bug-report'), _c('frustration-report'), _c('suggestion-box')], 1)
+  return _c('div', [_c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.finished),
+      expression: "finished"
+    }],
+    staticClass: "alert alert-success"
+  }, [_c('strong', [_vm._v("Congrats, you've finished studying everything you set for this session!")]), _vm._v("\n    Add more material by returning to your dashboard and setting a new session, or\n    check back in later to see if you have material to review. Or just keep studying, if you want.")]), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.message),
+      expression: "message"
+    }],
+    staticClass: "alert alert-info"
+  }, [_vm._v("\n      " + _vm._s(_vm.message))]), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'word') ? _c('word-question') : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'fact') ? _c('fact-question') : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'skill') ? _c('skill-question') : _vm._e(), _vm._v(" "), _c('div', [_c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.bug),
+      expression: "!bug"
+    }],
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.$store.dispatch('toggleBug')
+      }
+    }
+  }, [_vm._v("Report Bug")]), _vm._v(" "), _c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.frustrated),
+      expression: "!frustrated"
+    }],
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.$store.dispatch('toggleFrustrated')
+      }
+    }
+  }, [_vm._v("I'm frustrated")]), _vm._v(" "), _c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.suggestion),
+      expression: "!suggestion"
+    }],
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.$store.dispatch('toggleSuggestion')
+      }
+    }
+  }, [_vm._v("Make a suggestion")])]), _vm._v(" "), (_vm.bug) ? _c('bug-report') : _vm._e(), (_vm.frustrated) ? _c('frustration-report') : _vm._e(), _vm._v(" "), (_vm.suggestion) ? _c('suggestion-box') : _vm._e(), _vm._v(" "), _c('hr')], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -43594,6 +43707,8 @@ __WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_1_vuex
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mutation_types__ = __webpack_require__(2);
+var _mutations;
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
@@ -43602,7 +43717,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 // shape: [{ id, quantity }]
 var state = {
   facts: [], //stores and organizes facts
-  factsReady: false
+  factsReady: false,
+  anionsList: [{ name: 'chloride', formula: 'Cl-1', charge: -1 }, { name: 'bromide', formula: 'Br-1', charge: -1 }, { name: 'fluoride', formula: 'F-1', charge: -1 }, { name: 'iodide', formula: 'I-1', charge: -1 }, { name: 'oxide', formula: 'O-2', charge: -2 }, { name: 'sulfide', formula: 'S-2', charge: -2 }, { name: 'nitride', formula: 'N-3', charge: -3 }],
+
+  cationsList: [{ name: 'lithium', formula: 'Li', charge: 1, romNum: false }, { name: 'sodium', formula: 'Na', charge: 1, romNum: false }, { name: 'magnesium', formula: 'Mg', charge: 2, romNum: false }, { name: 'potassium', formula: 'K', charge: 1, romNum: false }, { name: 'calcium', formula: 'Ca', charge: 2, romNum: false }, { name: 'strontium', formula: 'Sr', charge: 2, romNum: false }, { name: 'cesium', formula: 'Cs', charge: 1, romNum: false }, { name: 'barium', formula: 'Ba', charge: 2, romNum: false }, { name: 'aluminum', formula: 'Al', charge: 3, romNum: false }, { name: 'titanium', formula: 'Ti', charge: [3, 4], romNum: true }, { name: 'vanadium', formula: 'V', charge: [2, 3, 4, 5], romNum: true }, { name: 'chromium', formula: 'Cr', charge: [2, 3, 4, 6], romNum: true }, { name: 'manganese', formula: 'Mn', charge: [2, 3, 4, 7], romNum: true }, { name: 'iron', formula: 'Fe', charge: [2, 3], romNum: true }, { name: 'cobalt', formula: 'Co', charge: [2, 3], romNum: true }, { name: 'nickel', formula: 'Ni', charge: [2, 3], romNum: true }, { name: 'platinum', formula: 'Pt', charge: [2, 4], romNum: true }, { name: 'copper', formula: 'Cu', charge: [1, 2], romNum: true }, { name: 'silver', formula: 'Ag', charge: [1], romNum: true }, { name: 'zinc', formula: 'Zn', charge: [2], romNum: false }, { name: 'cadmium', formula: 'Cd', charge: [2], romNum: true }, { name: 'mercury', formula: 'Hg', charge: [2], romNum: true }, { name: 'uranium', formula: 'U', charge: [4, 6], romNum: true }, { name: 'tin', formula: 'Sn', charge: [2, 4], romNum: true }, { name: 'lead', formula: 'Pb', charge: [2, 4], romNum: true }, { name: 'mercury(I)', formula: 'Hg2+2', charge: 2, level: 2 }],
+  polyanionsList: [],
+  polycationsList: []
+
 };
 
 // getters
@@ -43617,6 +43738,10 @@ var getters = {
   },
   getFacts: function getFacts(state) {
     return state.facts;
+  },
+  getIons: function getIons(state) {
+    return { cat: state.cationsList, an: state.anionsList,
+      polycat: state.polycationsList, polyan: state.polyanionsList };
   }
 };
 
@@ -43645,16 +43770,45 @@ var actions = {
         reject();
       });
     });
+  },
+  setupIons: function setupIons(_ref2) {
+    var commit = _ref2.commit;
+
+    return new Promise(function (resolve, reject) {
+      axios.get('../api/student/ions').then(function (response) {
+        var temp = response.data;
+        var polyan = [];
+        var polycat = [];
+        var ion = {};
+        var charge = 0;
+        //console.log(typeof(words));
+        for (var i = 0; i < temp.length; i++) {
+          charge = Number(/((?:\+|-)\d)/.exec(state.facts[temp[i]].key)[0]);
+          if (charge > 0) ion = { name: state.facts[temp[i]].prop, formula: state.facts[temp[i]].key, charge: charge, romNum: false };else ion = { name: state.facts[temp[i]].prop, formula: state.facts[temp[i]].key, charge: charge };
+          console.log(ion);
+          if (charge < 0) polyan.push(ion);else polycat.push(ion);
+        }
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_IONS */], polyan, polycat);
+        resolve();
+      }).catch(function (error) {
+        console.log(error);
+        reject();
+      });
+    });
   }
 };
 
 // mutations
-var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["a" /* INITIALIZE_FACTS */], function (state, facts) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["a" /* INITIALIZE_FACTS */], function (state, facts) {
   //console.log("in mutation, words is: " + words);
   state.facts = facts;
   //console.log('facts set');
   state.factsReady = true;
-});
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_IONS */], function (state, polyan, polycat) {
+  //console.log("in mutation, words is: " + words);
+  state.polyanionsList = polyan;
+  state.polycationsList = polycat;
+}), _mutations);
 
 /* harmony default export */ __webpack_exports__["a"] = ({
   state: state,
@@ -43696,6 +43850,9 @@ var getters = {
   checkStatesReady: function checkStatesReady(state) {
     return state.statesReady;
   },
+  getFinished: function getFinished(state) {
+    return state.finished;
+  },
   getCurrentStateID: function getCurrentStateID(state) {
     return state.currentStateID;
   },
@@ -43724,7 +43881,7 @@ var actions = {
 
     return new Promise(function (resolve, reject) {
       axios.get('../api/student/states/active').then(function (response) {
-        console.log(response.data);
+        //console.log(response.data);
         var temp = response.data;
         var states = [];
         var thisState = {};
@@ -43738,9 +43895,9 @@ var actions = {
           }
           states.push(thisState);
         }
-        console.log(states);
-        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_STATES */], states);
-        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_QUESTION */]);
+        //console.log(states);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* INITIALIZE_STATES */], states);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_QUESTION */]);
         resolve();
       }).catch(function (error) {
         console.log(error);
@@ -43759,8 +43916,8 @@ var actions = {
         for (var i = 0; i < temp.length; i++) {
           skills.push(temp[i]);
         }
-        console.log(skills);
-        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_SKILLS */], skills);
+        //console.log(skills);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_SKILLS */], skills);
         resolve();
       }).catch(function (error) {
         console.log(error);
@@ -43771,65 +43928,65 @@ var actions = {
   updateRtsAccs: function updateRtsAccs(_ref3, newState) {
     var commit = _ref3.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* UPDATE_RTS_ACCS */], newState);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["o" /* UPDATE_RTS_ACCS */], newState);
   },
   updateStage: function updateStage(_ref4, newState) {
     var commit = _ref4.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* UPDATE_STAGE */], newState);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["p" /* UPDATE_STAGE */], newState);
   },
   setQuestion: function setQuestion(_ref5) {
     var commit = _ref5.commit;
 
     var prev = state.currentIndex;
     var state_id = state.currentStateID;
-    console.log("prev is ", prev);
+    //console.log("prev is ", prev)
     var url = '../api/student/states/' + state_id;
-    console.log(url);
-    console.log("state for updating: ", state.states[prev]);
+    //console.log(url)
+    //console.log("state for updating: ", state.states[prev]);
     axios.post(url, state.states[prev]).catch(function (error) {
       console.log(error);
     });
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_QUESTION */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_QUESTION */]);
     //console.log('after SET_QUESTION, prev is ', prev)
   }
 };
 
 // mutations
-var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_STATES */], function (state, states) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* INITIALIZE_STATES */], function (state, states) {
   state.states = states;
   state.statesReady = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_SKILLS */], function (state, skills) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_SKILLS */], function (state, skills) {
   state.skills = skills;
   state.skillsReady = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_QUESTION */], function (state) {
-  console.log('before getNext index is ', state.currentIndex);
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_QUESTION */], function (state) {
+  //console.log('before getNext index is ', state.currentIndex)
   state.currentIndex = getNext();
-  console.log('after getNext index is ', state.currentIndex, state.states[state.currentIndex].type_id);
+  //console.log('after getNext index is ', state.currentIndex, state.states[state.currentIndex].type_id)
   state.currentTypeID = state.states[state.currentIndex].type_id;
   state.currentType = state.states[state.currentIndex].type;
   state.currentStage = state.states[state.currentIndex].stage;
   state.currentStateID = state.states[state.currentIndex].id;
   state.states[state.currentIndex].lastStudied = Date.now();
   if (state.currentType === 'skill') {
-    console.log('before subtype');
+    //console.log('before subtype')
     state.currentSubtype = state.skills[state.currentTypeID - 1].subtype;
-    console.log('after subtype');
+    //console.log('after subtype')
     state.currentSkill = state.skills[state.currentTypeID - 1].skill;
   } else {
     state.currentSubtype = false;
     state.currentSkill = false;
   }
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* UPDATE_RTS_ACCS */], function (state, newState) {
-  console.log("newState is ", newState);
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["o" /* UPDATE_RTS_ACCS */], function (state, newState) {
+  //console.log("newState is ", newState);
   state.states[state.currentIndex].accs.push(newState.accs);
   state.states[state.currentIndex].rts.push(newState.rts);
-  console.log("state is now ", state.states[state.currentIndex]);
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* UPDATE_STAGE */], function (state, newState) {
-  console.log("newState is ", newState);
+  //console.log("state is now ", state.states[state.currentIndex])
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["p" /* UPDATE_STAGE */], function (state, newState) {
+  //console.log("newState is ", newState)
   state.states[state.currentIndex].priority = newState.priority;
   state.states[state.currentIndex].stage = newState.stage;
-  console.log("state is now ", state.states[state.currentIndex]);
+  //console.log("state is now ", state.states[state.currentIndex])
 }), _mutations);
 
 var getNext = function getNext() {
@@ -43838,17 +43995,15 @@ var getNext = function getNext() {
   //var nextQ;
   var readiest = -1;
   var readiestUnready = -1;
+  var unseen = [];
 
   for (var i = 0; i < state.states.length; i++) {
-    console.log('state.states[i] is: ', state.states[i]);
+    //console.log('state.states[i] is: ', state.states[i]);
     //console.log('state.states[i -1] is: ', state.states[i-1]);
-    if (state.states[i].priority === 1) {
-      if (readiest !== -1) {
-        return readiest;
-      } else {
-        return i;
-      }
-    } else if (state.states[i].priority <= currentTime) {
+    if (state.states[i].priority < 100) {
+      unseen.push(i);
+    }
+    if (state.states[i].priority <= currentTime) {
       if (readiest !== -1) {
         if (state.states[readiest].priority > state.states[i].priority) {
           readiest = i;
@@ -43867,7 +44022,10 @@ var getNext = function getNext() {
     }
   }
   //console.log(readiest);
-  if (readiest !== -1) {
+  if (unseen.length > 0) {
+    var r = _.random(0, unseen.length - 1);
+    return unseen[r];
+  } else if (readiest !== -1) {
     return readiest;
   } else {
     //console.log()
@@ -43930,7 +44088,7 @@ var actions = {
           var word = { word: temp[i].word, type_id: temp[i].id, altwords: alts, prompts: prompts };
           words.push(word);
         }
-        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* INITIALIZE_WORDS */], words);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* INITIALIZE_WORDS */], words);
         resolve();
       }).catch(function (error) {
         console.log(error);
@@ -43941,7 +44099,7 @@ var actions = {
 };
 
 // mutations
-var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* INITIALIZE_WORDS */], function (state, words) {
+var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* INITIALIZE_WORDS */], function (state, words) {
   //console.log("in INITIALIZE_WORDS, words is: " + words);
   state.words = words;
   //console.log(state.words[1].altwords[0]);
@@ -43976,7 +44134,14 @@ var state = {
   frustrationCount: 0, //counts how many times user indicates frustrationCount
   hintCount: 0, //counts how many times user requests hint
   errors: "", //collects session errors for display
-  message: ''
+  feedback: '',
+  feedbackType: {
+    "alert-success": true
+  },
+  message: '',
+  frustrated: false,
+  bug: false,
+  suggestion: false
 };
 
 // getters
@@ -43986,6 +44151,24 @@ var getters = {
   },
   getQuestionSetTime: function getQuestionSetTime(state) {
     return state.questionSetTime;
+  },
+  getFeedback: function getFeedback(state) {
+    return state.feedback;
+  },
+  getFeedbackType: function getFeedbackType(state) {
+    return state.feedbackType;
+  },
+  isBug: function isBug(state) {
+    return state.bug;
+  },
+  isFrustrated: function isFrustrated(state) {
+    return state.frustrated;
+  },
+  hasSuggestion: function hasSuggestion(state) {
+    return state.suggestion;
+  },
+  getMessage: function getMessage(state) {
+    return state.message;
   }
 };
 
@@ -43995,27 +44178,63 @@ var actions = {
     var commit = _ref.commit;
 
     //console.log('setReady');
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_READY */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_READY */]);
   },
   setQuestionStart: function setQuestionStart(_ref2) {
     var commit = _ref2.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_QUESTION_START */], Date.now());
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_QUESTION_START */], Date.now());
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_MESSAGE */], '');
   },
   setMessage: function setMessage(_ref3, message) {
     var commit = _ref3.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_MESSAGE */], message);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_MESSAGE */], message);
+  },
+  setFeedback: function setFeedback(_ref4, feedback) {
+    var commit = _ref4.commit;
+
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_FEEDBACK */], feedback);
+  },
+  setFeedbackType: function setFeedbackType(_ref5, feedbackType) {
+    var commit = _ref5.commit;
+
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_FEEDBACK_TYPE */], feedbackType);
+  },
+  toggleBug: function toggleBug(_ref6) {
+    var commit = _ref6.commit;
+
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* TOGGLE_BUG */]);
+  },
+  toggleFrustrated: function toggleFrustrated(_ref7) {
+    var commit = _ref7.commit;
+
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* TOGGLE_FRUSTRATED */]);
+  },
+  toggleSuggestion: function toggleSuggestion(_ref8) {
+    var commit = _ref8.commit;
+
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["n" /* TOGGLE_SUGGESTION */]);
   }
 };
 
 // mutations
-var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_READY */], function (state) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_READY */], function (state) {
   state.setupComplete = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_QUESTION_START */], function (state, time) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_QUESTION_START */], function (state, time) {
   state.questionSetTime = time;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* SET_MESSAGE */], function (state, message) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_MESSAGE */], function (state, message) {
   state.message = message;
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_FEEDBACK */], function (state, feedback) {
+  state.feedback = feedback;
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_FEEDBACK_TYPE */], function (state, feedbackType) {
+  state.feedbackType = feedbackType;
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* TOGGLE_BUG */], function (state) {
+  state.bug = !state.bug;
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* TOGGLE_FRUSTRATED */], function (state) {
+  state.frustrated = !state.frustrated;
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["n" /* TOGGLE_SUGGESTION */], function (state) {
+  state.suggestion = !state.suggestion;
 }), _mutations);
 
 /* harmony default export */ __webpack_exports__["a"] = ({
@@ -44177,20 +44396,18 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     return {
       entry: '',
       tries: 0,
-      feedback: '',
       acc: 0,
       rts: [],
-      startTime: 0,
-      feedbackType: {
-        "alert-success": true
-      }
+      startTime: 0
     };
   },
   //props: ['questionTypeID'],
   computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
     currentQuestion: 'getCurrent',
     questionSetTime: 'getQuestionSetTime',
-    stageData: 'getStageData'
+    stageData: 'getStageData',
+    feedback: 'getFeedback',
+    feedbackType: 'getFeedbackType'
   }), {
     word: function word() {
       return this.$store.getters.getWordById(this.currentQuestion[1]);
@@ -44226,7 +44443,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         moveOn = true;
         gotIt = true;
         this.acc = this.tries - 1;
-        this.feedbackType = { "alert-success": true };
+        this.$store.dispatch('setFeedbackType', { "alert-success": true });
 
         //console.log('acc is set to ', this.acc)
       } else if (correct === 'dontKnow') {
@@ -44241,9 +44458,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         this.acc = 4;
       }
       if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
-        this.feedbackType = { "alert-warning": true };
-      } else if (gotIt === false) this.feedbackType = { "alert-danger": true };
-      this.feedback = answerDetail.messageSent;
+        this.$store.dispatch('setFeedbackType', { "alert-warning": true });
+      } else if (gotIt === false) this.$store.dispatch('setFeedbackType', { "alert-danger": true });
+      this.$store.dispatch('setFeedback', answerDetail.messageSent);
       var action = {};
       action.state_id = this.currentQuestion[4];
       action.type = 'answer given-' + correct;
@@ -44335,6 +44552,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "input-group"
   }, [_c('input', {
     directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
       name: "model",
       rawName: "v-model",
       value: (_vm.entry),
@@ -44342,7 +44562,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }],
     staticClass: "form-control",
     attrs: {
-      "autofocus": "",
       "type": "text"
     },
     domProps: {
@@ -44446,24 +44665,26 @@ if (false) {
       172800000, //2d
       345600000, //4d
       864000000, //10d
-      2160000000 //25d
+      2160000000, //25d
+      6000000000 // 2.5 months
       ];
       console.log("in fact priority, stageData is ", stageData);
       var timesStudied = stageData.accs.length;
       var correct = stageData.accs[timesStudied - 1];
       var stage = Number(stageData.stage);
       var newStage = 0;
+      var now = Date.now();
       if (correct === 0 && timesStudied === 1) {
         newStage = 4;
       } else if (correct === 0) {
-        newStage = stage + 1;
+        if (stage = 10) newStage = 10;else newStage = stage + 1;
       } else if (correct === 1 || stage === 0) {
         newStage = stage;
       } else {
         newStage = stage - 1;
       }
-      console.log("lastStudied is", stageData.lastStudied);
-      var newPriority = stageData.lastStudied + stageArray[newStage];
+      //console.log("lastStudied is", stageData.lastStudied);
+      var newPriority = now + stageArray[newStage];
       console.log('newPriority is ', newPriority);
       //insert randomization:
       var randomFactor = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 40) * 1000;
@@ -44519,27 +44740,7 @@ module.exports = Component.exports
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('button', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (!_vm.show),
-      expression: "!show"
-    }],
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": _vm.showForm
-    }
-  }, [_vm._v("Report Bug")]), _vm._v(" "), _c('div', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (_vm.show),
-      expression: "show"
-    }],
+  return _c('div', [_c('div', {
     staticClass: "panel panel-default"
   }, [_c('div', {
     staticClass: "panel-heading"
@@ -44549,6 +44750,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "input-group"
   }, [_c('textarea', {
     directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
       name: "model",
       rawName: "v-model",
       value: (_vm.entry),
@@ -44556,7 +44760,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }],
     staticClass: "form-control",
     attrs: {
-      "autofocus": "",
       "type": "text"
     },
     domProps: {
@@ -44630,15 +44833,12 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
-//
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      entry: '',
-      show: false
+      entry: ''
     };
   },
   computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
@@ -44655,7 +44855,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         state_id: this.stateID, time: Date.now() };
       axios.post('../api/student/actions', action).then(function (results) {
         _this.$store.dispatch('setMessage', 'Thank you for your bug report!');
-        _this.show = !_this.show;
+        _this.$store.dispatch('toggleBug');
         _this.entry = '';
       }).catch(function (error) {
         console.log(error);
@@ -44667,7 +44867,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       axios.post('../api/student/actions', action).catch(function (error) {
         console.log(error);
       });
-      this.show = !this.show;
+      this.$store.dispatch('toggleBug');
     }
   }
 });
@@ -44742,15 +44942,12 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
-//
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      entry: '',
-      show: false
+      entry: ''
     };
   },
   computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
@@ -44767,7 +44964,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         state_id: this.stateID, time: Date.now() };
       axios.post('../api/student/actions', action).then(function (results) {
         _this.$store.dispatch('setMessage', 'Thanks for sharing your experience!');
-        _this.show = !_this.show;
+        _this.$store.dispatch('toggleFrustrated');
         _this.entry = '';
       }).catch(function (error) {
         console.log(error);
@@ -44779,7 +44976,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       axios.post('../api/student/actions', action).catch(function (error) {
         console.log(error);
       });
-      this.show = !this.show;
+      this.$store.dispatch('toggleFrustrated');
     }
   }
 });
@@ -44789,27 +44986,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('button', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (!_vm.show),
-      expression: "!show"
-    }],
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": _vm.showForm
-    }
-  }, [_vm._v("I'm frustrated")]), _vm._v(" "), _c('div', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (_vm.show),
-      expression: "show"
-    }],
+  return _c('div', [_c('div', {
     staticClass: "panel panel-default"
   }, [_c('div', {
     staticClass: "panel-heading"
@@ -44936,15 +45113,12 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
-//
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      entry: '',
-      show: false
+      entry: ''
     };
   },
   computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
@@ -44961,7 +45135,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         state_id: this.stateID, time: Date.now() };
       axios.post('../api/student/actions', action).then(function (results) {
         _this.$store.dispatch('setMessage', 'Thanks for sharing your suggestion!');
-        _this.show = !_this.show;
+        _this.$store.dispatch('toggleSuggestion');
         _this.entry = '';
       }).catch(function (error) {
         console.log(error);
@@ -44973,7 +45147,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       axios.post('../api/student/actions', action).catch(function (error) {
         console.log(error);
       });
-      this.show = !this.show;
+      this.$store.dispatch('toggleSuggestion');
     }
   }
 });
@@ -44983,27 +45157,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('button', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (!_vm.show),
-      expression: "!show"
-    }],
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": _vm.showForm
-    }
-  }, [_vm._v("Make a suggestion")]), _vm._v(" "), _c('div', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (_vm.show),
-      expression: "show"
-    }],
+  return _c('div', [_c('div', {
     staticClass: "panel panel-default"
   }, [_c('div', {
     staticClass: "panel-heading"
@@ -45201,7 +45355,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('div', {
     staticClass: "col-md-8 col-md-offset-2"
   }, [(_vm.fact.group_name === 'polyatomic ions' ||
-    _vm.fact.group_name === 'acids') ? _c('polyatomic-ion-question') : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'elementSymbol') ? _c('element-symbol-question') : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'elementCharge') ? _c('element-charge-question') : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'elementGroup') ? _c('element-group-question') : _vm._e()], 1)])])
+    _vm.fact.group_name === 'acids' || _vm.fact.group_name === 'commonCompound') ? _c('polyatomic-ion-question') : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'elementSymbol') ? _c('element-symbol-question') : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'elementCharge') ? _c('element-charge-question') : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'elementGroup') ? _c('element-group-question') : _vm._e()], 1)])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -45359,15 +45513,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     return {
       entry: '',
       tries: 0,
-      feedback: '',
       acc: 0,
       rts: [],
       startTime: 0,
       //determines whether name or formula is given
-      requestFormula: true,
-      feedbackType: {
-        "alert-success": true
-      }
+      requestFormula: true
     };
   },
   //props: ['questionTypeID'],
@@ -45375,7 +45525,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     currentQuestion: 'getCurrent',
     questionSetTime: 'getQuestionSetTime',
     stageData: 'getStageData',
-    facts: 'getFacts'
+    facts: 'getFacts',
+    feedback: 'getFeedback',
+    feedbackType: 'getFeedbackType'
   }), {
     fact: function fact() {
       return this.$store.getters.getFactById(this.currentQuestion[1]);
@@ -45418,7 +45570,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         moveOn = true;
         gotIt = true;
         this.acc = this.tries - 1;
-        this.feedbackType = { "alert-success": true };
+        this.$store.dispatch('setFeedbackType', { "alert-success": true });
 
         //console.log('acc is set to ', this.acc)
       } else if (correct === 'dontKnow') {
@@ -45438,9 +45590,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         }
       }
       if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
-        this.feedbackType = { "alert-warning": true };
-      } else if (gotIt === false) this.feedbackType = { "alert-danger": true };
-      this.feedback = answerDetail.messageSent;
+        this.$store.dispatch('setFeedbackType', { "alert-warning": true });
+      } else if (gotIt === false) this.$store.dispatch('setFeedbackType', { "alert-danger": true });
+      this.$store.dispatch('setFeedback', answerDetail.messageSent);
       var action = {};
       action.state_id = this.currentQuestion[4];
       action.type = 'answer given-' + correct;
@@ -45588,7 +45740,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     domProps: {
       "innerHTML": _vm._s(this.$options.filters.formatFormula('VO2+1'))
     }
-  }), _vm._v(".")]) : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'acids') ? _c('div', [_vm._v("Instructions: If you don't have any guesses, enter zero to see the answer.\n          If you are asked for a formula, put the acidic hydrogens at the front and\n          use the following format: write 'H3C6H5O7' for "), _c('span', {
+  }), _vm._v(".")]) : _vm._e(), _vm._v(" "), (_vm.fact.group_name === 'acids' || _vm.fact.group_name === 'commonCompound') ? _c('div', [_vm._v("Instructions: If you don't have any guesses, enter zero to see the answer.\n          If you are asked for an acid formula, put the acidic hydrogens at the front and\n          use the following format: write 'H3C6H5O7' for "), _c('span', {
     domProps: {
       "innerHTML": _vm._s(this.$options.filters.formatFormula('H3C6H5O7'))
     }
@@ -45600,6 +45752,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "input-group"
   }, [_c('input', {
     directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
       name: "model",
       rawName: "v-model",
       value: (_vm.entry),
@@ -45607,7 +45762,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }],
     staticClass: "form-control",
     attrs: {
-      "autofocus": "",
       "type": "text"
     },
     domProps: {
@@ -45710,6 +45864,7 @@ if (false) {
 var state = {
   elementsList: [{ name: 'hydrogen', symbol: 'H', family: 'non-metal', location: '1', charge: 1, valence: 1, findex: 8 }, { name: 'helium', symbol: 'He', family: 'noble gas', location: '2', charge: 0, valence: 2, findex: 4 }, { name: 'lithium', symbol: 'Li', family: 'alkali metal', location: '3', charge: 1, valence: 1, findex: 2 }, { name: 'beryllium', symbol: 'Be', family: 'alkaline earth metal', location: '4', charge: 2, valence: 2, findex: 3 }, { name: 'boron', symbol: 'B', family: 'Boron group', location: '5', charge: 3, valence: 3, findex: 8 }, { name: 'carbon', symbol: 'C', family: 'Carbon group', location: '6', charge: 0, valence: 4, findex: 8 }, { name: 'nitrogen', symbol: 'N', family: 'Nitrogen group (pnictogen)', location: '7', charge: -3, valence: 5, findex: 8 }, { name: 'oxygen', symbol: 'O', family: 'chalcogen', location: '8', charge: -2, valence: 6, findex: 1 }, { name: 'fluorine', symbol: 'F', family: 'halogen', location: '9', charge: -1, valence: 7, findex: 0 }, { name: 'bromine', symbol: 'Br', family: 'halogen', location: 'Hal', charge: -1, valence: 7, findex: 0 }, { name: 'iodine', symbol: 'I', family: 'halogen', location: 'Hal', charge: -1, valence: 7, findex: 0 }, { name: 'sodium', symbol: 'Na', family: 'alkali metal', location: '11', charge: 1, valence: 1, findex: 2 }, { name: 'magnesium', symbol: 'Mg', family: 'alkaline earth metal', location: '12', charge: 2, valence: 2, findex: 3 }, { name: 'aluminum', symbol: 'Al', family: 'Boron group', location: '13', charge: 3, valence: 3, findex: 9 }, { name: 'silicon', symbol: 'Si', family: 'Carbon group', location: '14', charge: 4, valence: 4, findex: 8 }, { name: 'phosphorus', symbol: 'P', family: 'Nitrogen group (pnictogen)', location: '15', charge: -3, valence: 5, findex: 8 }, { name: 'sulfur', symbol: 'S', family: 'chalcogen', location: '16', charge: -2, valence: 6, findex: 1 }, { name: 'chlorine', symbol: 'Cl', family: 'halogen', location: '17', charge: -1, valence: 7, findex: 0 }, { name: 'argon', symbol: 'Ar', family: 'noble gas', location: 'NG', charge: 0, valence: 8, findex: 4 }, { name: 'potassium', symbol: 'K', family: 'alkali metal', location: '19', charge: 1, valence: 1, findex: 2 }, { name: 'calcium', symbol: 'Ca', family: 'alkaline earth metal', location: '20', charge: 2, valence: 2, findex: 3 }, { name: 'titanium', symbol: 'Ti', family: 'transition metal', location: 'ETM', charge: 4, findex: 7 }, { name: 'iron', symbol: 'Fe', family: 'transition metal', location: 'MTM', charge: [3, 2], findex: 7 }, { name: 'copper', symbol: 'Cu', family: 'coinage metal', location: 'CM', charge: [2, 1], findex: 6 }, { name: 'mercury', symbol: 'Hg', family: '(post-)transition metal', location: 'PTM', charge: [2, 1], findex: 57 }, { name: 'silver', symbol: 'Ag', family: 'coinage metal', location: 'CM', charge: [2, 1], findex: 6 }, { name: 'gold', symbol: 'Au', family: 'coinage metal', location: 'CM', charge: [3, 1], findex: 6 }, { name: 'tin', symbol: 'Sn', family: 'post-transition metal', location: 'PTM', charge: [2, 4], valence: 4, findex: 5 }, { name: 'lead', symbol: 'Pb', family: 'post-transition metal', location: 'PTM', charge: [2, 4], valence: 4, findex: 5 }, { name: 'zinc', symbol: 'Zn', family: '(post-)transition metal', location: 'PTM', charge: [2], findex: 57 }],
   elementsCharges: [[{ alt: 1, correct: 'correct', message: '', op: 'equals' }, { alt: -1, correct: 'close', message: 'Possible, but in special circumstances. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'H only has one electron to lose, so it can\'t have a charge above +1. ', op: 'greater' }, { alt: -1, correct: 'knownWrong', message: 'It would be almost impossible to add more than 1 electron to H. ', op: 'less' }], [{ alt: 0, correct: 'correct', message: 'Noble gases pretty much never have charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Noble gases pretty much never have charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 3, correct: 'correct', message: 'Boron often has a +3 charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Like carbon, boron forms many compounds in which it shares electrons, but it does form ionic compounds also. ', op: 'equals' }], [{ alt: 0, correct: 'correct', message: 'Carbon usually shares electrons, rather than forming ions. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Carbon usually shares electrons, and rarely forms ions. ', op: 'notEqual' }], [{ alt: -3, correct: 'correct', message: 'When nitrogen forms an ion, it\'s usually -3 charge. ', op: 'equals' }, { alt: -3, correct: 'close', message: 'In more complicated situations, N can have many different charges. ', op: 'notEqual' }], [{ alt: -2, correct: 'correct', message: 'O almost always has a -2 charge. ', op: 'equals' }, { alt: -2, correct: 'knownWrong', message: 'O almost always has a -2 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'F always has a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'F almost always has a -1 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Halogens almost always have a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Halogens almost always have a -1 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Halogens almost always have a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Halogens almost always have a -1 charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 3, correct: 'correct', message: 'Aluminum always has +3 charge. ', op: 'equals' }, { alt: 3, correct: 'knownWrong', message: 'Aluminum always has +3 charge. ', op: 'notEqual' }], [{ alt: 4, correct: 'correct', message: 'Si often has a 4+ charge when it occurs in rocks. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Si doesn\'t share electrons as much as C. ', op: 'equals' }], [{ alt: -3, correct: 'correct', message: 'When P forms an ion, it\'s usually -3 charge. ', op: 'equals' }, { alt: -3, correct: 'close', message: 'In more complicated situations, P can have many different charges. ', op: 'notEqual' }], [{ alt: -2, correct: 'correct', message: 'S usually has a -2 charge. ', op: 'equals' }, { alt: -2, correct: 'knownWrong', message: 'In more complicated situations, S can have many different charges. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Cl almost always has a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Cl almost always has a -1 charge. ', op: 'notEqual' }], [{ alt: 0, correct: 'correct', message: 'Noble gases pretty much never have charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Noble gases pretty much never have charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 4, correct: 'correct', message: 'Ti usually has a 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Transition elements often have multiple charges, but Ti is usually +4. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 3, correct: 'correct', message: 'Fe usually has a 3+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Fe usually has a 3+ or 2+ charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Fe can have a range of charges, but is +2 or +3 normally. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Cu usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 1, correct: 'correct', message: 'Cu usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Cu rarely has a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 1, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Hg does\'t have a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 1, correct: 'correct', message: 'Ag usually has a 1+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Ag occasionally has a 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Ag rarely has a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 1, correct: 'correct', message: 'Au usually has a 1+ or +3 charge. ', op: 'equals' }, { alt: 3, correct: 'correct', message: 'Au usually has a 1+ or 3+ charge. ', op: 'equals' }, { alt: 3, correct: 'close', message: 'Au rarely has a charge above 3+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 4, correct: 'correct', message: 'Sn usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Sn usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less' }], [{ alt: 4, correct: 'correct', message: 'Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Zn always has a 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Zn does\'t have a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }]]
+
 };
 
 // getters
@@ -45866,15 +46021,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     return {
       entry: '',
       tries: 0,
-      feedback: '',
       acc: 0,
       rts: [],
       startTime: 0,
       //determines whether name or formula is given
-      requestSymbol: true,
-      feedbackType: {
-        "alert-success": true
-      }
+      requestSymbol: true
     };
   },
   //props: ['questionTypeID'],
@@ -45883,7 +46034,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     questionSetTime: 'getQuestionSetTime',
     stageData: 'getStageData',
     facts: 'getFacts',
-    elements: 'getElements'
+    elements: 'getElements',
+    feedback: 'getFeedback',
+    feedbackType: 'getFeedbackType'
   }), {
     fact: function fact() {
       return this.$store.getters.getFactById(this.currentQuestion[1]);
@@ -45925,7 +46078,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         moveOn = true;
         gotIt = true;
         this.acc = this.tries - 1;
-        this.feedbackType = { "alert-success": true };
+        this.$store.dispatch('setFeedbackType', { "alert-success": true });
 
         //console.log('acc is set to ', this.acc)
       } else if (correct === 'dontKnow') {
@@ -45947,9 +46100,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         }
       }
       if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
-        this.feedbackType = { "alert-warning": true };
-      } else if (gotIt === false) this.feedbackType = { "alert-danger": true };
-      this.feedback = answerDetail.messageSent;
+        this.$store.dispatch('setFeedbackType', { "alert-warning": true });
+      } else if (gotIt === false) this.$store.dispatch('setFeedbackType', { "alert-danger": true });
+      this.$store.dispatch('setFeedback', answerDetail.messageSent);
       var action = {};
       action.state_id = this.currentQuestion[4];
       action.type = 'answer given-' + correct;
@@ -46066,6 +46219,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "input-group"
   }, [_c('input', {
     directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
       name: "model",
       rawName: "v-model",
       value: (_vm.entry),
@@ -46073,7 +46229,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }],
     staticClass: "form-control",
     attrs: {
-      "autofocus": "",
       "type": "text"
     },
     domProps: {
@@ -46254,7 +46409,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     return {
       entry: '',
       tries: 0,
-      feedback: '',
       acc: 0,
       rts: [],
       startTime: 0,
@@ -46262,17 +46416,16 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       chargeGiven: true,
       charge: 0,
       useSymbol: true,
-      chargesArray: [-3, -2, -1, 1, 2, 3, 4, 5],
-      feedbackType: {
-        "alert-success": true
-      }
+      chargesArray: [-3, -2, -1, 1, 2, 3, 4, 5]
     };
   },
   //props: ['questionTypeID'],
   computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
     currentQuestion: 'getCurrent',
     questionSetTime: 'getQuestionSetTime',
-    stageData: 'getStageData'
+    stageData: 'getStageData',
+    feedback: 'getFeedback',
+    feedbackType: 'getFeedbackType'
   }), {
     fact: function fact() {
       return this.$store.getters.getFactById(this.currentQuestion[1]);
@@ -46326,7 +46479,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         moveOn = true;
         gotIt = true;
         this.acc = this.tries - 1;
-        this.feedbackType = { "alert-success": true };
+        this.$store.dispatch('setFeedbackType', { "alert-success": true });
 
         //console.log('acc is set to ', this.acc)
       } else if (correct === 'dontKnow') {
@@ -46340,9 +46493,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       }
       if (moveOn === true && gotIt === false) this.acc = 4;
       if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
-        this.feedbackType = { "alert-warning": true };
-      } else if (gotIt === false) this.feedbackType = { "alert-danger": true };
-      this.feedback = answerDetail.messageSent;
+        this.$store.dispatch('setFeedbackType', { "alert-warning": true });
+      } else if (gotIt === false) this.$store.dispatch('setFeedbackType', { "alert-danger": true });
+      this.$store.dispatch('setFeedback', answerDetail.messageSent);
       var action = {};
       action.state_id = this.currentQuestion[4];
       action.type = 'answer given-' + correct;
@@ -46516,6 +46669,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "input-group"
   }, [_c('input', {
     directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
       name: "model",
       rawName: "v-model",
       value: (_vm.entry),
@@ -46523,7 +46679,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }],
     staticClass: "form-control",
     attrs: {
-      "autofocus": "",
       "type": "text"
     },
     domProps: {
@@ -46767,16 +46922,12 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     return {
       entry: '',
       tries: 0,
-      feedback: '',
       acc: 0,
       rts: [],
       startTime: 0,
       //determines whether name or formula is given
       tableFormat: false,
       useSymbol: true,
-      feedbackType: {
-        "alert-success": true
-      },
       families: ['halogen', 'chalcogen', 'alkali metal', 'alkaline earth metal', 'noble gas', 'post-transition metal', 'coinage metal', 'transition metal', 'non-metal', 'metal']
     };
   },
@@ -46785,7 +46936,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     currentQuestion: 'getCurrent',
     questionSetTime: 'getQuestionSetTime',
     stageData: 'getStageData',
-    facts: 'getFacts'
+    facts: 'getFacts',
+    feedback: 'getFeedback',
+    feedbackType: 'getFeedbackType'
   }), {
     fact: function fact() {
       return this.$store.getters.getFactById(this.currentQuestion[1]);
@@ -46847,7 +47000,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         moveOn = true;
         gotIt = true;
         this.acc = this.tries - 1;
-        this.feedbackType = { "alert-success": true };
+        this.$store.dispatch('setFeedbackType', { "alert-success": true });
 
         //console.log('acc is set to ', this.acc)
       } else if (correct === 'dontKnow') {
@@ -46869,9 +47022,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         }
       }
       if (answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
-        this.feedbackType = { "alert-warning": true };
-      } else if (gotIt === false) this.feedbackType = { "alert-danger": true };
-      this.feedback = answerDetail.messageSent;
+        this.$store.dispatch('setFeedbackType', { "alert-warning": true });
+      } else if (gotIt === false) this.$store.dispatch('setFeedbackType', { "alert-danger": true });
+      this.$store.dispatch('setFeedback', answerDetail.messageSent);
       var action = {};
       action.state_id = this.currentQuestion[4];
       action.type = 'answer given-' + correct;
@@ -47234,6 +47387,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "input-group"
   }, [_c('input', {
     directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
       name: "model",
       rawName: "v-model",
       value: (_vm.entry),
@@ -47241,7 +47397,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }],
     staticClass: "form-control",
     attrs: {
-      "autofocus": "",
       "type": "text"
     },
     domProps: {
@@ -47424,20 +47579,18 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     return {
       entry: '',
       tries: 0,
-      feedback: '',
       acc: 0,
       rts: [],
-      startTime: 0,
-      feedbackType: {
-        "alert-success": true
-      }
+      startTime: 0
     };
   },
   //props: ['questionTypeID'],
   computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
     currentQuestion: 'getCurrent',
     questionSetTime: 'getQuestionSetTime',
-    stageData: 'getStageData'
+    stageData: 'getStageData',
+    feedback: 'getFeedback',
+    feedbackType: 'getFeedbackType'
   }), {
     question: function question() {
       var setTime = this.questionSetTime;
@@ -47518,7 +47671,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         moveOn = true;
         gotIt = true;
         this.acc = this.tries - 1;
-        this.feedbackType = { "alert-success": true };
+        this.$store.dispatch('setFeedbackType', { "alert-success": true });
         //console.log('acc is set to ', this.acc)
       } else {
         if (this.tries < 3) {
@@ -47530,9 +47683,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         this.acc = 4;
       }
       if (answerDetail.correct === 'formatError') {
-        this.feedbackType = { "alert-warning": true };
-      } else if (gotIt === false) this.feedbackType = { "alert-danger": true };
-      this.feedback = answerDetail.messageSent;
+        this.$store.dispatch('setFeedbackType', { "alert-warning": true });
+      } else if (gotIt === false) this.$store.dispatch('setFeedbackType', { "alert-danger": true });
+      this.$store.dispatch('setFeedback', answerDetail.messageSent);
       var action = {};
       action.state_id = this.currentQuestion[4];
       action.type = 'answer given-' + correct;
@@ -47614,6 +47767,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "input-group"
   }, [_c('input', {
     directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
       name: "model",
       rawName: "v-model",
       value: (_vm.entry),
@@ -47621,7 +47777,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }],
     staticClass: "form-control",
     attrs: {
-      "autofocus": "",
       "type": "text"
     },
     domProps: {
@@ -47821,45 +47976,53 @@ if (false) {
       //ms until next to study
       var delayWrong = 3000;
       var delayDiscover = 10000;
-      var delayMaster = 240000;
-      var delayReview = 1200000;
+      var delayMaster = 600000;
+      var delayReview = 2160000000;
       var timesCriterionForMaster = 10; //must of studied 10x
       var accCriterionForMaster = 1; //no more than 1 wrong in last 10
       var timesCriterionForReview = 30;
       var accCriterionForReview = 1;
-      var rtCriterionForReview = 10;
+      //const rtCriterionForReview = 6000;
       //console.log("in fact priority, stageData is ", stageData)
       var timesStudied = stageData.accs.length;
-      var correct = stageData.accs[timesStudied - 1];
+      var incorrect = stageData.accs[timesStudied - 1];
+      console.log('incorrect', incorrect);
       var stage = Number(stageData.stage);
       var newStage = 0;
       var newPriority = 0;
       var metrics = Vue.metricsHelper(stageData);
-      if (timesStudied > timesCriterionForReview && metrics.accuracyLast10 <= accCriterionForReview && metrics.averageRTLast10 < rtCriterionForReview) {
-        if (stage === 'master') {
-          newStage = 'review';
+      var now = Date.now();
+      console.log(metrics);
+      if (timesStudied > timesCriterionForReview && metrics.accuracyLast10 <= accCriterionForReview) {
+        if (stage === 4) {
+          newStage = 9;
           //console.log(thisItem.type + ' ' + thisItem.subtype + ' now mastered!');
         }
       }
       if (timesStudied > timesCriterionForMaster && metrics.accuracyLast10 <= accCriterionForMaster) {
-        if (stage === 'discover') {
-          newStage = 'master';
+        if (stage === 0) {
+          newStage = 4;
           //console.log(thisItem.type + ' ' + thisItem.subtype + ' now discovered!');
         }
       }
-      stage = newStage;
+      //console.log({stage: stage, newStage: newStage});
+      if (newStage !== 0) stage = newStage;
+      //console.log({stage: stage, newStage: newStage});
+
       //update priority
-      if (stage === 'discover' && correct) {
-        newPriority = stageData.lastStudied + delayDiscover;
-      } else if (stage === 'master' && correct) {
-        newPriority = stageData.lastStudied + delayMaster;
-      } else if (stage === 'review' && correct) {
-        newPriority = stageData.lastStudied + delayReview;
-      } else newPriority = stageData.lastStudied + delayWrong;
+      if (stage === 0 && !incorrect) {
+        newPriority = now + delayDiscover;
+      } else if (stage === 4 && !incorrect) {
+        newPriority = now + delayMaster;
+      } else if (stage === 9 && !incorrect) {
+        newPriority = now + delayReview;
+      } else newPriority = now + delayWrong;
       //randomize new priority a bit
       var randomFactor = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 40) * 1000;
       newPriority += randomFactor;
-      return { priority: newPriority, stage: newStage };
+      console.log({ newPriority: newPriority, randomFactor: randomFactor, now: now });
+      //console.log({priority: newPriority, stage: stage})
+      return { priority: newPriority, stage: stage };
     };
 
     Vue.metricsHelper = function (stageData) {
@@ -47910,6 +48073,509 @@ if (false) {
     };
   }
 });
+
+/***/ }),
+/* 126 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(127)
+}
+var Component = __webpack_require__(4)(
+  /* script */
+  __webpack_require__(129),
+  /* template */
+  __webpack_require__(130),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/IonicFormulaQuestion.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] IonicFormulaQuestion.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-2b27f9f9", Component.options)
+  } else {
+    hotAPI.reload("data-v-2b27f9f9", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 127 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(128);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(13)("a48afeca", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-2b27f9f9\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./IonicFormulaQuestion.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-2b27f9f9\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./IonicFormulaQuestion.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 128 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(12)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 129 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(1);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      tries: 0,
+      acc: 0,
+      rts: [],
+      startTime: 0,
+      //determines whether name or formula is given
+      requestFormula: true,
+      romanNums: ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII']
+
+    };
+  },
+  //props: ['questionTypeID'],
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    currentQuestion: 'getCurrent',
+    questionSetTime: 'getQuestionSetTime',
+    stageData: 'getStageData',
+    facts: 'getFacts',
+    ions: 'getIons',
+    feedback: 'getFeedback',
+    feedbackType: 'getFeedbackType'
+  }), {
+
+    question: function question() {
+      var formula = '';
+      var name = '';
+      var setTime = this.questionSetTime;
+      var anions = this.ions.an;
+      var cations = this.ions.cat;
+      var catName = '';
+      var catCharge = 0;
+      if (this.currentQuestion[6] === 'complex ionic formulas') {
+        anions.concat(this.ions.polyan);
+        cations.concat(this.ions.polycat);
+      }
+      var anIndex = _.random(0, anions.length - 1);
+      var catIndex = _.random(0, cations.length - 1);
+      if (cations[catIndex].romNum) {
+        catCharge = cations[catIndex].charge[_.random(0, cations[catIndex].charge.length - 1)];
+        catName = cations[catIndex].name + '(' + this.romanNums[catCharge] + ')';
+      } else {
+        catName = cations[catIndex].name;
+        catCharge = cations[catIndex].charge;
+      }
+      name = catName + ' ' + anions[anIndex].name;
+
+      var regex1 = /[\w]+/g;
+      var anArray = anions[anIndex].formula.match(regex1);
+      var catArray = cations[catIndex].formula.match(regex1);
+      //console.log(catArray, anArray);
+      var anionCharge = anArray[1];
+      var anNum = catCharge;
+      var catNum = anionCharge;
+      if (anNum % 2 === 0 && catNum % 2 === 0) {
+        anNum /= 2;
+        catNum /= 2;
+      }
+      if (anNum % 3 === 0 && catNum % 3 === 0) {
+        anNum /= 3;
+        catNum /= 3;
+      }
+      //console.log(typeof anNum, anNum);
+      if (Number(anNum) === 1) {
+        anNum = '';
+      }
+      if (Number(catNum) === 1) {
+        catNum = '';
+      }
+
+      //check for more than 1 capital letter in anArray[0], catArray[0] to see if () needed
+      var regex2 = /[A-Z]/g;
+      var anNumEl = anArray[0].match(regex2).length;
+      var catNumEl = catArray[0].match(regex2).length;
+
+      var anFormula = void 0,
+          catFormula = '';
+
+      if (anNumEl > 1 && anNum) {
+        anFormula = '(' + anArray[0] + ')';
+      } else {
+        anFormula = anArray[0];
+      }
+
+      if (catNumEl > 1 && catNum) {
+        catFormula = '(' + catArray[0] + ')';
+      } else {
+        catFormula = catArray[0];
+      }
+
+      formula = catFormula + catNum + anFormula + anNum;
+      return { name: name, formula: formula, setTime: setTime };
+
+      //
+    }
+  }),
+  created: function created() {
+    this.requestFormula = Math.random() >= 0.5;
+  },
+
+  methods: {
+
+    submitEntry: function submitEntry(event) {
+      this.tries += 1;
+      var answerDetail = this.checkEntry();
+      if (this.startTime === 0) {
+        this.startTime = this.questionSetTime;
+      }
+      answerDetail.timeStamp = Date.now();
+
+      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
+      //console.log('rts is set to ', this.rts)
+      this.startTime = Date.now();
+
+      var correct = answerDetail.correct;
+      var moveOn = false;
+      var gotIt = false;
+
+      if (correct === 'correct') {
+        answerDetail.messageSent += ' Correct!';
+        moveOn = true;
+        gotIt = true;
+        this.acc = this.tries - 1;
+        this.$store.dispatch('setFeedbackType', { "alert-success": true });
+
+        //console.log('acc is set to ', this.acc)
+      } else if (correct === 'dontKnow') {
+        moveOn = true;
+      } else {
+        if (this.tries < 3) {
+          answerDetail.messageSent += " Try again!";
+        } else moveOn = true;
+      }
+      if (moveOn === true && gotIt === false) {
+        if (this.requestFormula) {
+          answerDetail.messageSent = 'The formula of "' + this.question.name + '" is\n          "' + this.question.answer + '". We\'ll come back to it.';
+          this.acc = 4;
+        } else {
+          answerDetail.messageSent = 'The name of "' + this.question.formula + '" is\n          "' + this.question.name + '". We\'ll come back to it.';
+          this.acc = 4;
+        }
+      }
+      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
+        this.$store.dispatch('setFeedbackType', { "alert-warning": true });
+      } else if (gotIt === false) this.$store.dispatch('setFeedbackType', { "alert-danger": true });
+      this.$store.dispatch('setFeedback', answerDetail.messageSent);
+      var action = {};
+      action.state_id = this.currentQuestion[4];
+      action.type = 'answer given-' + correct;
+      action.detail = answerDetail;
+      action.time = answerDetail.timeStamp;
+
+      //this code gives a 500 error now, should check laravel side
+      //console.log("action is ", action);
+      axios.post('../api/student/actions', action).catch(function (error) {
+        console.log(error);
+      });
+
+      if (moveOn) {
+        //update states
+
+        var updatedState = { rts: this.rts, accs: this.acc };
+        console.log("updatedState is", updatedState);
+        this.$store.dispatch('updateRtsAccs', updatedState);
+        updatedState = Vue.skillPriorityHelper(this.stageData);
+        this.$store.dispatch('updateStage', updatedState);
+
+        //set new question
+        //console.log('about to set new question');
+        this.$store.dispatch('setQuestion');
+        this.$store.dispatch('setQuestionStart');
+
+        //update props
+        this.entry = '';
+        this.tries = 0;
+        this.acc = 0;
+        this.rts = [];
+        this.requestFormula = Math.random() >= 0.5;
+      }
+    },
+
+    //checks the entry, returns answerDetail
+    checkEntry: function checkEntry() {
+      var answerDetailToReturn = { answer: this.entry, messageSent: '', correct: '' };
+      //console.log('this.entry: ', this.entry);
+      //console.log('this.answer: ', this.answers);
+      if (this.entry === '') {
+        answerDetailToReturn.correct = 'noAnswer';
+        answerDetailToReturn.messageSent += 'If you don\'t know the answer, enter zero. ';
+      } else if (Number(this.entry) === 0) {
+        answerDetailToReturn.correct = 'dontKnow';
+      }
+      //if answer is formula:
+      if (this.requestFormula) {
+        if (this.entry === this.question.formula) {
+          answerDetailToReturn.correct = 'correct';
+        } else if (this.entry.toLowerCase() === this.question.formula.toLowerCase()) {
+          answerDetailToReturn.correct = 'close';
+          answerDetailToReturn.messageSent = 'Check your capitalization!';
+        }
+        //later, try to parse answer and give specific feedback
+        //break into cation and anion
+        //check quantity of ions and correct identity
+        //check parentheses
+        else {
+            var reCatParen = /\((\w+)\)(\d?)(\w+)(\d?)/;
+            var reAnParen = /(\w+)(\d?)\((\w+)\)(\d?)/;
+            var reBothParen = /\((\w+)\)(\d?)\((\w+)\)(\d?)/;
+            var reNoParen = /(\w+)(\d?)(\w+)(\d?)/;
+            var parensE = 0;
+            var reArrayE = reCatParen.exec(this.entry);
+            if (!reArrayE) {
+              reArrayE = reAnParen.exec(this.entry);
+              parensE = 1;
+            }
+            if (!reArrayE) {
+              reArrayE = reBothParen.exec(this.entry);
+              parentheses = 2;
+            }
+            if (!reArrayE) {
+              reArrayE = reNoParen.exec(this.entry);
+              parensE = 3;
+            }
+            if (!reArrayE) {
+              answerDetailToReturn.correct = 'unknownWrong';
+              answerDetailToReturn.messageSent = 'Make sure your answer is formatted like an ionic formula.';
+            } else {
+              var parensA = 0;
+              var reArrayA = reCatParen.exec(this.question.formula);
+              if (!reArrayA) {
+                reArrayA = reAnParen.exec(this.question.formula);
+                parensA = 1;
+              }
+              if (!reArrayA) {
+                reArrayA = reBothParen.exec(this.question.formula);
+                parensA = 2;
+              }
+              if (!reArrayA) {
+                reArrayA = reNoParen.exec(this.question.formula);
+                parensA = 3;
+              }
+              if (parensA !== parensE) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your parentheses. ';
+              }
+              if (reArrayA[1] !== reArrayE[1]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your cation. ';
+              }
+              if (reArrayA[3] !== reArrayE[3]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your anion. ';
+              }
+              if (reArrayA[2] !== reArrayE[2] || reArrayA[4] !== reArrayE[4]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check the number of ions. ';
+              }
+            }
+          }
+      }
+
+      //if answer is name:
+      else {
+          if (this.entry === this.question.name) {
+            answerDetailToReturn.correct = 'correct';
+          } else if (this.entry.toLowerCase() === this.question.name.toLowerCase()) {
+            answerDetailToReturn.correct = 'close';
+            answerDetailToReturn.messageSent = 'Check your capitalization!';
+          } else {
+            var reName = /(\w+)(\([IVX]+\))?\s(\w+)/;
+            var reArrayNA = reName.exec(this.question.name);
+            var reArrayNE = reName.exec(this.entry);
+            if (!reArrayNE) {
+              answerDetailToReturn.correct = 'unknownWrong';
+              answerDetailToReturn.messageSent = 'Check the format of your answer. ';
+            } else {
+              if (reArrayNE[1] !== reArrayNA[1] || reArrayNE[2] !== reArrayNA[2]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your cation. ';
+              }
+              if (reArrayNE[3] !== reArrayNA[3]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your anion. ';
+              }
+            }
+          }
+        }
+      return answerDetailToReturn;
+    }
+  }
+});
+
+/***/ }),
+/* 130 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._v("Ionic Formulas Practice!")]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_c('div', [_vm._v("Instructions: If you don't have any guesses, enter zero to see the answer.\n        If you are asked for a formula, all numbers will be converted to subscripts, so write '(NH4)3C6H5O7' for\n        "), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula('(NH4)3C6H5O7'))
+    }
+  }), _vm._v("."), _c('br'), _vm._v("\n        Note that these questions are generated randomly from a list of common ions, and may not all be actual stable compounds.\n        ")]), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.requestFormula) ? _c('div', [_vm._v("\n          What is the formula of " + _vm._s(_vm.question.name) + "?\n\n          Your answer is: "), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.entry))
+    }
+  })]) : _vm._e(), _vm._v(" "), (!(_vm.requestFormula)) ? _c('div', [_vm._v("\n          What is the name of "), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.question.formula))
+    }
+  }), _vm._v("?")]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_c('input', {
+    directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.entry),
+      expression: "entry"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text"
+    },
+    domProps: {
+      "value": (_vm.entry)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.entry = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.feedback),
+      expression: "feedback"
+    }],
+    staticClass: "alert",
+    class: _vm.feedbackType
+  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-2b27f9f9", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

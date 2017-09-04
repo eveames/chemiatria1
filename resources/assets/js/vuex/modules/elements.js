@@ -107,6 +107,7 @@ const state = {
     [{alt: 2, correct: 'correct', message: 'Zn always has a 2+ charge. ', op: 'equals'},
     {alt: 2, correct: 'close', message: 'Zn does\'t have a charge above 2+. ', op: 'greater'},
     {alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less'}]]
+
 }
 
 // getters
@@ -121,6 +122,7 @@ const getters = {
   },
   getElements: (state) => state.elementsList
 }
+
 
 export default {
   state,

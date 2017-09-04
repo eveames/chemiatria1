@@ -16,7 +16,7 @@
             <br><br>
             Enter a reasonable charge for {{nameOrSymbol}}:</div>
             <div class="input-group">
-              <input autofocus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
+              <input v-focus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
               <span class="input-group-btn">
                 <button @click="submitEntry" class="btn btn-default"
                   type="button">Submit answer!</button>
@@ -39,7 +39,6 @@ export default {
     return {
       entry: '',
       tries: 0,
-      feedback: '',
       acc: 0,
       rts: [],
       startTime: 0,
@@ -48,9 +47,6 @@ export default {
       charge: 0,
       useSymbol: true,
       chargesArray: [-3, -2, -1, 1, 2, 3, 4, 5],
-      feedbackType: {
-        "alert-success": true,
-      }
     }
   },
   //props: ['questionTypeID'],
@@ -58,7 +54,9 @@ export default {
     ...mapGetters({
       currentQuestion: 'getCurrent',
       questionSetTime: 'getQuestionSetTime',
-      stageData: 'getStageData'
+      stageData: 'getStageData',
+      feedback: 'getFeedback',
+      feedbackType: 'getFeedbackType'
     }),
     fact: function () {
       return this.$store.getters.getFactById(this.currentQuestion[1]);
@@ -111,7 +109,7 @@ export default {
     		moveOn = true;
         gotIt = true;
         this.acc = this.tries-1;
-        this.feedbackType = {"alert-success": true}
+        this.$store.dispatch('setFeedbackType', {"alert-success": true});
 
         //console.log('acc is set to ', this.acc)
     	}
@@ -128,10 +126,10 @@ export default {
       if (moveOn === true && gotIt === false) this.acc = 4;
       if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close'
         || answerDetail.correct === 'dontKnow') {
-        this.feedbackType = {"alert-warning": true}
+        this.$store.dispatch('setFeedbackType', {"alert-warning": true});
       }
-      else if (gotIt === false) this.feedbackType = {"alert-danger": true}
-      this.feedback = answerDetail.messageSent;
+      else if (gotIt === false) this.$store.dispatch('setFeedbackType', {"alert-danger": true});
+      this.$store.dispatch('setFeedback', answerDetail.messageSent);
       let action = {};
       action.state_id = this.currentQuestion[4];
       action.type = 'answer given-' + correct;

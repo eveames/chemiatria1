@@ -1,8 +1,6 @@
 <template>
   <div>
-    <button @click="showForm" class="btn btn-default"
-      type="button" v-show="!show">Make a suggestion</button>
-      <div v-show="show" class="panel panel-default">
+      <div class="panel panel-default">
           <div class="panel-heading">Suggestion</div>
           <div class="panel-body">
             <div>Cool! Please describe below:</div>
@@ -26,8 +24,7 @@
   export default {
     data: function() {
         return {
-          entry: '',
-          show: false,
+          entry: ''
         }
     },
     computed: {
@@ -45,7 +42,7 @@
         axios.post('../api/student/actions', action)
         .then((results) => {
           this.$store.dispatch('setMessage', 'Thanks for sharing your suggestion!');
-          this.show = !this.show;
+          this.$store.dispatch('toggleSuggestion')
           this.entry = '';
         })
         .catch(function (error) {
@@ -59,7 +56,7 @@
         .catch(function (error) {
           console.log(error);
         });
-        this.show = !this.show;
+        this.$store.dispatch('toggleSuggestion')
       }
     }
   }
