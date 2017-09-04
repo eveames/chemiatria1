@@ -77,11 +77,10 @@
                 <div class="title m-b-md">
                     Chemiatria: Learn Chemistry
                 </div>
-                <p>Chemiatria is currently under construction, and there's not much here right now.
-                    It will be a collection of tools and games to help you learn chemistry quickly and painlessly,
+                <p>Chemiatria is a collection of tools and games to help you learn chemistry quickly and painlessly,
                     informed by current science on how people most quickly master new material. For example,
                     you can use spaced repetition to learn facts quickly, and you can learn to recognize patterns
-                    effortlessly (for example, to see if Lewis structures are correct at a glance) by seeing many 
+                    effortlessly (for example, to see if Lewis structures are correct at a glance) by seeing many
                     examples quickly.</p>
 
                 <div class="links">
