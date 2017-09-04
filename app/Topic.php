@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use chemiatria\Word;
 use chemiatria\Skill;
 use chemiatria\State;
+use chemiatria\Fact;
 
 class Topic extends Model
 {
@@ -29,5 +30,9 @@ class Topic extends Model
     public function users()
     {
       return $this->hasManyThrough('chemiatria\User','chemiatria\State');
+    }
+    public function facts()
+    {
+      return $this->belongsToMany('chemiatria\Fact');
     }
 }

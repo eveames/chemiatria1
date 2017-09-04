@@ -25,4 +25,22 @@ class Fact extends Model
     {
       return ['name' =>$this->key, 'type_id' => $this->id, 'type' => 'fact', 'subtype' => $this->group_name];
     }
+    public function name()
+    {
+      $name = '';
+      if ($this->group_name == 'acids' || $this->group_name == 'commonCompound' ||
+        $this->group_name == 'elementSymbol') $name = $this->key;
+      else if ($this->group_name == 'polyatomic ions') $name = $this->prop;
+      else if ($this->group_name == 'elementCharge') $name = $this->key . ' charges';
+      else if ($this->group_name == 'elementGroup') $name = $this->key . ' group';
+      else if ($this->group_name == 'conversion factor') $name = $this->key_name . ' to ' . $this->prop_name;
+      else if ($this->group_name == 'numerical constant') $name = $this->prop_name . ' of ' . $this->prop;
+      else $name = $this->key . $this->key_name . $this->prop . $this->prop_name;
+      return $name;
+    }
+    public function detail()
+    {
+      $name = $this->name();
+      return ['name' => $name, 'type_id' => $this->id, 'type' => 'fact', 'subtype' => $this->group_name];
+    }
 }

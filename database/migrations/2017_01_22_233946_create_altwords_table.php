@@ -24,7 +24,7 @@ class CreateAltwordsTable extends Migration
             $table->foreign('word_id')->references('id')->on('words');
             $table->string('alt', 40);
             $table->string('message', 150)->nullable();
-            $table->unsignedInteger('correct');
+            $table->string('correct', 15);
             $table->string('MCprompt')->nullable();
             $table->timestamps();
         });

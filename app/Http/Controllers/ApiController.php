@@ -10,7 +10,9 @@ use chemiatria\State;
 use chemiatria\Altword;
 use chemiatria\Fact;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use chemiatria\Helpers\SessionPlanHelper;
+use chemiatria\Action;
 
 class ApiController extends Controller
 {
@@ -54,6 +56,30 @@ class ApiController extends Controller
             return $errorMessage;
         }
     }
+
+    //returns fact ids for polyatomic ions the user is familiar with
+    public function getIons()
+    {
+      $userID = Auth::user()->id;
+      $ions = DB::table('states')->join('users', 'states.user_id', '=', 'users.id')
+        ->where('users.id', '=', $userID)
+        ->join('facts', 'states.studyable_id', '=','facts.id')
+        ->where('states.studyable_type', '=', 'chemiatria\Fact')
+        ->where('facts.group_name', '=', 'polyatomic ions')
+        //->select('states.studyable_id');
+        ->get();
+      $ionIDs = $ions->pluck('studyable_id');
+        return $ionIDs;
+    }
+
+    //controls API used by angular
+    public function getFactsByTopic($topic_id) {
+    	//returns json object:  {{word: word, prompts: [], alternates: []}, {}, etc}
+      $topic = Topic::find($topic_id);
+    	$facts = $topic->facts()->get();
+    	return $facts;
+    }
+
     public function getTopics() {
     	//returns json object list all available topics
     	//maybe someday sorts them by course, student progress?
@@ -64,6 +90,20 @@ class ApiController extends Controller
         $typesList = $course->questions;
         Debugbar::info($typesList);
     	return $typesList;
+    }
+
+    public function getSkills() {
+    	//returns json object list all available skills
+    	//maybe someday sorts them by course, student progress?
+      try {
+            $skills = Skill::all();
+            return $skills;
+        }
+        catch (Exception $e) {
+            $errorMessage = 'Caught exception: ' . $e->getMessage();
+
+            return $errorMessage;
+        }
     }
 
     public function getStates() {
@@ -83,13 +123,16 @@ class ApiController extends Controller
     	//returns full list of states for all items in study array, by user
     	$user = Auth::user();
       //$states =
-    	$states = $user->states->where('current', 1)->map(function($item)
-        {
-          //dd($item->data());
-          return $item->data();
-        });
-      //dd($states);
-    	return $states;
+      $activeStates = array();
+      $user->states->each(function($item) use (&$activeStates)
+      {
+        if ($item->current === 1) {
+          $activeStates[] = $item->data();
+          //dd($activeStates);
+        }
+      });
+      //dd($activeStates);
+    	return $activeStates;
     }
 
     public function updateAllStates(Request $request) {
@@ -145,8 +188,8 @@ class ApiController extends Controller
         //$update = $request->all();
         $state = Auth::user()->states()->find($id);
         $state->lastStudied = $request->lastStudied;
-        $state->accuracyArray = json_encode($request->accuracyArray);
-        $state->rtArray = json_encode($request->rtArray);
+        $state->accuracies = json_encode($request->accs);
+        $state->rts = json_encode($request->rts);
         $state->stage = $request->stage;
         $state->priority = $request->priority;
 
@@ -181,9 +224,13 @@ class ApiController extends Controller
     public function postAction(Request $request) {
     	//posts action to actions table
         try {
-            $action = new Action($request->all());
+            $action = new Action();
+            $action->state_id = $request->state_id;
+            $action->type = $request->type;
+            $action->detail = json_encode($request->detail);
+            $action->time = $request->time;
             Auth::user()->actions()->save($action);
-            return [$request->qID, $action->type];
+            return ['saved successfully'];
         }
         catch(Exception $e) {
             $errorMessage = 'Caught exception: ' . $e->getMessage();

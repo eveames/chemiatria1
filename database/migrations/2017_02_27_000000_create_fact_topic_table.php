@@ -14,6 +14,13 @@ class CreateFactTopicTable extends Migration
     public function up()
     {
         //
+        Schema::create('fact_topic', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('fact_id');
+            $table->foreign('fact_id')->references('id')->on('facts');
+            $table->unsignedInteger('topic_id');
+            $table->foreign('topic_id')->references('id')->on('topics');
+        });
     }
 
     /**
@@ -23,6 +30,8 @@ class CreateFactTopicTable extends Migration
      */
     public function down()
     {
-        //
+        if (Schema::hasTable('fact_topic')) {
+          Schema::drop('fact_topic');
+        }
     }
 }

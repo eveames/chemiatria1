@@ -20,22 +20,25 @@ class WordController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-
+     public function __construct()
+     {
+         $this->middleware('auth');
+     }
     public function index(Request $request)
     {
         // show only matches to search
-        if($request->search) 
+        if($request->search)
         {
             $search = $request->search; //<-- we use global request to get the param of URL
-            
+
             $searchArray = explode('; ', $search);
-            
+
             $words = DB::table('words')->whereIn('word', $searchArray)->get();
             $topics = DB::table('topics')->whereIn('topic', $searchArray)->get();
             $alternates = Altword::with('word')->whereIn('alt', $searchArray)->get();
-            
+
             $request->session()->flash('message', 'You searched for ' . $search . '.');
-            
+
         }
         //show all
         else {
@@ -114,7 +117,7 @@ class WordController extends Controller
             return redirect(url('words/' . $word->id));
         }
         // show the edit form and pass the word, alts and topics
-        
+
         $nonTopics = Topic::whereNotIn('id', $word->topics->modelKeys())->orderBy('id')->get();
         return view('words.edit')
             ->with('word', $word)->with('altwords', $word->altwords)
@@ -152,11 +155,13 @@ class WordController extends Controller
         $prompts = $request->prompts;
         $newPrompts = explode("; ", $request->newPrompts);
         $prompts = array_merge($prompts, $newPrompts);
+        $prompts = array_filter($prompts, function($v){
+          return (!(ctype_space($v) || $v == ''));
+        });
         $word->prompts = json_encode($prompts);
-
-        //store topics
-
         $word->save();
+
+        //store alts
         $alts = $word->altwords()->get();
         $data = array_filter($request->all());
         $altArray = array_filter($data, function($k){
@@ -178,12 +183,15 @@ class WordController extends Controller
         {
             if(!isset($newAltArray['newAltwords' . $i . 'alt'])) {break;}
             $alt = new Altword;
+            $alt->word_id = $word->id;
             $alt->alt = $newAltArray['newAltwords' . $i . 'alt'];
             $alt->correct = $newAltArray['newAltwords' . $i . 'correct'];
             if (isset($newAltArray['newAltwords' . $i . 'message']))
                 {$alt->message = $newAltArray['newAltwords' . $i . 'message'];}
+            $alt->save();
         }
 
+        //store topics
         $oldTopics = $word->topics()->get();
         if (isset($request->topic)){
             $currentTopicIDs = array_keys($request->topic);
@@ -193,7 +201,7 @@ class WordController extends Controller
             $newTopicIDs = array_keys($request->nonTopic);
         }
         else {$newTopicIDs = [];}
-        
+
         foreach($oldTopics as $oldTopic)
         {
             if(! in_array($oldTopic->id, $currentTopicIDs))

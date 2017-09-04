@@ -11,7 +11,8 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Styles -->
-    <link href="/css/app.css" rel="stylesheet">
+    <!--<link href="/css/app.css" rel="stylesheet">-->
+    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 
     <!-- Scripts -->
     <script>
@@ -38,6 +39,10 @@
                     <a class="navbar-brand" href="{{ url('/') }}">
                         {{ config('app.name', 'Laravel') }}
                     </a>
+                    <a class="navbar" href="{{url('/home') }}">
+                      Dashboard
+                    </a>
+
                 </div>
 
                 <div class="collapse navbar-collapse" id="app-navbar-collapse">
@@ -88,9 +93,13 @@
             @endif
             @yield('content')
         </div>
+
+</div>
     </div>
 
     <!-- Scripts -->
-    <script src="/js/bootstrap.js"></script>
+    <!--<script src="/js/bootstrap.js"></script>-->
+
+<script src="{{ mix('js/app.js') }}"></script>
 </body>
 </html>

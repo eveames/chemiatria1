@@ -7,6 +7,7 @@ use chemiatria\Topic;
 use chemiatria\Skill;
 use chemiatria\Word;
 use chemiatria\Action;
+use chemiatria\Fact;
 
 class State extends Model
 {
@@ -46,6 +47,7 @@ class State extends Model
       $detail['priority'] = $this->priority;
       $detail['accs'] = $this->accuracies;
       $detail['rts'] = $this->rts;
+      $detail['lastStudied'] = $this->lastStudied;
       $detail['topic_ids'] = $this->topics()->pluck('topic_id')->toArray();
       return $detail;
     }
@@ -66,17 +68,33 @@ class State extends Model
         return;
 
     }
+    public static function storeFact(User $user, Topic $topic, Fact $fact)
+    {
+        // Validate the request...
+
+        $state = new State;
+        $state->setupNew($state);
+        //dd('back in storeWord');
+        //$state->studyable_type = "word";
+        $state->studyable()->associate($fact);
+        $state->user()->associate($user);
+        $state->priority = $topic->id;
+        //dd('about to save', $state);
+        $state->save();
+        $state->topics()->attach($topic->id);
+        return;
+
+    }
     public static function storeSkill(User $user, Topic $topic, Skill $skill)
     {
       $state = new State;
       $state->setupNew($state);
-      $topic->states()->attach($state->id);
-      $state->studyable_type = "Skill";
-      $state->studable()->associate($skill);
+      $state->studyable()->associate($skill);
       $state->user()->associate($user);
       $state->priority = $topic->id;
-      dd('about to save', $state);
       $state->save();
+      $state->topics()->attach($topic->id);
+      return;
     }
     private function setupNew($state)
     {

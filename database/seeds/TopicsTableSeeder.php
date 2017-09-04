@@ -19,8 +19,9 @@ class TopicsTableSeeder extends Seeder
         	'Valence Bond Theory', 'Molecular Orbital Theory', 'Gases', 'Intermolecular Forces',
         	'Phases', 'Solids', 'Colligative Properties', 'Advanced Solutions', 'Kinetics',
         	'Equilibrium', 'Acids and Bases', 'Environmental Chemistry', 'Thermodynamics',
-        	'Electrochemistry', 'Nuclear Chemistry', 'Descriptive Chemistry', 
-        	'Coordination Chemistry', 'Organic Chemistry', 'Biochemistry'];
+        	'Electrochemistry', 'Nuclear Chemistry', 'Descriptive Chemistry',
+        	'Coordination Chemistry', 'Organic Chemistry', 'Biochemistry', 'Significant Figures',
+          'Basic Element Info'];
 
         for ($i = 0 ; $i < count($topicsList) ; ++$i) {
       		DB::table('topics')->insert([

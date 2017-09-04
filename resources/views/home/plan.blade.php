@@ -87,7 +87,7 @@
 <!-- will be used to add new topics -->
 @if($new !== null)
 <h4>New topics!</h4>
-<p> Add all words and skills associated with a topic
+<p> Add all words, facts and skills associated with a topic
    by checking it, or click the button to edit in detail. If you add multiple
   new topics at once, they will be prioritized by their ID (lowest ID studied first).
   If you want to study them in a different order, for right now, you should just add the one
@@ -98,23 +98,24 @@
             <td>Add</td>
             <td>ID</td>
             <td>Topic</td>
-            <td>Associated words and skills</td>
+            <td colspan="3">Associated words, facts and skills</td>
         </tr>
     </thead>
     <tbody>
-    @foreach($new as $value)
-        <tr>
-            <td>{{ Form::checkbox('new[' . $value['id'] . ']', $value['selected']) }}</td>
-            <td>{{ $value['id'] }}</td>
-            <td>{{ $value['name'] }}</td>
-            <td>{{ $value['words']->implode(', ') }}</td>
-            <td>{{ implode(', ', $value['skills']) }}</td>
-            <td>
-                <a class="btn btn-small btn-primary"
-                href="{{ URL::to('home/plan/topic' . $value['id']) }}">Manage topic details</a>
-            </td>
-        </tr>
-    @endforeach
+      @foreach($new as $value)
+          <tr>
+              <td>{{ Form::checkbox('new[' . $value['id'] . ']', $value['selected']) }}</td>
+              <td>{{ $value['id'] }}</td>
+              <td>{{ $value['name'] }}</td>
+              <td>{{ $value['words']->implode(', ') }}</td>
+              <td>{{ $value['skills']->implode(', ') }}</td>
+              <td>{{ $value['facts']->implode(', ') }}</td>
+              <!--<td>
+                  <a class="btn btn-small btn-primary"
+                  href="{{ URL::to('home/plan/topic/' . $value['id']) }}">Manage topic details</a>
+              </td>-->
+          </tr>
+      @endforeach
     </tbody>
 </table>
 @endif
