@@ -102,10 +102,24 @@ class HomeController extends Controller
             $statesToSet0 = array_merge($statesToSet0, array_keys($arr));
           }
 
-          $statesToSet1 = array_merge($statesToSet1, array_keys($data['unseen']));
+          //dd($data['unseen']);
+          $unseenSet = array_intersect_key($input['unseen'], $data['unseen']);
+          foreach($unseenSet as $arr)
+          {
+            //dd($arr);
+            $statesToSet1 = array_merge($statesToSet1, array_keys($arr));
+          }
 
           //dd($statesToSet0);
         }
+      elseif (isset($input['unseen']) && is_array($input['unseen'])) {
+        //dd($input['unseen']);
+        foreach($input['unseen'] as $arr)
+        {
+          //dd($arr);
+          $statesToSet0 = array_merge($statesToSet0, array_keys($arr));
+        }
+      }
       if(isset($data['due']) && is_array($data['due']))
         {
           $dueSet = array_intersect_key($input['due'], $data['due']);
@@ -117,6 +131,13 @@ class HomeController extends Controller
             $statesToSet0 = array_merge($statesToSet0, array_keys($arr));
           }
         }
+      elseif (isset($input['due']) && is_array($input['due'])) {
+        foreach($input['due'] as $arr)
+        {
+          //dd($arr);
+          $statesToSet0 = array_merge($statesToSet0, array_keys($arr));
+        }
+      }
       if(isset($data['prev']) && is_array($data['prev']))
         {
           $prevUnset = array_diff_key($input['prev'], $data['prev']);
@@ -124,6 +145,13 @@ class HomeController extends Controller
             $statesToSet0 = array_merge($statesToSet0, array_keys($arr));
           }
         }
+      elseif (isset($input['prev']) && is_array($input['prev'])) {
+        foreach($input['prev'] as $arr)
+        {
+          //dd($arr);
+          $statesToSet0 = array_merge($statesToSet0, array_keys($arr));
+        }
+      }
       if(isset($data['other']) && is_array($data['other']))
         {
           $otherSet = array_intersect_key($input['other'], $data['other']);
@@ -131,6 +159,13 @@ class HomeController extends Controller
             $statesToSet1 = array_merge($statesToSet1, array_keys($arr));
           }
         }
+      elseif (isset($input['other']) && is_array($input['other'])) {
+        foreach($input['other'] as $arr)
+        {
+          //dd($arr);
+          $statesToSet0 = array_merge($statesToSet0, array_keys($arr));
+        }
+      }
       $statesToSet1 = array_filter($statesToSet1, function($item) {
         return(is_numeric($item));
       });
