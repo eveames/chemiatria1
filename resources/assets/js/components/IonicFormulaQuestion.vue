@@ -17,7 +17,7 @@
             What is the name of <span v-html="this.$options.filters.formatFormula(question.formula)"></span>?</div>
             <br>
           <div class="input-group">
-              <input v-focus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
+              <input v-focus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control" autocapitalize="off" autocorrect="off">
               <span class="input-group-btn">
                 <button @click="submitEntry" class="btn btn-default"
                   type="button">Submit answer!</button>

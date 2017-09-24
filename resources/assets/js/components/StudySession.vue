@@ -6,6 +6,10 @@
     check back in later to see if you have material to review. Or just keep studying, if you want.</div>
     <div v-show="message" class="alert alert-info">
       {{message}}</div>
+  <div v-if="ready === false">Please wait, loading</div>
+  <div class="alert alert-danger" v-if="ready === true && currentQuestionState[0] === -1">
+    You haven't chosen anything to study! Please return to your dashboard and use Setup New Session
+    to select something.</div>
   <word-question v-if="ready === true && currentQuestionState[2] === 'word'">
   </word-question>
   <fact-question v-if="ready === true && currentQuestionState[2] === 'fact'">

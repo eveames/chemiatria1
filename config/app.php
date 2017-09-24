@@ -51,7 +51,7 @@ return [
     |
     */
 
-    'url' => env('www.chemiatria.org', 'http://localhost'),
+    'url' => env('APP_URL', 'http://localhost'),
 
     /*
     |--------------------------------------------------------------------------

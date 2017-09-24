@@ -101,10 +101,9 @@ class HomeController extends Controller
             //dd($arr);
             $statesToSet0 = array_merge($statesToSet0, array_keys($arr));
           }
-          foreach($data['unseen'] as $arr)
-          {
-            $statesToSet1 = array_merge($statesToSet1, array_keys($arr));
-          }
+
+          $statesToSet1 = array_merge($statesToSet1, array_keys($data['unseen']));
+
           //dd($statesToSet0);
         }
       if(isset($data['due']) && is_array($data['due']))

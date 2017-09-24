@@ -16,7 +16,7 @@
             <br><br>
             Enter a reasonable charge for {{nameOrSymbol}}:</div>
             <div class="input-group">
-              <input v-focus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
+              <input v-focus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control" autocorrect="off">
               <span class="input-group-btn">
                 <button @click="submitEntry" class="btn btn-default"
                   type="button">Submit answer!</button>

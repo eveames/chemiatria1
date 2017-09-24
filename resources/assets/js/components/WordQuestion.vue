@@ -16,7 +16,7 @@
                       <h4>{{word.prompts[0]}}</h4>
                       <br>
                       <div class="input-group">
-                        <input v-focus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control">
+                        <input v-focus v-model="entry" @keyup.enter="submitEntry" type="text" class="form-control" autocapitalize="off" autocorrect="off">
                         <span class="input-group-btn">
                           <button @click="submitEntry" class="btn btn-default"
                             type="button">Submit answer!</button>

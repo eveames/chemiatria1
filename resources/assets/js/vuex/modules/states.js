@@ -129,22 +129,31 @@ const mutations = {
   [types.SET_QUESTION] (state) {
     //console.log('before getNext index is ', state.currentIndex)
     state.currentIndex = getNext();
-    //console.log('after getNext index is ', state.currentIndex, state.states[state.currentIndex].type_id)
-    state.currentTypeID = state.states[state.currentIndex].type_id;
-    state.currentType = state.states[state.currentIndex].type;
-    state.currentStage = state.states[state.currentIndex].stage;
-    state.currentStateID = state.states[state.currentIndex].id;
-    state.states[state.currentIndex].lastStudied = Date.now();
-    if (state.currentType === 'skill') {
-      //console.log('before subtype')
-      state.currentSubtype = state.skills[state.currentTypeID -1].subtype;
-      //console.log('after subtype')
-      state.currentSkill = state.skills[state.currentTypeID -1].skill;
+    console.log('after getNext index is ', state.currentIndex)
+    if (state.currentIndex === -1) {
+      state.currentTypeID = false;
+      state.currentType = false;
+      state.currentStage = false;
+      state.currentStateID = false;
     }
     else {
-      state.currentSubtype = false;
-      state.currentSkill = false;
+      state.currentTypeID = state.states[state.currentIndex].type_id;
+      state.currentType = state.states[state.currentIndex].type;
+      state.currentStage = state.states[state.currentIndex].stage;
+      state.currentStateID = state.states[state.currentIndex].id;
+      state.states[state.currentIndex].lastStudied = Date.now();
+      if (state.currentType === 'skill') {
+        //console.log('before subtype')
+        state.currentSubtype = state.skills[state.currentTypeID -1].subtype;
+        //console.log('after subtype')
+        state.currentSkill = state.skills[state.currentTypeID -1].skill;
+      }
+      else {
+        state.currentSubtype = false;
+        state.currentSkill = false;
+      }
     }
+
   },
   [types.UPDATE_RTS_ACCS] (state, newState) {
     //console.log("newState is ", newState);
@@ -169,7 +178,7 @@ const getNext = () => {
       let unseen = [];
 
     	for (let i = 0; i < state.states.length; i++) {
-        //console.log('state.states[i] is: ', state.states[i]);
+        console.log('state.states[i] is: ', state.states[i]);
         //console.log('state.states[i -1] is: ', state.states[i-1]);
         if (state.states[i].priority < 100) {
           unseen.push(i);
@@ -191,15 +200,17 @@ const getNext = () => {
     			else {readiestUnready = i;}
     		}
     	}
-    	//console.log(readiest);
+    	console.log(readiest);
       if (unseen.length > 0) {
         let r = _.random(0, unseen.length -1);
         return unseen[r];
       }
     	else if (readiest !== -1) { return readiest;}
     	else {
-            //console.log()
-            if (state.states[readiestUnready].priority > currentTime + 1800000) {state.finished = true;}
+            console.log("in final else")
+            if (readiestUnready !== -1) {
+              if (state.states[readiestUnready].priority > currentTime + 1800000) {state.finished = true;}
+            }
             return readiestUnready;
         }
     };
