@@ -4,6 +4,7 @@
         <div class="col-md-8 col-md-offset-2">
           <sigfig-question v-if="currentQuestion[5] === 'sigfig'"></sigfig-question>
           <ionic-formula-question v-if="currentQuestion[5] === 'ionicFormula'"></ionic-formula-question>
+          <lewis-structure-question v-if="currentQuestion[5] === 'LewisStructure'"></lewis-structure-question>
       </div>
   </div>
 </div>

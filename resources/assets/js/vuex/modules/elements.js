@@ -106,8 +106,32 @@ const state = {
     {alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less'}],
     [{alt: 2, correct: 'correct', message: 'Zn always has a 2+ charge. ', op: 'equals'},
     {alt: 2, correct: 'close', message: 'Zn does\'t have a charge above 2+. ', op: 'greater'},
-    {alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less'}]]
-
+    {alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less'}]],
+    //element data for drawing Lewis structures
+    lewisElements: {
+      hydrogen: ['H', 1, 2, 2, 1,2],
+      helium: ['He', 2, 2,2,0,0],
+      lithium: ['Li',1,2,8,1,4],
+      beryllium: ['Be',2,4,8,2,4],
+      boron: ['B',3,6,8,3,4],
+      carbon: ['C', 4, 8, 8],
+      nitrogen: ['N', 5,7,8,3,4],
+      oxygen: ['O', 6, 8, 8,2,2],
+      fluorine: ['F', 7, 8,8,1,1],
+      neon: ['Ne', 8,8,8,0,0],
+      silicon: ['Si',4,8,8,4,4],
+      phosphorus: ['P',5,8,12,3,5],
+      sulfur: ['S', 6, 8, 12,2,6],
+      chlorine: ['Cl',7,8,16,1,4],
+      germanium: ['Ge',4,8,8,4,4],
+      arsenic: ['As',5,8,12,3,5],
+      selenium: ['Se',6,8,12,2,6],
+      bromine: ['Br', 7,8,16,1,5],
+      antimony: ['Sb',5,8,12,3,5],
+      tellurium: ['Te',6,8,12,2,6],
+      iodine: ['I',7,8,16,1,7],
+      xenon: ['Xe',8,8,16,0,6]
+    }
 }
 
 // getters
@@ -120,7 +144,8 @@ const getters = {
     console.log('in getElementChargesByIndex', index)
     return state.elementsCharges[index];
   },
-  getElements: (state) => state.elementsList
+  getElements: (state) => state.elementsList,
+  getLSE: (state) => state.lewisElements
 }
 
 

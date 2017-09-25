@@ -27,7 +27,9 @@ Vue.component('element-symbol-question', require('./components/ElementSymbolQues
 Vue.component('element-charge-question', require('./components/ElementChargeQuestion.vue'));
 Vue.component('element-group-question', require('./components/ElementGroupQuestion.vue'));
 Vue.component('sigfig-question', require('./components/SigfigQuestion.vue'));
-Vue.component('ionic-formula-question', require('./components/IonicFormulaQuestion'));
+Vue.component('ionic-formula-question', require('./components/IonicFormulaQuestion.vue'));
+Vue.component('lewis-structure-question', require('./components/LewisStructureQuestion.vue'));
+Vue.component('lewis-atom', require('./components/LewisAtom.vue'));
 Vue.component('bug-report', require('./components/BugReport.vue'));
 Vue.component('frustration-report', require('./components/FrustrationReport.vue'));
 Vue.component('suggestion-box', require('./components/SuggestionBox.vue'));
@@ -38,6 +40,7 @@ import SkillPriorityPlugin from './plugins/SkillPriorityPlugin.js';
 Vue.use(RandomGeneratorPlugin);
 Vue.use(FactPriorityPlugin);
 Vue.use(SkillPriorityPlugin);
+Vue.use(LewisPositionerPlugin);
 //console.log('did something');
 Vue.filter('formatFormula', function(value) {
   let str = String(value);
