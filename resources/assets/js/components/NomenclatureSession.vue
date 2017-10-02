@@ -1,5 +1,8 @@
 <template>
 <div>
+  <div>Currently set to {{mode}}</div>
+  <button @click="setMode()" class="btn btn-default"
+    type="button">Set {{notMode}}</button>
   <div v-show="finished" class="alert alert-success">
     <strong>Congrats, you've finished studying everything you set for this session!</strong>
     Add more material by returning to your dashboard and setting a new session, or
@@ -8,10 +11,8 @@
       {{message}}</div>
   <div v-if="ready === false">Please wait, loading</div>
   <div class="alert alert-danger" v-if="ready === true && currentQuestionState[0] === -1">
-    You haven't chosen anything to study! Please return to your dashboard and use Setup New Session
-    to select something.</div>
-  <word-question v-if="ready === true && currentQuestionState[2] === 'word'">
-  </word-question>
+    You haven't set up nomenclature! Please return to your dashboard and use Setup New Session
+    to add the topic nomenclature.</div>
   <fact-question v-if="ready === true && currentQuestionState[2] === 'fact'">
   </fact-question>
   <skill-question v-if="ready === true && currentQuestionState[2] === 'skill'">
@@ -35,9 +36,15 @@
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
+  data: function() {
+    return {
+      mode: 'Easy Mode',
+      notMode: 'Hard Mode',
+      modeBool: true,
+    }
+  },
   computed: {
     ...mapGetters({
-      wordsStatus: 'checkWordsReady',
       factsStatus: 'checkFactsReady',
       statesStatus: 'checkStatesReady',
       currentQuestionState: 'getCurrent',
@@ -46,7 +53,7 @@ export default {
       frustrated: 'isFrustrated',
       bug: 'isBug',
       suggestion: 'hasSuggestion',
-      message: 'getMessage'
+      message: 'getMessage',
     }),
     ready () {
       if(this.setupReady === true && typeof(this.currentQuestionState) !== 'undefined') {
@@ -56,10 +63,8 @@ export default {
     }
   },
   created () {
-    Promise.all([this.$store.dispatch('setupWords'),
-    this.$store.dispatch('setupFacts'),
-    this.$store.dispatch('setupSkills')])
-    .then((results) => {this.$store.dispatch('setupStates', false)})
+    Promise.all([this.$store.dispatch('setupFacts')])
+    .then((results) => {this.$store.dispatch('setupStates', 9)})
     .then((results) => {this.$store.dispatch('setupIons')})
     .then((results) => {
 
@@ -70,6 +75,19 @@ export default {
       this.$store.dispatch('setQuestionStart');
     })
 
+  },
+  methods: {
+    setMode() {
+      if (this.modeBool) {
+        this.mode = 'Hard Mode'
+        this.notMode = 'Easy Mode'
+      }
+      else {
+        this.notMode = 'Hard Mode'
+        this.mode = 'Easy Mode'
+      }
+      this.modeBool != this.modeBool
+    }
   }
 }
 </script>

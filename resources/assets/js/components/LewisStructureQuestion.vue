@@ -18,6 +18,8 @@
             <svg width="200" height="200">
               <lewis-atom :stats='stats'></lewis-atom>
             </svg>
+
+
             <br>
             <div v-show="feedback" class="alert" v-bind:class="feedbackType"><p>{{feedback}}</p></div>
     </div>
@@ -38,6 +40,7 @@ export default {
       acc: 0,
       rts: [],
       startTime: 0,
+      index: 0,
       //determines whether name or formula is given
     }
   },
@@ -48,38 +51,40 @@ export default {
       questionSetTime: 'getQuestionSetTime',
       stageData: 'getStageData',
       feedback: 'getFeedback',
-      feedbackType: 'getFeedbackType'
+      feedbackType: 'getFeedbackType',
+      lewisHomo: 'getLewisHomoDiatomics',
+      lewisHetero: 'getLewisHeteroDiatomics',
+      lewisMulti: 'getLewisSimpleCentral',
+      elements: 'getLSE'
     }),
-    atomsArray: function() {
-      return  [
-          [0, 0, 'carbon', [[1,1],[2,1],[3,1],[4,1]], 0],
-          [1, 0, 'hydrogen', [[0,1]], 0],
-          [2, 0, 'hydrogen', [[0,1]], 0],
-          [3, 0, 'hydrogen', [[0,1]], 0],
-          [4, 0, 'hydrogen', [[0,1]], 0]
-        ];
+    formulasArray: function() {
+      let temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti)
+      return temp
     },
     formula: function() {
-      return 'CH4';
+      return this.formulasArray[this.index]
     },
-    answer: function() {
-      return 'y';
+    question: function() {
+      return Vue.simpleCentralStructure(this.formula, this.elements)
     },
     stats: function() {
       let directions = Array(12);
       directions.fill(0);
-      let drawnAtoms = Array(this.atomsArray.length);
+      let drawnAtoms = Array(this.question.structure.length);
       drawnAtoms.fill(0);
       return {
         center: [100,100],
         directions: directions,
-        atomsArray: this.atomsArray,
+        atomsArray: this.question.structure,
         drawnAtoms: drawnAtoms,
-        index: 0
+        index: 0,
       }
     }
   },
   created () {
+    this.index = _.random(0, this.formulasArray.length -1)
+  },
+  mounted () {
 
   },
   methods: {
@@ -143,7 +148,7 @@ export default {
         let updatedState = {rts: this.rts, accs: this.acc};
         //console.log("updatedState is", updatedState)
         this.$store.dispatch('updateRtsAccs', updatedState);
-        updatedState = Vue.factPriorityHelper(this.stageData);
+        updatedState = Vue.skillPriorityHelper(this.stageData);
         this.$store.dispatch('updateStage', updatedState);
 
         //set new question
@@ -156,10 +161,9 @@ export default {
         this.tries = 0
         this.acc = 0
         this.rts = []
-        this.chargeGiven = Math.random() >= 0.5;
-        this.useSymbol = Math.random() >= 0.5;
-        if (this.chargeGiven) this.charge = this.chargesArray[_.random(0, 7)];
-        else this.charge = 0;
+        this.index = _.random(0, this.formulasArray.length -1)
+        //this.index =47
+
     	}
     },
 
@@ -182,7 +186,7 @@ export default {
           answerDetailToReturn.correct = 'formatError';
           answerDetailToReturn.messageSent = 'Please check the format of your answer. ';
         }
-        if (entryTemp === this.answer) {
+        if (entryTemp === this.question.answer) {
           answerDetailToReturn.correct = 'correct';
         }
         else answerDetailToReturn.correct = 'knownWrong';

@@ -119,13 +119,13 @@ export default {
         else moveOn = true;
     	}
       if (moveOn === true && gotIt === false) {
-        if (this.requestFormula) {
-          answerDetail.messageSent = `The formula of "${this.fact.key}" is
+        if (!this.requestFormula) {
+          answerDetail.messageSent = `The name of "${this.fact.key}" is
           "${this.answer}". We\'ll come back to it.`;
           this.acc = 4;
         }
         else {
-          answerDetail.messageSent = `The name of "${this.fact.prop}" is
+          answerDetail.messageSent = `The formula of "${this.fact.prop}" is
           "${this.answer}". We\'ll come back to it.`;
           this.acc = 4;
         }
@@ -153,7 +153,7 @@ export default {
     		//update states
 
         let updatedState = {rts: this.rts, accs: this.acc};
-        console.log("updatedState is", updatedState)
+        //console.log("updatedState is", updatedState)
         this.$store.dispatch('updateRtsAccs', updatedState);
         updatedState = Vue.factPriorityHelper(this.stageData);
         this.$store.dispatch('updateStage', updatedState);
@@ -191,8 +191,8 @@ export default {
             }
             else {
               for (let fact of this.facts) {
-                console.log(this.facts, fact)
-                console.log(this.entry, fact.key);
+                //console.log(this.facts, fact)
+                //console.log(this.entry, fact.key);
                 if (this.entry === fact.key) {
                   answerDetailToReturn.correct = 'knownWrong';
                   answerDetailToReturn.messageSent = `${this.entry} is ${fact.prop}.`;
@@ -212,7 +212,7 @@ export default {
             }
             else {
               for (let fact of this.facts) {
-                console.log(this.entry, fact.prop);
+                //console.log(this.entry, fact.prop);
                 if (this.entry === fact.prop) {
                   answerDetailToReturn.correct = 'knownWrong';
                   answerDetailToReturn.messageSent = `${this.entry} is  ${fact.key}.`;

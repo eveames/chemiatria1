@@ -30,6 +30,7 @@ Route::get('/home', 'HomeController@index');
 Route::get('/home/report', 'HomeController@email_progress');
 
 Route::get('/home/play', 'HomeController@play');
+Route::get('/home/nomenclature', 'HomeController@nomenclature');
 
 Route::get('/home/play/all', 'HomeController@playall');
 
@@ -49,6 +50,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'api/student'], function () {
     Route::get('topics', 'ApiController@getTopics');
     Route::get('states', 'ApiController@getStates');
     Route::get('states/active', 'ApiController@getActiveStates');
+    Route::get('states/{topic_id}', 'ApiController@getStatesByTopic');
     Route::post('states', 'ApiController@updateAllStates');
     Route::post('states/new', 'ApiController@newState');
     Route::post('states/{id}', 'ApiController@updateState');

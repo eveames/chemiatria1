@@ -52,6 +52,11 @@ class HomeController extends Controller
       return view('home.play')->with('user', auth()->user());
     }
 
+    public function nomenclature()
+    {
+      return view('home.nomenclature')->with('user', auth()->user());
+    }
+
     public function playall()
     {
       //first, reset session to include all states

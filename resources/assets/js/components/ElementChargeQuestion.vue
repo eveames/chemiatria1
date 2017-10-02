@@ -123,7 +123,10 @@ export default {
           answerDetail.messageSent += " Try again!"}
         else moveOn = true;
     	}
-      if (moveOn === true && gotIt === false) this.acc = 4;
+      if (moveOn === true && gotIt === false) {
+        this.acc = 4;
+        answerDetail.messageSent = this.answers[0].message + answerDetail.messageSent
+      }
       if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close'
         || answerDetail.correct === 'dontKnow') {
         this.$store.dispatch('setFeedbackType', {"alert-warning": true});

@@ -1,7 +1,13 @@
 <template>
   <g>
-    <text :id="'atom' + index":x="textRect.left" :y="textRect.top" font-family="Verdana" font-size="24">{{element[0]}}</text>
-
+    <text :id="'atom' + index" :x="textRect.left" :y="textRect.baseline" font-family="Verdana"
+      font-size="24">{{element[0]}}</text>
+    <line v-for="bond in toDraw.bonds" :x1='bond.start[0]' :y1='bond.start[1]' :x2='bond.end[0]'
+      :y2='bond.end[1]' stroke-width="2" stroke="black"/>
+    <circle v-for="dot in toDraw.dots" :cx='dot.position[0]' :cy='dot.position[1]' r="2"/>
+    <text v-if="toDraw.formalCharge" :x='toDraw.formalCharge.position[0] - 8' :y='toDraw.formalCharge.position[1]'
+      font-family="Verdana" font-size="14">{{toDraw.formalCharge.charge}}</text>
+    <lewis-atom v-for="atom in toDraw.newAtoms" :stats="atom.stats" :key="atom.stats.index"></lewis-atom>
   </g>
 </template>
 <script>
@@ -9,12 +15,31 @@ import { mapGetters, mapActions } from 'vuex'
 import _ from 'lodash'
 
 export default {
+  data: function() {
+    return {
+      mounted: false
+    }
+  },
   props: ['stats'],
   computed: {
     ...mapGetters({
       currentQuestion: 'getCurrent',
       elements: 'getLSE',
     }),
+    baseRect: function() {
+      if (this.mounted) {
+        let rect = document.getElementById('atom' + this.index).getBBox();
+        console.log('in if')
+        let width = rect.width;
+        let height = rect.height;
+        return {x: rect.x, y: rect.y, width: width, height: height}
+        //console.log(this.element, this.baseRect)
+      }
+      else {
+        console.log('in else')
+        return {x: 100, y: 100, width: 40, height: 30}
+      }
+    },
     index: function() {
       return this.stats.index;
     },
@@ -25,24 +50,24 @@ export default {
       return this.atom[1];
     },
     element: function() {
-      console.log(this.elements, this.atom)
+      //console.log(this.elements, this.atom)
       return this.elements[this.atom[2]];
     },
     numBonds: function() {
       let numBonds = 0;
-      for (let i = 0; i < this.atom.connections.length; i++){
-        numBonds += i[1];
+      for (let i = 0; i < this.atom[3].length; i++){
+        numBonds += this.atom[3][i][1];
       }
       return numBonds;
     },
     numConnections: function() {
-      return this.atom.connections.length;
+      return this.atom[3].length;
     },
     numDomains: function() {
       return this.numConnections + _.ceil(this.numUnbondedE/2)
     },
     formalCharge: function() {
-      return this.numUnbondedE + this.numBonds - this.element[1];
+      return this.element[1] - (this.numUnbondedE + this.numBonds) ;
     },
     directions: function() {
       return this.stats.directions.slice(0);
@@ -53,17 +78,17 @@ export default {
       return temp;
     },
     textRect: function() {
-      let rect = document.getElementById('atom' + this.index).getBBox();
-      let left = rect.x;
-      let top = rect.y;
-      let width = rect.width;
-      let height = rect.height;
-      let right = left + width;
-      let bottom = top - height;
-      let centerx = left +width/2;
-      let centery = top - height/2;
+      let left = this.stats.center[0] - this.baseRect.width/2
+      let top = this.stats.center[1] - this.baseRect.height/2
+      let width = this.baseRect.width;
+      let height = this.baseRect.height;
+      let right = this.stats.center[0] + this.baseRect.width/2
+      let bottom = this.stats.center[1] + this.baseRect.height/2
+      let centerx = this.stats.center[0];
+      let centery = this.stats.center[1];
+      let baseline = this.stats.center[1] + this.baseRect.height/4;
       return {left: left, right: right, top: top, bottom: bottom,
-        width: width, height: height, centerx: centerx, centery: centery}
+        width: width, height: height, centerx: centerx, centery: centery, baseline: baseline}
     },
     numBondsAlready: function() {
       let numBondsAlready =0;
@@ -73,43 +98,53 @@ export default {
       if (numBondsAlready > 1) console.log('not setup for cylic molecules')
       return numBondsAlready;
     },
-    domainsToDraw: function() {
-      let x = 0
-      if (numBondsAlready === 1) x = this.directions.index(1)
+    toDraw: function() {
+      let x = _.random(0,11)
+      let posOccupied = []
+      if (this.numBondsAlready === 1) {
+        x = this.directions.indexOf(1)
+        posOccupied.push(x)
+      }
       let domains = this.numDomains;
       let posToAdd = []
       let bondsArray = []
-      let doubleBondsArray = []
-      let tripleBondsArray = []
       let newAtomsArray = []
-      let radicalsArray = []
-      let lonePairsArray = []
-      let formalChargesArray = []
-      if (domains === 6) posToAdd = [(x+6)%12, (x+2)%12, (x+4)%12, (x+8)%12, (x+10)%12,x]
+      let dotsArray = []
+      let formalChargeToDraw = false;
+      if (this.formalCharge !== 0) domains += 1
+      if (domains === 7) posToAdd = [(x+6)%12, (x+2)%12, (x+4)%12, (x+8)%12, (x+10)%12, (x+5)%12, x]
+      else if (domains === 6) posToAdd = [(x+6)%12, (x+2)%12, (x+4)%12, (x+8)%12, (x+10)%12,x]
       else if (domains === 5) posToAdd = [(x+5)%12,(x+2)%12, (x+7)%12, (x+10)%12, x]
       else if (domains === 4) posToAdd = [(x+6)%12,(x+3)%12, (x+9)%12, x]
       else if (domains === 3) posToAdd = [(x+4)%12, (x+8)%12, x]
       else if (domains === 2) posToAdd = [(x+6)%12, x]
       else if (domains === 1) posToAdd = [x]
-      else console.log("error, too many domains")
+      else console.log("bad number of domains")
       //add bond and atoms
-      let bondsToDraw = this.numConnections - numBondsAlready
+      let bondsToDraw = this.numConnections - this.numBondsAlready
       //draw lines at angles defined by posToAdd
       let connections = this.atom[3]
-      connections.forEach(function(item) {
+      connections.forEach(item => {
         if (this.drawnAtoms[item[0]] === 0) {
           let direction = posToAdd.shift();
+          posOccupied.push(direction)
           if (item[1] === 1) {
             let ends = Vue.bondPositioner(this.textRect, direction);
-            singleBondsArray.push({start: ends.start, end: ends.end})
+            bondsArray.push({start: ends[0], end: ends[1]})
+
           }
+          //need to fix these
           if (item[1] === 2) {
             let ends = Vue.doubleBondPositioner(this.textRect, direction);
-            doubleBondsArray.push({start: ends.start, end: ends.end})
+            bondsArray.push({start: ends[0], end: ends[1]})
+            bondsArray.push({start: ends[2], end: ends[3]})
           }
           if (item[1] === 3) {
             let ends = Vue.tripleBondPositioner(this.textRect, direction);
-            tripleBondsArray.push({start: ends.start, end: ends.end})
+            bondsArray.push({start: ends[0], end: ends[1]})
+            bondsArray.push({start: ends[2], end: ends[3]})
+            bondsArray.push({start: ends[4], end: ends[5]})
+
           }
           //add atoms
           let directions = Array(12);
@@ -127,19 +162,60 @@ export default {
         }
       })
       //add lone pairs and radicals
-      if (this.numUnpairedE%2 === 1) {
+      if (this.numUnbondedE%2 === 1 || this.atom[5] !== 0) {
         //radical
-        let direction = posToAdd.shift()
-        let position = Vue.lpPositioner(this.textRect, direction, 1)
-        radicalsArray.push({position: position})
+        let numRad = 1;
+        if(this.atom[5] !== 0) numRad = this.atom[5];
+        for (let i = 0; i < numRad; i++) {
+          let direction = posToAdd.shift()
+          posOccupied.push(direction)
+          //console.log(direction)
+          let position = Vue.lpPositioner(this.textRect, direction, 1)
+          dotsArray.push({position: position})
+        }
       }
-      let lpToAdd = _.floor(this.numUnpairedE/2)
+      let lpToAdd = 0;
+      if (this.atom[5] !== 0) {
+        lpToAdd = (this.numUnbondedE - this.atom[5])/2
+        if (lpToAdd !== _.floor(lpToAdd)) console.log("bad value for numUnpairedE")
+      }
+      else lpToAdd = _.floor(this.numUnbondedE/2)
+      //console.log('lpToAdd is: ', lpToAdd)
       for (let i = 0; i < lpToAdd; i++) {
         let direction = posToAdd.shift()
+        posOccupied.push(direction)
         let dotPositions = Vue.lpPositioner(this.textRect, direction, 0)
-        lonePairsArray.push({first: dotPositions[0], second: dotPositions[1]})
+        //console.log("dotPositions is ", dotPositions)
+        dotsArray.push({position: dotPositions[0]})
+        dotsArray.push({position: dotPositions[1]})
       }
+      if (this.formalCharge !== 0) {
+        console.log("posOccupied", posOccupied)
+        for (let i = 0; i < 12; i++) {
+          if (posOccupied.indexOf(i) === -1) {
+            console.log("setting up fc, i is ", i)
+            let fcpos = Vue.lpPositioner(this.textRect, i, 1)
+            let plus = this.formalCharge > 0;
+            let one = this.formalCharge === 1 || this.formalCharge === -1
+            let str = String(this.formalCharge);
+            if (one) str = ''
+            if (plus) str = str + '+';
+            else str = str.replace(/(-)(\d+)/, '$2$1')
+            formalChargeToDraw = {charge: str, position: fcpos}
+            break;
+          }
+        }
+      }
+      //console.log("textRect:", this.textRect )
+      //console.log('bonds: ', bondsArray)
+      //console.log('newAtoms: ', newAtomsArray)
+      return {bonds: bondsArray, dots: dotsArray, newAtoms: newAtomsArray, formalCharge: formalChargeToDraw}
     }
+  },
+  mounted: function() {
+    this.mounted = true
+  },
+  updated: function() {
   }
 }
 </script>

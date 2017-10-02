@@ -1,11 +1,11 @@
 <template>
   <div class="panel panel-default">
-      <div class="panel-heading">Ionic Formulas Practice!</div>
+      <div class="panel-heading">Ionic Compounds Practice!</div>
 
         <div class="panel-body">
           <div>Instructions: If you don't have any guesses, enter zero to see the answer.
           If you are asked for a formula, all numbers will be converted to subscripts, so write '(NH4)3C6H5O7' for
-          <span v-html="this.$options.filters.formatFormula('(NH4)3C6H5O7')"></span>.<br>
+          <span v-html="this.$options.filters.formatFormula('(NH4)3C6H5O7')"></span>. Recall that compounds are always charge balanced.<br> 
           Note that these questions are generated randomly from a list of common ions, and may not all be actual stable compounds.
           </div>
           <br>
@@ -60,72 +60,19 @@ export default {
       feedbackType: 'getFeedbackType'
     }),
 
-
-
     question: function() {
-      let formula = '';
-      let name = '';
       let setTime = this.questionSetTime;
       let anions = this.ions.an;
       let cations = this.ions.cat;
-      let catName = '';
-      let catCharge = 0;
       if (this.currentQuestion[6] === 'complex ionic formulas') {
         anions.concat(this.ions.polyan);
         cations.concat(this.ions.polycat);
       }
-      let anIndex = _.random(0, anions.length-1);
-      let catIndex = _.random(0, cations.length-1);
-      if (cations[catIndex].romNum) {
-        catCharge = cations[catIndex].charge[_.random(0, cations[catIndex].charge.length -1)];
-        catName = cations[catIndex].name + '(' + this.romanNums[catCharge] + ')';
-      }
-      else {
-        catName = cations[catIndex].name;
-        catCharge = cations[catIndex].charge;
-      }
-      name = catName + ' ' + anions[anIndex].name;
-
-      let regex1 = /[\w]+/g;
-    	let anArray = anions[anIndex].formula.match(regex1);
-      let catArray = cations[catIndex].formula.match(regex1);
-    	//console.log(catArray, anArray);
-    	let anionCharge = anArray[1];
-    	let anNum = catCharge;
-    	let catNum = anionCharge;
-    	if (anNum % 2 === 0 && catNum % 2 === 0) {
-    		anNum /= 2;
-    		catNum /= 2;
-    	}
-    	if (anNum % 3 === 0 && catNum % 3 === 0) {
-    		anNum /= 3;
-    		catNum /= 3;
-    	}
-  		//console.log(typeof anNum, anNum);
-    	if (Number(anNum) === 1) {anNum = '';}
-    	if (Number(catNum) === 1) {catNum = '';}
-
-    	//check for more than 1 capital letter in anArray[0], catArray[0] to see if () needed
-    	let regex2 = /[A-Z]/g;
-    	let anNumEl = anArray[0].match(regex2).length;
-    	let catNumEl = catArray[0].match(regex2).length;
-
-    	let anFormula, catFormula = '';
-
-    	if (anNumEl > 1 && anNum) {
-    		anFormula = '(' + anArray[0] + ')';
-    	}
-    	else { anFormula = anArray[0];}
-
-    	if (catNumEl > 1 && catNum) {
-    		catFormula = '(' + catArray[0] + ')';
-    	}
-    	else { catFormula = catArray[0];}
-
-    	formula = catFormula + catNum + anFormula + anNum;
-      return {name: name, formula: formula, setTime: setTime};
-
-      //
+      let anion = anions[_.random(0, anions.length-1)];
+      let cation = cations[_.random(0, cations.length-1)];
+      let question = Vue.ionicNameFormula(cation, anion);
+      question.setTime = setTime;
+      return question;
     },
   },
   created () {

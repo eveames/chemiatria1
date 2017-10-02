@@ -205,8 +205,8 @@ export default {
           this.acc = 4;
         }
         else {
-          answerDetail.messageSent = `${this.fact.prop} is
-          the symbol for ${this.answer}. We\'ll come back to it.`;
+          answerDetail.messageSent = `${this.fact.key} is
+          in ${this.families[this.answers[0].alt]}. We\'ll come back to it.`;
           this.acc = 4;
         }
       }

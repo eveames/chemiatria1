@@ -135,6 +135,23 @@ class ApiController extends Controller
     	return $activeStates;
     }
 
+    public function getStatesByTopic($topic_id) {
+    	//returns full list of states for all items in study array, by user
+    	$user = Auth::user();
+      $topic = Topic::find($topic_id);
+      //$states =
+      $activeStates = array();
+      $user->states->each(function($item) use (&$activeStates, $topic)
+      {
+        if ($item->topics->contains($topic)) {
+          $activeStates[] = $item->data();
+          //dd($activeStates);
+        }
+      });
+      //dd($activeStates);
+    	return $activeStates;
+    }
+
     public function updateAllStates(Request $request) {
     	//updates states table
         try {

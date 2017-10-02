@@ -44,9 +44,11 @@ const getters = {
 
 // actions
 const actions = {
-  setupStates ({commit}) {
+  setupStates ({commit}, topic) {
+    let url = '../api/student/states/active'
+    if (topic) url = '../api/student/states/'+topic
     return new Promise((resolve, reject) => {
-      axios.get('../api/student/states/active')
+      axios.get(url)
       .then((response) => {
       //console.log(response.data);
       let temp = response.data;

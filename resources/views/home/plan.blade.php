@@ -71,9 +71,9 @@
 <h4>Other material you have previously studied, not currently recommended for review</h4>
 <p>Check it if you want to include it in your current session.</p>
 <dl>
-  @foreach($data['prev'] as $key => $topic)
-  <dt>{{ Form::checkbox('data[' . 'prev' .'][' . $key .']', '0', false) }}
-  {{ Form::label('data[' . 'prev' .'][' . $key .']', $topic['name']) }}</dt>
+  @foreach($data['other'] as $key => $topic)
+  <dt>{{ Form::checkbox('data[' . 'other' .'][' . $key .']', '0', false) }}
+  {{ Form::label('data[' . 'other' .'][' . $key .']', $topic['name']) }}</dt>
   <dd>{{ ltrim($topic['string'], ',') }}</dd>
   @endforeach
 </dl>

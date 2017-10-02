@@ -29252,6 +29252,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__plugins_RandomGeneratorPlugin_js__ = __webpack_require__(118);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__plugins_FactPriorityPlugin_js__ = __webpack_require__(119);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__plugins_SkillPriorityPlugin_js__ = __webpack_require__(120);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__plugins_LewisPositionerPlugin_js__ = __webpack_require__(138);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__plugins_LewisStructurePlugin_js__ = __webpack_require__(139);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__plugins_NameFormulaPlugin_js__ = __webpack_require__(145);
 
 /**
  * First we will load all of this project's JavaScript dependencies which
@@ -29273,6 +29276,7 @@ window.Vuex = __webpack_require__(0);
 Vue.component('example', __webpack_require__(41));
 Vue.component('test1', __webpack_require__(47));
 Vue.component('study-session', __webpack_require__(50));
+Vue.component('nomenclature-session', __webpack_require__(140));
 Vue.component('word-question', __webpack_require__(55));
 Vue.component('fact-question', __webpack_require__(60));
 Vue.component('skill-question', __webpack_require__(65));
@@ -29291,10 +29295,15 @@ Vue.component('suggestion-box', __webpack_require__(106));
 
 
 
+
+
+
 Vue.use(__WEBPACK_IMPORTED_MODULE_1__plugins_RandomGeneratorPlugin_js__["a" /* default */]);
 Vue.use(__WEBPACK_IMPORTED_MODULE_2__plugins_FactPriorityPlugin_js__["a" /* default */]);
 Vue.use(__WEBPACK_IMPORTED_MODULE_3__plugins_SkillPriorityPlugin_js__["a" /* default */]);
-Vue.use(LewisPositionerPlugin);
+Vue.use(__WEBPACK_IMPORTED_MODULE_4__plugins_LewisPositionerPlugin_js__["a" /* default */]);
+Vue.use(__WEBPACK_IMPORTED_MODULE_5__plugins_LewisStructurePlugin_js__["a" /* default */]);
+Vue.use(__WEBPACK_IMPORTED_MODULE_6__plugins_NameFormulaPlugin_js__["a" /* default */]);
 //console.log('did something');
 Vue.filter('formatFormula', function (value) {
   var str = String(value);
@@ -43553,7 +43562,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     var _this = this;
 
     Promise.all([this.$store.dispatch('setupWords'), this.$store.dispatch('setupFacts'), this.$store.dispatch('setupSkills')]).then(function (results) {
-      _this.$store.dispatch('setupStates');
+      _this.$store.dispatch('setupStates', false);
     }).then(function (results) {
       _this.$store.dispatch('setupIons');
     }).then(function (results) {
@@ -44501,11 +44510,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         } else moveOn = true;
       }
       if (moveOn === true && gotIt === false) {
-        if (this.requestFormula) {
-          answerDetail.messageSent = 'The formula of "' + this.fact.key + '" is\n          "' + this.answer + '". We\'ll come back to it.';
+        if (!this.requestFormula) {
+          answerDetail.messageSent = 'The name of "' + this.fact.key + '" is\n          "' + this.answer + '". We\'ll come back to it.';
           this.acc = 4;
         } else {
-          answerDetail.messageSent = 'The name of "' + this.fact.prop + '" is\n          "' + this.answer + '". We\'ll come back to it.';
+          answerDetail.messageSent = 'The formula of "' + this.fact.prop + '" is\n          "' + this.answer + '". We\'ll come back to it.';
           this.acc = 4;
         }
       }
@@ -44529,7 +44538,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         //update states
 
         var updatedState = { rts: this.rts, accs: this.acc };
-        console.log("updatedState is", updatedState);
+        //console.log("updatedState is", updatedState)
         this.$store.dispatch('updateRtsAccs', updatedState);
         updatedState = Vue.factPriorityHelper(this.stageData);
         this.$store.dispatch('updateStage', updatedState);
@@ -44572,8 +44581,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
             for (var _iterator = this.facts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
               var fact = _step.value;
 
-              console.log(this.facts, fact);
-              console.log(this.entry, fact.key);
+              //console.log(this.facts, fact)
+              //console.log(this.entry, fact.key);
               if (this.entry === fact.key) {
                 answerDetailToReturn.correct = 'knownWrong';
                 answerDetailToReturn.messageSent = this.entry + ' is ' + fact.prop + '.';
@@ -44613,7 +44622,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
               for (var _iterator2 = this.facts[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                 var _fact = _step2.value;
 
-                console.log(this.entry, _fact.prop);
+                //console.log(this.entry, fact.prop);
                 if (this.entry === _fact.prop) {
                   answerDetailToReturn.correct = 'knownWrong';
                   answerDetailToReturn.messageSent = this.entry + ' is  ' + _fact.key + '.';
@@ -45379,7 +45388,10 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
           answerDetail.messageSent += " Try again!";
         } else moveOn = true;
       }
-      if (moveOn === true && gotIt === false) this.acc = 4;
+      if (moveOn === true && gotIt === false) {
+        this.acc = 4;
+        answerDetail.messageSent = this.answers[0].message + answerDetail.messageSent;
+      }
       if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
         this.$store.dispatch('setFeedbackType', { "alert-warning": true });
       } else if (gotIt === false) this.$store.dispatch('setFeedbackType', { "alert-danger": true });
@@ -45906,7 +45918,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
           answerDetail.messageSent = this.fact.key + ' is\n          in ' + this.answers[0].alt + '. We\'ll come back to it.';
           this.acc = 4;
         } else {
-          answerDetail.messageSent = this.fact.prop + ' is\n          the symbol for ' + this.answer + '. We\'ll come back to it.';
+          answerDetail.messageSent = this.fact.key + ' is\n          in ' + this.families[this.answers[0].alt] + '. We\'ll come back to it.';
           this.acc = 4;
         }
       }
@@ -46865,75 +46877,18 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
   }), {
 
     question: function question() {
-      var formula = '';
-      var name = '';
       var setTime = this.questionSetTime;
       var anions = this.ions.an;
       var cations = this.ions.cat;
-      var catName = '';
-      var catCharge = 0;
       if (this.currentQuestion[6] === 'complex ionic formulas') {
         anions.concat(this.ions.polyan);
         cations.concat(this.ions.polycat);
       }
-      var anIndex = _.random(0, anions.length - 1);
-      var catIndex = _.random(0, cations.length - 1);
-      if (cations[catIndex].romNum) {
-        catCharge = cations[catIndex].charge[_.random(0, cations[catIndex].charge.length - 1)];
-        catName = cations[catIndex].name + '(' + this.romanNums[catCharge] + ')';
-      } else {
-        catName = cations[catIndex].name;
-        catCharge = cations[catIndex].charge;
-      }
-      name = catName + ' ' + anions[anIndex].name;
-
-      var regex1 = /[\w]+/g;
-      var anArray = anions[anIndex].formula.match(regex1);
-      var catArray = cations[catIndex].formula.match(regex1);
-      //console.log(catArray, anArray);
-      var anionCharge = anArray[1];
-      var anNum = catCharge;
-      var catNum = anionCharge;
-      if (anNum % 2 === 0 && catNum % 2 === 0) {
-        anNum /= 2;
-        catNum /= 2;
-      }
-      if (anNum % 3 === 0 && catNum % 3 === 0) {
-        anNum /= 3;
-        catNum /= 3;
-      }
-      //console.log(typeof anNum, anNum);
-      if (Number(anNum) === 1) {
-        anNum = '';
-      }
-      if (Number(catNum) === 1) {
-        catNum = '';
-      }
-
-      //check for more than 1 capital letter in anArray[0], catArray[0] to see if () needed
-      var regex2 = /[A-Z]/g;
-      var anNumEl = anArray[0].match(regex2).length;
-      var catNumEl = catArray[0].match(regex2).length;
-
-      var anFormula = void 0,
-          catFormula = '';
-
-      if (anNumEl > 1 && anNum) {
-        anFormula = '(' + anArray[0] + ')';
-      } else {
-        anFormula = anArray[0];
-      }
-
-      if (catNumEl > 1 && catNum) {
-        catFormula = '(' + catArray[0] + ')';
-      } else {
-        catFormula = catArray[0];
-      }
-
-      formula = catFormula + catNum + anFormula + anNum;
-      return { name: name, formula: formula, setTime: setTime };
-
-      //
+      var anion = anions[_.random(0, anions.length - 1)];
+      var cation = cations[_.random(0, cations.length - 1)];
+      var question = Vue.ionicNameFormula(cation, anion);
+      question.setTime = setTime;
+      return question;
     }
   }),
   created: function created() {
@@ -47141,13 +47096,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "panel panel-default"
   }, [_c('div', {
     staticClass: "panel-heading"
-  }, [_vm._v("Ionic Formulas Practice!")]), _vm._v(" "), _c('div', {
+  }, [_vm._v("Ionic Compounds Practice!")]), _vm._v(" "), _c('div', {
     staticClass: "panel-body"
   }, [_c('div', [_vm._v("Instructions: If you don't have any guesses, enter zero to see the answer.\n        If you are asked for a formula, all numbers will be converted to subscripts, so write '(NH4)3C6H5O7' for\n        "), _c('span', {
     domProps: {
       "innerHTML": _vm._s(this.$options.filters.formatFormula('(NH4)3C6H5O7'))
     }
-  }), _vm._v("."), _c('br'), _vm._v("\n        Note that these questions are generated randomly from a list of common ions, and may not all be actual stable compounds.\n        ")]), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.requestFormula) ? _c('div', [_vm._v("\n          What is the formula of " + _vm._s(_vm.question.name) + "?\n\n          Your answer is: "), _c('span', {
+  }), _vm._v(". Recall that compounds are always charge balanced."), _c('br'), _vm._v(" \n        Note that these questions are generated randomly from a list of common ions, and may not all be actual stable compounds.\n        ")]), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.requestFormula) ? _c('div', [_vm._v("\n          What is the formula of " + _vm._s(_vm.question.name) + "?\n\n          Your answer is: "), _c('span', {
     domProps: {
       "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.entry))
     }
@@ -47970,11 +47925,13 @@ var state = {
 
   // actions
 };var actions = {
-  setupStates: function setupStates(_ref) {
+  setupStates: function setupStates(_ref, topic) {
     var commit = _ref.commit;
 
+    var url = '../api/student/states/active';
+    if (topic) url = '../api/student/states/' + topic;
     return new Promise(function (resolve, reject) {
-      axios.get('../api/student/states/active').then(function (response) {
+      axios.get(url).then(function (response) {
         //console.log(response.data);
         var temp = response.data;
         var states = [];
@@ -48350,32 +48307,41 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
 "use strict";
 var state = {
   elementsList: [{ name: 'hydrogen', symbol: 'H', family: 'non-metal', location: '1', charge: 1, valence: 1, findex: 8 }, { name: 'helium', symbol: 'He', family: 'noble gas', location: '2', charge: 0, valence: 2, findex: 4 }, { name: 'lithium', symbol: 'Li', family: 'alkali metal', location: '3', charge: 1, valence: 1, findex: 2 }, { name: 'beryllium', symbol: 'Be', family: 'alkaline earth metal', location: '4', charge: 2, valence: 2, findex: 3 }, { name: 'boron', symbol: 'B', family: 'Boron group', location: '5', charge: 3, valence: 3, findex: 8 }, { name: 'carbon', symbol: 'C', family: 'Carbon group', location: '6', charge: 0, valence: 4, findex: 8 }, { name: 'nitrogen', symbol: 'N', family: 'Nitrogen group (pnictogen)', location: '7', charge: -3, valence: 5, findex: 8 }, { name: 'oxygen', symbol: 'O', family: 'chalcogen', location: '8', charge: -2, valence: 6, findex: 1 }, { name: 'fluorine', symbol: 'F', family: 'halogen', location: '9', charge: -1, valence: 7, findex: 0 }, { name: 'bromine', symbol: 'Br', family: 'halogen', location: 'Hal', charge: -1, valence: 7, findex: 0 }, { name: 'iodine', symbol: 'I', family: 'halogen', location: 'Hal', charge: -1, valence: 7, findex: 0 }, { name: 'sodium', symbol: 'Na', family: 'alkali metal', location: '11', charge: 1, valence: 1, findex: 2 }, { name: 'magnesium', symbol: 'Mg', family: 'alkaline earth metal', location: '12', charge: 2, valence: 2, findex: 3 }, { name: 'aluminum', symbol: 'Al', family: 'Boron group', location: '13', charge: 3, valence: 3, findex: 9 }, { name: 'silicon', symbol: 'Si', family: 'Carbon group', location: '14', charge: 4, valence: 4, findex: 8 }, { name: 'phosphorus', symbol: 'P', family: 'Nitrogen group (pnictogen)', location: '15', charge: -3, valence: 5, findex: 8 }, { name: 'sulfur', symbol: 'S', family: 'chalcogen', location: '16', charge: -2, valence: 6, findex: 1 }, { name: 'chlorine', symbol: 'Cl', family: 'halogen', location: '17', charge: -1, valence: 7, findex: 0 }, { name: 'argon', symbol: 'Ar', family: 'noble gas', location: 'NG', charge: 0, valence: 8, findex: 4 }, { name: 'potassium', symbol: 'K', family: 'alkali metal', location: '19', charge: 1, valence: 1, findex: 2 }, { name: 'calcium', symbol: 'Ca', family: 'alkaline earth metal', location: '20', charge: 2, valence: 2, findex: 3 }, { name: 'titanium', symbol: 'Ti', family: 'transition metal', location: 'ETM', charge: 4, findex: 7 }, { name: 'iron', symbol: 'Fe', family: 'transition metal', location: 'MTM', charge: [3, 2], findex: 7 }, { name: 'copper', symbol: 'Cu', family: 'coinage metal', location: 'CM', charge: [2, 1], findex: 6 }, { name: 'mercury', symbol: 'Hg', family: '(post-)transition metal', location: 'PTM', charge: [2, 1], findex: 57 }, { name: 'silver', symbol: 'Ag', family: 'coinage metal', location: 'CM', charge: [2, 1], findex: 6 }, { name: 'gold', symbol: 'Au', family: 'coinage metal', location: 'CM', charge: [3, 1], findex: 6 }, { name: 'tin', symbol: 'Sn', family: 'post-transition metal', location: 'PTM', charge: [2, 4], valence: 4, findex: 5 }, { name: 'lead', symbol: 'Pb', family: 'post-transition metal', location: 'PTM', charge: [2, 4], valence: 4, findex: 5 }, { name: 'zinc', symbol: 'Zn', family: '(post-)transition metal', location: 'PTM', charge: [2], findex: 57 }],
-  elementsCharges: [[{ alt: 1, correct: 'correct', message: '', op: 'equals' }, { alt: -1, correct: 'close', message: 'Possible, but in special circumstances. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'H only has one electron to lose, so it can\'t have a charge above +1. ', op: 'greater' }, { alt: -1, correct: 'knownWrong', message: 'It would be almost impossible to add more than 1 electron to H. ', op: 'less' }], [{ alt: 0, correct: 'correct', message: 'Noble gases pretty much never have charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Noble gases pretty much never have charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 3, correct: 'correct', message: 'Boron often has a +3 charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Like carbon, boron forms many compounds in which it shares electrons, but it does form ionic compounds also. ', op: 'equals' }], [{ alt: 0, correct: 'correct', message: 'Carbon usually shares electrons, rather than forming ions. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Carbon usually shares electrons, and rarely forms ions. ', op: 'notEqual' }], [{ alt: -3, correct: 'correct', message: 'When nitrogen forms an ion, it\'s usually -3 charge. ', op: 'equals' }, { alt: -3, correct: 'close', message: 'In more complicated situations, N can have many different charges. ', op: 'notEqual' }], [{ alt: -2, correct: 'correct', message: 'O almost always has a -2 charge. ', op: 'equals' }, { alt: -2, correct: 'knownWrong', message: 'O almost always has a -2 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'F always has a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'F almost always has a -1 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Halogens almost always have a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Halogens almost always have a -1 charge. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Halogens almost always have a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Halogens almost always have a -1 charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 3, correct: 'correct', message: 'Aluminum always has +3 charge. ', op: 'equals' }, { alt: 3, correct: 'knownWrong', message: 'Aluminum always has +3 charge. ', op: 'notEqual' }], [{ alt: 4, correct: 'correct', message: 'Si often has a 4+ charge when it occurs in rocks. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Si doesn\'t share electrons as much as C. ', op: 'equals' }], [{ alt: -3, correct: 'correct', message: 'When P forms an ion, it\'s usually -3 charge. ', op: 'equals' }, { alt: -3, correct: 'close', message: 'In more complicated situations, P can have many different charges. ', op: 'notEqual' }], [{ alt: -2, correct: 'correct', message: 'S usually has a -2 charge. ', op: 'equals' }, { alt: -2, correct: 'knownWrong', message: 'In more complicated situations, S can have many different charges. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Cl almost always has a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: 'Cl almost always has a -1 charge. ', op: 'notEqual' }], [{ alt: 0, correct: 'correct', message: 'Noble gases pretty much never have charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Noble gases pretty much never have charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'Alkali metals always have +1 charge. ', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: 'Alkaline earth metals always have +2 charge. ', op: 'notEqual' }], [{ alt: 4, correct: 'correct', message: 'Ti usually has a 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Transition elements often have multiple charges, but Ti is usually +4. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 3, correct: 'correct', message: 'Fe usually has a 3+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Fe usually has a 3+ or 2+ charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Fe can have a range of charges, but is +2 or +3 normally. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Cu usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 1, correct: 'correct', message: 'Cu usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Cu rarely has a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 1, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Hg does\'t have a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 1, correct: 'correct', message: 'Ag usually has a 1+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Ag occasionally has a 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Ag rarely has a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 1, correct: 'correct', message: 'Au usually has a 1+ or +3 charge. ', op: 'equals' }, { alt: 3, correct: 'correct', message: 'Au usually has a 1+ or 3+ charge. ', op: 'equals' }, { alt: 3, correct: 'close', message: 'Au rarely has a charge above 3+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 4, correct: 'correct', message: 'Sn usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Sn usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less' }], [{ alt: 4, correct: 'correct', message: 'Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Zn always has a 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Zn does\'t have a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }]],
+  elementsCharges: [[{ alt: 1, correct: 'correct', message: 'H is usually +1', op: 'equals' }, { alt: -1, correct: 'close', message: 'Possible, but in special circumstances. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'H only has one electron to lose, so it can\'t have a charge above +1. ', op: 'greater' }, { alt: -1, correct: 'knownWrong', message: 'It would be almost impossible to add more than 1 electron to H. ', op: 'less' }], [{ alt: 0, correct: 'correct', message: 'Noble gases pretty much never have charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Noble gases pretty much never have charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 3, correct: 'correct', message: 'Boron often has a +3 charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Like carbon, boron forms many compounds in which it shares electrons, but it does form ionic compounds also. ', op: 'equals' }], [{ alt: 0, correct: 'correct', message: 'Carbon usually shares electrons, rather than forming ions. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Carbon usually shares electrons, and rarely forms ions. ', op: 'notEqual' }], [{ alt: -3, correct: 'correct', message: 'When nitrogen forms an ion, it\'s usually -3 charge. ', op: 'equals' }, { alt: -3, correct: 'close', message: 'In some situations, N can have many different charges, but this isn\'t the usual charge. ', op: 'notEqual' }], [{ alt: -2, correct: 'correct', message: 'O almost always has a -2 charge. ', op: 'equals' }, { alt: -2, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'F always has a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Halogens almost always have a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Halogens almost always have a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 3, correct: 'correct', message: 'Aluminum always has +3 charge. ', op: 'equals' }, { alt: 3, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 4, correct: 'correct', message: 'Si often has a 4+ charge when it occurs in rocks. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Si doesn\'t share electrons as much as C. ', op: 'equals' }], [{ alt: -3, correct: 'correct', message: 'When P forms an ion, it\'s usually -3 charge. ', op: 'equals' }, { alt: -3, correct: 'close', message: 'P can have many different charges, but this is not the usual one. ', op: 'notEqual' }], [{ alt: -2, correct: 'correct', message: 'S usually has a -2 charge. ', op: 'equals' }, { alt: -2, correct: 'knownWrong', message: 'S can have many different charges, but this is not the usual one. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Cl almost always has a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 0, correct: 'correct', message: 'Noble gases pretty much never have charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Noble gases pretty much never have charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 4, correct: 'correct', message: 'Ti usually has a 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Transition elements often have multiple charges, but Ti is usually +4. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 3, correct: 'correct', message: 'Fe usually has a 3+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Fe usually has a 3+ or 2+ charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Fe can have a range of charges, but is +2 or +3 normally. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Cu usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 1, correct: 'correct', message: 'Cu usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Cu rarely has a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 1, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Hg does\'t have a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 1, correct: 'correct', message: 'Ag usually has a 1+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Ag occasionally has a 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Ag rarely has a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 1, correct: 'correct', message: 'Au usually has a 1+ or +3 charge. ', op: 'equals' }, { alt: 3, correct: 'correct', message: 'Au usually has a 1+ or 3+ charge. ', op: 'equals' }, { alt: 3, correct: 'close', message: 'Au rarely has a charge above 3+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 4, correct: 'correct', message: 'Sn usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Sn usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less' }], [{ alt: 4, correct: 'correct', message: 'Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Zn always has a 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Zn does\'t have a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }]],
   //element data for drawing Lewis structures
+  //1: valence e-
+  //2: normal max e-
+  //3: min normal e-
+  //4: min/normal valence (num bonds)
+  //5: max valence when oxidized (num bonds)
   lewisElements: {
-    hydrogen: ['H', 1, 2, 2, 1, 2],
-    helium: ['He', 2, 2, 2, 0, 0],
-    lithium: ['Li', 1, 2, 8, 1, 4],
-    beryllium: ['Be', 2, 4, 8, 2, 4],
-    boron: ['B', 3, 6, 8, 3, 4],
-    carbon: ['C', 4, 8, 8],
-    nitrogen: ['N', 5, 7, 8, 3, 4],
-    oxygen: ['O', 6, 8, 8, 2, 2],
-    fluorine: ['F', 7, 8, 8, 1, 1],
-    neon: ['Ne', 8, 8, 8, 0, 0],
-    silicon: ['Si', 4, 8, 8, 4, 4],
-    phosphorus: ['P', 5, 8, 12, 3, 5],
-    sulfur: ['S', 6, 8, 12, 2, 6],
-    chlorine: ['Cl', 7, 8, 16, 1, 4],
-    germanium: ['Ge', 4, 8, 8, 4, 4],
-    arsenic: ['As', 5, 8, 12, 3, 5],
-    selenium: ['Se', 6, 8, 12, 2, 6],
-    bromine: ['Br', 7, 8, 16, 1, 5],
-    antimony: ['Sb', 5, 8, 12, 3, 5],
-    tellurium: ['Te', 6, 8, 12, 2, 6],
-    iodine: ['I', 7, 8, 16, 1, 7],
-    xenon: ['Xe', 8, 8, 16, 0, 6]
-  }
+    H: ['H', 1, 2, 2, 1, 2],
+    He: ['He', 2, 2, 2, 0, 0],
+    Li: ['Li', 1, 2, 8, 1, 4],
+    Be: ['Be', 2, 4, 8, 2, 4],
+    B: ['B', 3, 6, 8, 3, 4],
+    C: ['C', 4, 8, 8, 4, 4],
+    N: ['N', 5, 7, 8, 3, 4],
+    O: ['O', 6, 8, 8, 2, 2],
+    F: ['F', 7, 8, 8, 1, 1],
+    Ne: ['Ne', 8, 8, 8, 0, 0],
+    Si: ['Si', 4, 8, 8, 4, 4],
+    P: ['P', 5, 8, 12, 3, 5],
+    S: ['S', 6, 8, 12, 2, 6],
+    Cl: ['Cl', 7, 8, 16, 1, 4],
+    Ge: ['Ge', 4, 8, 8, 4, 4],
+    As: ['As', 5, 8, 12, 3, 5],
+    Se: ['Se', 6, 8, 12, 2, 6],
+    Br: ['Br', 7, 8, 16, 1, 5],
+    Sb: ['Sb', 5, 8, 12, 3, 5],
+    Te: ['Te', 6, 8, 12, 2, 6],
+    I: ['I', 7, 8, 16, 1, 7],
+    Xe: ['Xe', 8, 8, 16, 0, 8]
+  },
+
+  LewisHomoDiatomics: ['H2', 'N2', 'O2', 'F2', 'Cl2', 'Br2', 'I2', 'S2', 'P2', 'Se2'],
+  LewisHeteroDiatomics: ['HF', 'HCl', 'HBr', 'HI', 'ClF', 'BrF', 'IF', 'BrCl', 'ICl', 'IBr', 'CO', 'NO', 'SO', 'NP', 'HO', 'ClO'],
+  LewisSimpleCentralMulti: ['BH3', 'CH4', 'NH3', 'OH2', 'SiH4', 'PH3', 'SH2', 'AsH3', 'SeH2', 'BF3', 'CF4', 'SiF4', 'GeF4', 'PF3', 'PF5', 'AsF3', 'AsF5', 'SbF3', 'SbF5', 'SF2', 'SF4', 'SF6', 'SeF2', 'SeF4', 'SeF6', 'TeF2', 'TeF4', 'TeF6', 'ClF3', 'BrF3', 'BrF5', 'IF3', 'IF5', 'BeCl2', 'BCl3', 'CCl4', 'SiCl4', 'NCl3', 'PCl3', 'PCl5', 'AsCl3', 'AsCl5', 'SbCl3', 'SbCl5', 'SCl2', 'SCl4', 'SeCl2', 'SeCl4', 'TeCl2', 'TeCl4', 'BrCl3', 'ICl3', 'CBr4', 'CI4', 'CO2', 'CS2', 'SiO2', 'NO2', 'SO2', 'SO3', 'SeO2', 'SeO3', 'TeO2', 'TeO3', 'XeO2', 'XeO4', 'XeF2', 'XeF4', 'XeF6', 'O3']
 
   // getters
 };var getters = {
@@ -48396,6 +48362,15 @@ var state = {
   },
   getLSE: function getLSE(state) {
     return state.lewisElements;
+  },
+  getLewisHomoDiatomics: function getLewisHomoDiatomics(state) {
+    return state.LewisHomoDiatomics;
+  },
+  getLewisHeteroDiatomics: function getLewisHeteroDiatomics(state) {
+    return state.LewisHeteroDiatomics;
+  },
+  getLewisSimpleCentral: function getLewisSimpleCentral(state) {
+    return state.LewisSimpleCentralMulti;
   }
 };
 
@@ -48700,7 +48675,7 @@ exports = module.exports = __webpack_require__(3)(undefined);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -48744,6 +48719,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
+//
+//
 
 
 
@@ -48755,7 +48732,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       tries: 0,
       acc: 0,
       rts: [],
-      startTime: 0
+      startTime: 0,
+      index: 0
       //determines whether name or formula is given
     };
   },
@@ -48765,32 +48743,40 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     questionSetTime: 'getQuestionSetTime',
     stageData: 'getStageData',
     feedback: 'getFeedback',
-    feedbackType: 'getFeedbackType'
+    feedbackType: 'getFeedbackType',
+    lewisHomo: 'getLewisHomoDiatomics',
+    lewisHetero: 'getLewisHeteroDiatomics',
+    lewisMulti: 'getLewisSimpleCentral',
+    elements: 'getLSE'
   }), {
-    atomsArray: function atomsArray() {
-      return [[0, 0, 'carbon', [[1, 1], [2, 1], [3, 1], [4, 1]], 0], [1, 0, 'hydrogen', [[0, 1]], 0], [2, 0, 'hydrogen', [[0, 1]], 0], [3, 0, 'hydrogen', [[0, 1]], 0], [4, 0, 'hydrogen', [[0, 1]], 0]];
+    formulasArray: function formulasArray() {
+      var temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti);
+      return temp;
     },
     formula: function formula() {
-      return 'CH4';
+      return this.formulasArray[this.index];
     },
-    answer: function answer() {
-      return 'y';
+    question: function question() {
+      return Vue.simpleCentralStructure(this.formula, this.elements);
     },
     stats: function stats() {
       var directions = Array(12);
       directions.fill(0);
-      var drawnAtoms = Array(this.atomsArray.length);
+      var drawnAtoms = Array(this.question.structure.length);
       drawnAtoms.fill(0);
       return {
         center: [100, 100],
         directions: directions,
-        atomsArray: this.atomsArray,
+        atomsArray: this.question.structure,
         drawnAtoms: drawnAtoms,
         index: 0
       };
     }
   }),
-  created: function created() {},
+  created: function created() {
+    this.index = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.formulasArray.length - 1);
+  },
+  mounted: function mounted() {},
 
   methods: {
 
@@ -48850,7 +48836,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         var updatedState = { rts: this.rts, accs: this.acc };
         //console.log("updatedState is", updatedState)
         this.$store.dispatch('updateRtsAccs', updatedState);
-        updatedState = Vue.factPriorityHelper(this.stageData);
+        updatedState = Vue.skillPriorityHelper(this.stageData);
         this.$store.dispatch('updateStage', updatedState);
 
         //set new question
@@ -48863,9 +48849,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         this.tries = 0;
         this.acc = 0;
         this.rts = [];
-        this.chargeGiven = Math.random() >= 0.5;
-        this.useSymbol = Math.random() >= 0.5;
-        if (this.chargeGiven) this.charge = this.chargesArray[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 7)];else this.charge = 0;
+        this.index = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.formulasArray.length - 1);
+        //this.index =47
       }
     },
 
@@ -48889,7 +48874,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
           answerDetailToReturn.correct = 'formatError';
           answerDetailToReturn.messageSent = 'Please check the format of your answer. ';
         }
-        if (entryTemp === this.answer) {
+        if (entryTemp === this.question.answer) {
           answerDetailToReturn.correct = 'correct';
         } else answerDetailToReturn.correct = 'knownWrong';
       }
@@ -49041,16 +49026,41 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      mounted: false
+    };
+  },
   props: ['stats'],
   computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
     currentQuestion: 'getCurrent',
     elements: 'getLSE'
   }), {
+    baseRect: function baseRect() {
+      if (this.mounted) {
+        var rect = document.getElementById('atom' + this.index).getBBox();
+        console.log('in if');
+        var width = rect.width;
+        var height = rect.height;
+        return { x: rect.x, y: rect.y, width: width, height: height
+          //console.log(this.element, this.baseRect)
+        };
+      } else {
+        console.log('in else');
+        return { x: 100, y: 100, width: 40, height: 30 };
+      }
+    },
     index: function index() {
       return this.stats.index;
     },
@@ -49061,24 +49071,24 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       return this.atom[1];
     },
     element: function element() {
-      console.log(this.elements, this.atom);
+      //console.log(this.elements, this.atom)
       return this.elements[this.atom[2]];
     },
     numBonds: function numBonds() {
       var numBonds = 0;
-      for (var i = 0; i < this.atom.connections.length; i++) {
-        numBonds += i[1];
+      for (var i = 0; i < this.atom[3].length; i++) {
+        numBonds += this.atom[3][i][1];
       }
       return numBonds;
     },
     numConnections: function numConnections() {
-      return this.atom.connections.length;
+      return this.atom[3].length;
     },
     numDomains: function numDomains() {
       return this.numConnections + __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.ceil(this.numUnbondedE / 2);
     },
     formalCharge: function formalCharge() {
-      return this.numUnbondedE + this.numBonds - this.element[1];
+      return this.element[1] - (this.numUnbondedE + this.numBonds);
     },
     directions: function directions() {
       return this.stats.directions.slice(0);
@@ -49089,17 +49099,17 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       return temp;
     },
     textRect: function textRect() {
-      var rect = document.getElementById('atom' + this.index).getBBox();
-      var left = rect.x;
-      var top = rect.y;
-      var width = rect.width;
-      var height = rect.height;
-      var right = left + width;
-      var bottom = top - height;
-      var centerx = left + width / 2;
-      var centery = top - height / 2;
+      var left = this.stats.center[0] - this.baseRect.width / 2;
+      var top = this.stats.center[1] - this.baseRect.height / 2;
+      var width = this.baseRect.width;
+      var height = this.baseRect.height;
+      var right = this.stats.center[0] + this.baseRect.width / 2;
+      var bottom = this.stats.center[1] + this.baseRect.height / 2;
+      var centerx = this.stats.center[0];
+      var centery = this.stats.center[1];
+      var baseline = this.stats.center[1] + this.baseRect.height / 4;
       return { left: left, right: right, top: top, bottom: bottom,
-        width: width, height: height, centerx: centerx, centery: centery };
+        width: width, height: height, centerx: centerx, centery: centery, baseline: baseline };
     },
     numBondsAlready: function numBondsAlready() {
       var numBondsAlready = 0;
@@ -49109,68 +49119,115 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       if (numBondsAlready > 1) console.log('not setup for cylic molecules');
       return numBondsAlready;
     },
-    domainsToDraw: function domainsToDraw() {
-      var x = 0;
-      if (numBondsAlready === 1) x = this.directions.index(1);
+    toDraw: function toDraw() {
+      var _this = this;
+
+      var x = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 11);
+      var posOccupied = [];
+      if (this.numBondsAlready === 1) {
+        x = this.directions.indexOf(1);
+        posOccupied.push(x);
+      }
       var domains = this.numDomains;
       var posToAdd = [];
       var bondsArray = [];
-      var doubleBondsArray = [];
-      var tripleBondsArray = [];
       var newAtomsArray = [];
-      var radicalsArray = [];
-      var lonePairsArray = [];
-      var formalChargesArray = [];
-      if (domains === 6) posToAdd = [(x + 6) % 12, (x + 2) % 12, (x + 4) % 12, (x + 8) % 12, (x + 10) % 12, x];else if (domains === 5) posToAdd = [(x + 5) % 12, (x + 2) % 12, (x + 7) % 12, (x + 10) % 12, x];else if (domains === 4) posToAdd = [(x + 6) % 12, (x + 3) % 12, (x + 9) % 12, x];else if (domains === 3) posToAdd = [(x + 4) % 12, (x + 8) % 12, x];else if (domains === 2) posToAdd = [(x + 6) % 12, x];else if (domains === 1) posToAdd = [x];else console.log("error, too many domains");
+      var dotsArray = [];
+      var formalChargeToDraw = false;
+      if (this.formalCharge !== 0) domains += 1;
+      if (domains === 7) posToAdd = [(x + 6) % 12, (x + 2) % 12, (x + 4) % 12, (x + 8) % 12, (x + 10) % 12, (x + 5) % 12, x];else if (domains === 6) posToAdd = [(x + 6) % 12, (x + 2) % 12, (x + 4) % 12, (x + 8) % 12, (x + 10) % 12, x];else if (domains === 5) posToAdd = [(x + 5) % 12, (x + 2) % 12, (x + 7) % 12, (x + 10) % 12, x];else if (domains === 4) posToAdd = [(x + 6) % 12, (x + 3) % 12, (x + 9) % 12, x];else if (domains === 3) posToAdd = [(x + 4) % 12, (x + 8) % 12, x];else if (domains === 2) posToAdd = [(x + 6) % 12, x];else if (domains === 1) posToAdd = [x];else console.log("bad number of domains");
       //add bond and atoms
-      var bondsToDraw = this.numConnections - numBondsAlready;
+      var bondsToDraw = this.numConnections - this.numBondsAlready;
       //draw lines at angles defined by posToAdd
       var connections = this.atom[3];
       connections.forEach(function (item) {
-        if (this.drawnAtoms[item[0]] === 0) {
+        if (_this.drawnAtoms[item[0]] === 0) {
           var direction = posToAdd.shift();
+          posOccupied.push(direction);
           if (item[1] === 1) {
-            var ends = Vue.bondPositioner(this.textRect, direction);
-            singleBondsArray.push({ start: ends.start, end: ends.end });
+            var ends = Vue.bondPositioner(_this.textRect, direction);
+            bondsArray.push({ start: ends[0], end: ends[1] });
           }
+          //need to fix these
           if (item[1] === 2) {
-            var _ends = Vue.doubleBondPositioner(this.textRect, direction);
-            doubleBondsArray.push({ start: _ends.start, end: _ends.end });
+            var _ends = Vue.doubleBondPositioner(_this.textRect, direction);
+            bondsArray.push({ start: _ends[0], end: _ends[1] });
+            bondsArray.push({ start: _ends[2], end: _ends[3] });
           }
           if (item[1] === 3) {
-            var _ends2 = Vue.tripleBondPositioner(this.textRect, direction);
-            tripleBondsArray.push({ start: _ends2.start, end: _ends2.end });
+            var _ends2 = Vue.tripleBondPositioner(_this.textRect, direction);
+            bondsArray.push({ start: _ends2[0], end: _ends2[1] });
+            bondsArray.push({ start: _ends2[2], end: _ends2[3] });
+            bondsArray.push({ start: _ends2[4], end: _ends2[5] });
           }
           //add atoms
           var directions = Array(12);
           directions.fill(0);
           var newDirectionIndex = (direction + 6) % 12;
           directions[newDirectionIndex] = 1;
-          var newCenter = Vue.newAtomPositioner(this.textRect, direction);
+          var newCenter = Vue.newAtomPositioner(_this.textRect, direction);
           newAtomsArray.push({ stats: {
               center: newCenter,
               directions: directions,
-              atomsArray: this.stats.atomsArray,
-              drawnAtoms: this.drawnAtoms,
+              atomsArray: _this.stats.atomsArray,
+              drawnAtoms: _this.drawnAtoms,
               index: item[0]
             } });
         }
       });
       //add lone pairs and radicals
-      if (this.numUnpairedE % 2 === 1) {
+      if (this.numUnbondedE % 2 === 1 || this.atom[5] !== 0) {
         //radical
-        var direction = posToAdd.shift();
-        var position = Vue.lpPositioner(this.textRect, direction, 1);
-        radicalsArray.push({ position: position });
+        var numRad = 1;
+        if (this.atom[5] !== 0) numRad = this.atom[5];
+        for (var i = 0; i < numRad; i++) {
+          var direction = posToAdd.shift();
+          posOccupied.push(direction);
+          //console.log(direction)
+          var position = Vue.lpPositioner(this.textRect, direction, 1);
+          dotsArray.push({ position: position });
+        }
       }
-      var lpToAdd = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.floor(this.numUnpairedE / 2);
-      for (var i = 0; i < lpToAdd; i++) {
+      var lpToAdd = 0;
+      if (this.atom[5] !== 0) {
+        lpToAdd = (this.numUnbondedE - this.atom[5]) / 2;
+        if (lpToAdd !== __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.floor(lpToAdd)) console.log("bad value for numUnpairedE");
+      } else lpToAdd = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.floor(this.numUnbondedE / 2);
+      //console.log('lpToAdd is: ', lpToAdd)
+      for (var _i = 0; _i < lpToAdd; _i++) {
         var _direction = posToAdd.shift();
+        posOccupied.push(_direction);
         var dotPositions = Vue.lpPositioner(this.textRect, _direction, 0);
-        lonePairsArray.push({ first: dotPositions[0], second: dotPositions[1] });
+        //console.log("dotPositions is ", dotPositions)
+        dotsArray.push({ position: dotPositions[0] });
+        dotsArray.push({ position: dotPositions[1] });
       }
+      if (this.formalCharge !== 0) {
+        console.log("posOccupied", posOccupied);
+        for (var _i2 = 0; _i2 < 12; _i2++) {
+          if (posOccupied.indexOf(_i2) === -1) {
+            console.log("setting up fc, i is ", _i2);
+            var fcpos = Vue.lpPositioner(this.textRect, _i2, 1);
+            var plus = this.formalCharge > 0;
+            var one = this.formalCharge === 1 || this.formalCharge === -1;
+            var str = String(this.formalCharge);
+            if (one) str = '';
+            if (plus) str = str + '+';else str = str.replace(/(-)(\d+)/, '$2$1');
+            formalChargeToDraw = { charge: str, position: fcpos };
+            break;
+          }
+        }
+      }
+      //console.log("textRect:", this.textRect )
+      //console.log('bonds: ', bondsArray)
+      //console.log('newAtoms: ', newAtomsArray)
+      return { bonds: bondsArray, dots: dotsArray, newAtoms: newAtomsArray, formalCharge: formalChargeToDraw };
     }
-  })
+  }),
+  mounted: function mounted() {
+    this.mounted = true;
+  },
+  updated: function updated() {}
 });
 
 /***/ }),
@@ -49182,11 +49239,44 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "id": 'atom' + _vm.index,
       "x": _vm.textRect.left,
-      "y": _vm.textRect.top,
+      "y": _vm.textRect.baseline,
       "font-family": "Verdana",
       "font-size": "24"
     }
-  }, [_vm._v(_vm._s(_vm.element[0]))])])
+  }, [_vm._v(_vm._s(_vm.element[0]))]), _vm._v(" "), _vm._l((_vm.toDraw.bonds), function(bond) {
+    return _c('line', {
+      attrs: {
+        "x1": bond.start[0],
+        "y1": bond.start[1],
+        "x2": bond.end[0],
+        "y2": bond.end[1],
+        "stroke-width": "2",
+        "stroke": "black"
+      }
+    })
+  }), _vm._v(" "), _vm._l((_vm.toDraw.dots), function(dot) {
+    return _c('circle', {
+      attrs: {
+        "cx": dot.position[0],
+        "cy": dot.position[1],
+        "r": "2"
+      }
+    })
+  }), _vm._v(" "), (_vm.toDraw.formalCharge) ? _c('text', {
+    attrs: {
+      "x": _vm.toDraw.formalCharge.position[0] - 8,
+      "y": _vm.toDraw.formalCharge.position[1],
+      "font-family": "Verdana",
+      "font-size": "14"
+    }
+  }, [_vm._v(_vm._s(_vm.toDraw.formalCharge.charge))]) : _vm._e(), _vm._v(" "), _vm._l((_vm.toDraw.newAtoms), function(atom) {
+    return _c('lewis-atom', {
+      key: atom.stats.index,
+      attrs: {
+        "stats": atom.stats
+      }
+    })
+  })], 2)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -49195,6 +49285,871 @@ if (false) {
      require("vue-hot-reload-api").rerender("data-v-cc85718c", module.exports)
   }
 }
+
+/***/ }),
+/* 138 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  install: function install(Vue) {
+
+    //produces a string of given length; increasing zeros increases probability
+    //that any given digit in string is zero
+    Vue.bondPositioner = function (textRect, direction) {
+      var bondLength = 20;
+      var start = [0, 0];
+      var end = [20, 20];
+      var height = textRect.height;
+      var width = textRect.width;
+      if (direction === 0) {
+        start = [textRect.left - 5, textRect.centery];
+        end = [start[0] - bondLength, start[1]];
+      }
+      if (direction === 6) {
+        start = [textRect.right + 5, textRect.centery];
+        end = [start[0] + bondLength, start[1]];
+      }
+      if (direction === 3) {
+        start = [textRect.centerx, textRect.top - 5];
+        end = [start[0], start[1] - bondLength];
+      }
+      if (direction === 9) {
+        start = [textRect.centerx, textRect.bottom];
+        end = [start[0], start[1] + bondLength];
+      }
+      if (direction === 1) {
+        start = [textRect.left - 4, textRect.centery - height / 3];
+        end = [start[0] - bondLength * 0.866, start[1] - bondLength / 2];
+      }
+      if (direction === 11) {
+        start = [textRect.left - 4, textRect.centery + height / 3];
+        end = [start[0] - bondLength * 0.866, start[1] + bondLength / 2];
+      }
+      if (direction === 5) {
+        start = [textRect.right + 3, textRect.centery - height / 3];
+        end = [start[0] + bondLength * 0.866, start[1] - bondLength / 2];
+      }
+      if (direction === 7) {
+        start = [textRect.right + 3, textRect.centery + height / 3];
+        end = [start[0] + bondLength * 0.866, start[1] + bondLength / 2];
+      }
+      if (direction === 2) {
+        start = [textRect.centerx - width / 3, textRect.top - 3];
+        end = [start[0] - bondLength / 2, start[1] - bondLength * 0.866];
+      }
+      if (direction === 10) {
+        start = [textRect.centerx - width / 3, textRect.bottom];
+        end = [start[0] - bondLength / 2, start[1] + bondLength * 0.866];
+      }
+      if (direction === 4) {
+        start = [textRect.centerx + width / 3, textRect.top - 3];
+        end = [start[0] + bondLength / 2, start[1] - bondLength * 0.866];
+      }
+      if (direction === 8) {
+        start = [textRect.centerx + width / 3, textRect.bottom];
+        end = [start[0] + bondLength / 2, start[1] + bondLength * 0.866];
+      }
+
+      return [start, end];
+    };
+    Vue.newAtomPositioner = function (textRect, direction) {
+      var bondLength = 30;
+      var end = [0, 0];
+      var start = [20, 20];
+      var height = textRect.height;
+      var width = textRect.width;
+      if (direction === 0) {
+        start = [textRect.left - 5, textRect.centery];
+        end = [start[0] - bondLength, start[1]];
+      }
+      if (direction === 6) {
+        start = [textRect.right + 5, textRect.centery];
+        end = [start[0] + bondLength, start[1]];
+      }
+      if (direction === 3) {
+        start = [textRect.centerx, textRect.top - 5];
+        end = [start[0], start[1] - bondLength];
+      }
+      if (direction === 9) {
+        start = [textRect.centerx, textRect.bottom];
+        end = [start[0], start[1] + bondLength];
+      }
+      if (direction === 1) {
+        start = [textRect.left - 4, textRect.centery - height / 3];
+        end = [start[0] - bondLength * 0.866, start[1] - bondLength / 2];
+      }
+      if (direction == 11) {
+        start = [textRect.left - 4, textRect.centery + height / 3];
+        end = [start[0] - bondLength * 0.866, start[1] + bondLength / 2];
+      }
+      if (direction === 5) {
+        start = [textRect.right + 3, textRect.centery - height / 3];
+        end = [start[0] + bondLength * 0.866, start[1] - bondLength / 2];
+      }
+      if (direction === 7) {
+        start = [textRect.right + 3, textRect.centery + height / 3];
+        end = [start[0] + bondLength * 0.866, start[1] + bondLength / 2];
+      }
+      if (direction === 2) {
+        start = [textRect.centerx - width / 3, textRect.top - 3];
+        end = [start[0] - bondLength / 2, start[1] - bondLength * 0.866];
+      }
+      if (direction === 10) {
+        start = [textRect.centerx - width / 3, textRect.bottom];
+        end = [start[0] - bondLength / 2, start[1] + bondLength * 0.866];
+      }
+      if (direction == 4) {
+        start = [textRect.centerx + width / 3, textRect.top - 3];
+        end = [start[0] + bondLength / 2, start[1] - bondLength * 0.866];
+      }
+      if (direction === 8) {
+        start = [textRect.centerx + width / 3, textRect.bottom];
+        end = [start[0] + bondLength / 2, start[1] + bondLength * 0.866];
+      }
+      return end;
+    };
+    Vue.lpPositioner = function (textRect, direction, radical) {
+      //console.log(textRect, direction, radical)
+      var start = [0, 0];
+      var height = textRect.height;
+      var width = textRect.width;
+      var first = void 0,
+          second = [0, 0];
+      if (direction === 0) {
+        start = [textRect.left - 5, textRect.centery];
+        if (radical) return start;else {
+          first = [start[0], start[1] + 4];
+          second = [start[0], start[1] - 4];
+          return [first, second];
+        }
+      }
+      if (direction === 6) {
+        start = [textRect.right + 5, textRect.centery];
+        if (radical) return start;else {
+          first = [start[0], start[1] + 4];
+          second = [start[0], start[1] - 4];
+          return [first, second];
+        }
+      }
+      if (direction === 3) {
+        start = [textRect.centerx, textRect.top - 5];
+        if (radical) return start;else {
+          first = [start[0] + 4, start[1]];
+          second = [start[0] - 4, start[1]];
+          return [first, second];
+        }
+      }
+      if (direction === 9) {
+        start = [textRect.centerx, textRect.bottom];
+        if (radical) return start;else {
+          first = [start[0] + 4, start[1]];
+          second = [start[0] - 4, start[1]];
+          return [first, second];
+        }
+      }
+      if (direction === 1) {
+        start = [textRect.left - 4, textRect.centery - height / 3];
+        if (radical) return start;else {
+          first = [start[0] + 1, start[1] - 4];
+          second = [start[0] - 1, start[1] + 4];
+          return [first, second];
+        }
+      }
+      if (direction === 11) {
+        start = [textRect.left - 4, textRect.centery + height / 3];
+        if (radical) return start;else {
+          first = [start[0] + 1, start[1] + 4];
+          second = [start[0] - 1, start[1] - 4];
+          return [first, second];
+        }
+      }
+      if (direction === 5) {
+        start = [textRect.right + 3, textRect.centery - height / 3];
+        if (radical) return start;else {
+          first = [start[0] + 1, start[1] + 4];
+          second = [start[0] - 1, start[1] - 4];
+          return [first, second];
+        }
+      }
+      if (direction === 7) {
+        start = [textRect.right + 3, textRect.centery + height / 3];
+        if (radical) return start;else {
+          first = [start[0] + 1, start[1] - 4];
+          second = [start[0] - 1, start[1] + 4];
+          return [first, second];
+        }
+      }
+      if (direction === 2) {
+        start = [textRect.centerx - width / 2, textRect.top - 3];
+        if (radical) return start;else {
+          first = [start[0] + 3, start[1] - 1];
+          second = [start[0] - 3, start[1] + 1];
+          return [first, second];
+        }
+      }
+      if (direction === 10) {
+        start = [textRect.centerx - width / 2, textRect.bottom];
+        if (radical) return start;else {
+          first = [start[0] + 3, start[1] + 1];
+          second = [start[0] - 3, start[1] - 1];
+          return [first, second];
+        }
+      }
+      if (direction === 4) {
+        start = [textRect.centerx + width / 2, textRect.top - 3];
+        if (radical) return start;else {
+          first = [start[0] + 3, start[1] + 1];
+          second = [start[0] - 3, start[1] - 1];
+          return [first, second];
+        }
+      }
+      if (direction === 8) {
+        start = [textRect.centerx + width / 2, textRect.bottom];
+        if (radical) return start;else {
+          first = [start[0] + 3, start[1] - 1];
+          second = [start[0] - 3, start[1] + 1];
+          return [first, second];
+        }
+      } else return [start, 0];
+    };
+    Vue.doubleBondPositioner = function (textRect, direction) {
+      var bondLength = 20;
+      var start = void 0,
+          first = void 0,
+          second = [0, 0];
+      var end1 = void 0,
+          end2 = [20, 20];
+      var height = textRect.height;
+      var width = textRect.width;
+      if (direction === 0) {
+        start = [textRect.left - 5, textRect.centery];
+        first = [start[0], start[1] + 4];
+        second = [start[0], start[1] - 4];
+        end1 = [first[0] - bondLength, first[1]];
+        end2 = [second[0] - bondLength, second[1]];
+      }
+      if (direction === 6) {
+        start = [textRect.right + 5, textRect.centery];
+        first = [start[0], start[1] + 4];
+        second = [start[0], start[1] - 4];
+        end1 = [first[0] + bondLength, first[1]];
+        end2 = [second[0] + bondLength, second[1]];
+      }
+      if (direction === 3) {
+        start = [textRect.centerx, textRect.top - 5];
+        first = [start[0] + 4, start[1]];
+        second = [start[0] - 4, start[1]];
+        end1 = [first[0], first[1] - bondLength];
+        end2 = [second[0], second[1] - bondLength];
+      }
+      if (direction === 9) {
+        start = [textRect.centerx, textRect.bottom];
+        first = [start[0] + 4, start[1]];
+        second = [start[0] - 4, start[1]];
+        end1 = [first[0], first[1] + bondLength];
+        end2 = [second[0], second[1] + bondLength];
+      }
+      if (direction === 1) {
+        start = [textRect.left - 4, textRect.centery - height / 3];
+        first = [start[0] + 1, start[1] - 4];
+        second = [start[0] - 1, start[1] + 4];
+        end1 = [first[0] - bondLength * 0.866, first[1] - bondLength / 2];
+        end2 = [second[0] - bondLength * 0.866, second[1] - bondLength / 2];
+      }
+      if (direction === 11) {
+        start = [textRect.left - 4, textRect.centery + height / 3];
+        first = [start[0] + 1, start[1] + 4];
+        second = [start[0] - 1, start[1] - 4];
+        end1 = [first[0] - bondLength * 0.866, second[1] + bondLength / 2];
+        end2 = [second[0] - bondLength * 0.866, second[1] + bondLength / 2];
+      }
+      if (direction === 5) {
+        start = [textRect.right + 3, textRect.centery - height / 3];
+        first = [start[0] + 1, start[1] + 4];
+        second = [start[0] - 1, start[1] - 4];
+        end1 = [first[0] + bondLength * 0.866, first[1] - bondLength / 2];
+        end2 = [second[0] + bondLength * 0.866, second[1] - bondLength / 2];
+      }
+      if (direction === 7) {
+        start = [textRect.right + 3, textRect.centery + height / 3];
+        first = [start[0] + 1, start[1] - 4];
+        second = [start[0] - 1, start[1] + 4];
+        end1 = [first[0] + bondLength * 0.866, first[1] + bondLength / 2];
+        end2 = [second[0] + bondLength * 0.866, second[1] + bondLength / 2];
+      }
+      if (direction === 2) {
+        start = [textRect.centerx - width / 3, textRect.top - 3];
+        first = [start[0] + 3, start[1] - 1];
+        second = [start[0] - 3, start[1] + 1];
+        end1 = [first[0] - bondLength / 2, first[1] - bondLength * 0.866];
+        end2 = [second[0] - bondLength / 2, second[1] - bondLength * 0.866];
+      }
+      if (direction === 10) {
+        start = [textRect.centerx - width / 3, textRect.bottom];
+        first = [start[0] + 3, start[1] + 1];
+        second = [start[0] - 3, start[1] - 1];
+        end1 = [first[0] - bondLength / 2, first[1] + bondLength * 0.866];
+        end2 = [second[0] - bondLength / 2, second[1] + bondLength * 0.866];
+      }
+      if (direction == 4) {
+        start = [textRect.centerx + width / 3, textRect.top - 3];
+        first = [start[0] + 3, start[1] + 1];
+        second = [start[0] - 3, start[1] - 1];
+        end1 = [first[0] + bondLength / 2, first[1] - bondLength * 0.866];
+        end2 = [second[0] + bondLength / 2, second[1] - bondLength * 0.866];
+      }
+      if (direction === 8) {
+        start = [textRect.centerx + width / 3, textRect.bottom];
+        first = [start[0] + 3, start[1] - 1];
+        second = [start[0] - 3, start[1] + 1];
+        end1 = [first[0] + bondLength / 2, first[1] + bondLength * 0.866];
+        end2 = [second[0] + bondLength / 2, second[1] + bondLength * 0.866];
+      }
+      return [first, end1, second, end2];
+    };
+    Vue.tripleBondPositioner = function (textRect, direction) {
+      var bondLength = 20;
+      var start = void 0,
+          first = void 0,
+          second = [0, 0];
+      var end = void 0,
+          end1 = void 0,
+          end2 = [20, 20];
+      var height = textRect.height;
+      var width = textRect.width;
+      if (direction === 0) {
+        start = [textRect.left - 5, textRect.centery];
+        end = [start[0] - bondLength, start[1]];
+        first = [start[0], start[1] + 4];
+        second = [start[0], start[1] - 4];
+        end1 = [first[0] - bondLength, first[1]];
+        end2 = [second[0] - bondLength, second[1]];
+      }
+      if (direction === 6) {
+        start = [textRect.right + 5, textRect.centery];
+        end = [start[0] + bondLength, start[1]];
+        first = [start[0], start[1] + 4];
+        second = [start[0], start[1] - 4];
+        end1 = [first[0] + bondLength, first[1]];
+        end2 = [second[0] + bondLength, second[1]];
+      }
+      if (direction === 3) {
+        start = [textRect.centerx, textRect.top - 5];
+        end = [start[0], start[1] - bondLength];
+        first = [start[0] + 4, start[1]];
+        second = [start[0] - 4, start[1]];
+        end1 = [first[0], first[1] - bondLength];
+        end2 = [second[0], second[1] - bondLength];
+      }
+      if (direction === 9) {
+        start = [textRect.centerx, textRect.bottom];
+        end = [start[0], start[1] + bondLength];
+        first = [start[0] + 4, start[1]];
+        second = [start[0] - 4, start[1]];
+        end1 = [first[0], first[1] + bondLength];
+        end2 = [second[0], second[1] + bondLength];
+      }
+      if (direction === 1) {
+        start = [textRect.left - 4, textRect.centery - height / 3];
+        end = [start[0] - bondLength * 0.866, start[1] - bondLength / 2];
+        first = [start[0] + 1, start[1] - 4];
+        second = [start[0] - 1, start[1] + 4];
+        end1 = [first[0] - bondLength * 0.866, first[1] - bondLength / 2];
+        end2 = [second[0] - bondLength * 0.866, second[1] - bondLength / 2];
+      }
+      if (direction === 11) {
+        start = [textRect.left - 4, textRect.centery + height / 3];
+        end = [start[0] - bondLength * 0.866, start[1] + bondLength / 2];
+        first = [start[0] + 1, start[1] + 4];
+        second = [start[0] - 1, start[1] - 4];
+        end1 = [first[0] - bondLength * 0.866, second[1] + bondLength / 2];
+        end2 = [second[0] - bondLength * 0.866, second[1] + bondLength / 2];
+      }
+      if (direction === 5) {
+        start = [textRect.right + 3, textRect.centery - height / 3];
+        end = [start[0] + bondLength * 0.866, start[1] - bondLength / 2];
+        first = [start[0] + 1, start[1] + 4];
+        second = [start[0] - 1, start[1] - 4];
+        end1 = [first[0] + bondLength * 0.866, first[1] - bondLength / 2];
+        end2 = [second[0] + bondLength * 0.866, second[1] - bondLength / 2];
+      }
+      if (direction === 7) {
+        start = [textRect.right + 3, textRect.centery + height / 3];
+        end = [start[0] + bondLength * 0.866, start[1] + bondLength / 2];
+        first = [start[0] + 1, start[1] - 4];
+        second = [start[0] - 1, start[1] + 4];
+        end1 = [first[0] + bondLength * 0.866, first[1] + bondLength / 2];
+        end2 = [second[0] + bondLength * 0.866, second[1] + bondLength / 2];
+      }
+      if (direction === 2) {
+        start = [textRect.centerx - width / 3, textRect.top - 3];
+        end = [start[0] - bondLength / 2, start[1] - bondLength * 0.866];
+        first = [start[0] + 3, start[1] - 1];
+        second = [start[0] - 3, start[1] + 1];
+        end1 = [first[0] - bondLength / 2, first[1] - bondLength * 0.866];
+        end2 = [second[0] - bondLength / 2, second[1] - bondLength * 0.866];
+      }
+      if (direction === 10) {
+        start = [textRect.centerx - width / 3, textRect.bottom];
+        end = [start[0] - bondLength / 2, start[1] + bondLength * 0.866];
+        first = [start[0] + 3, start[1] + 1];
+        second = [start[0] - 3, start[1] - 1];
+        end1 = [first[0] - bondLength / 2, first[1] + bondLength * 0.866];
+        end2 = [second[0] - bondLength / 2, second[1] + bondLength * 0.866];
+      }
+      if (direction === 4) {
+        start = [textRect.centerx + width / 3, textRect.top - 3];
+        end = [start[0] + bondLength / 2, start[1] - bondLength * 0.866];
+        first = [start[0] + 3, start[1] + 1];
+        second = [start[0] - 3, start[1] - 1];
+        end1 = [first[0] + bondLength / 2, first[1] - bondLength * 0.866];
+        end2 = [second[0] + bondLength / 2, second[1] - bondLength * 0.866];
+      }
+      if (direction === 8) {
+        start = [textRect.centerx + width / 3, textRect.bottom];
+        end = [start[0] + bondLength / 2, start[1] + bondLength * 0.866];
+        first = [start[0] + 3, start[1] - 1];
+        second = [start[0] - 3, start[1] + 1];
+        end1 = [first[0] + bondLength / 2, first[1] + bondLength * 0.866];
+        end2 = [second[0] + bondLength / 2, second[1] + bondLength * 0.866];
+      }
+      return [start, end, first, end1, second, end2];
+    };
+  }
+});
+
+/***/ }),
+/* 139 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
+
+//import store from '../vuex/store';
+/* harmony default export */ __webpack_exports__["a"] = ({
+  install: function install(Vue) {
+
+    Vue.parseFormulaForStructure = function (formula) {
+      var atomFinder = /([A-Z][a-z]*)(\d*)/g;
+      var chargeFinder = /([+|-]\d*)$/;
+      var tempArray = [];
+      var structure = [];
+      while ((tempArray = atomFinder.exec(formula)) !== null) {
+        if (tempArray[2] === '') tempArray[2] = 1;
+        for (var i = 0; i < Number(tempArray[2]); i++) {
+          //0: index
+          //1: num unbondedE
+          //2: symbol
+          //3: connections
+          //4: is loop
+          //5: numUnpairedE
+          var atom = [0, 0, tempArray[1], [], 0, 0];
+          structure.push(atom);
+        }
+      }
+      var chargeArray = chargeFinder.exec(formula);
+      //console.log(chargeArray)
+      var charge = 0;
+      if (chargeArray) {
+        //console.log(Number(chargeArray[0]))
+        charge = Number(chargeArray[0]);
+      }
+      return { structure: structure, charge: charge };
+    };
+    //expects central atom first, and all other atoms same element. diatomics ok, no charges
+    Vue.simpleCentralStructure = function (formula, elements) {
+      //console.log('in simpleCentralStructure')
+      var strucObj = Vue.parseFormulaForStructure(formula);
+      var struc = strucObj.structure;
+      var charge = strucObj.charge;
+      if (charge !== 0) console.log("not setup for charges yet");
+      var numAtoms = struc.length;
+      var element = elements[struc[0][2]];
+      struc[0][0] = 0;
+      var bonds = element[4];
+      var outerBonds = 0;
+      for (var i = 1; i < numAtoms; i++) {
+        element = elements[struc[i][2]];
+        outerBonds += element[4];
+      }
+      console.log('outerBonds: ', outerBonds);
+      if (bonds < numAtoms - 1) bonds = element[5]; //use ox max valence instead of normal
+      if (bonds > outerBonds) bonds = outerBonds;
+      if (bonds % outerBonds !== 0) console.log("bonds don't divide evenly over atoms");
+      struc[0][1] = element[1] - bonds;
+      var bondsPerConnection = bonds / (numAtoms - 1);
+      for (var _i = 1; _i < numAtoms; _i++) {
+        element = elements[struc[_i][2]];
+        struc[_i][0] = _i;
+        struc[_i][1] = element[1] - bondsPerConnection;
+        if (!(bondsPerConnection >= element[4] && bondsPerConnection <= element[5])) console.log('bad structure! outer atoms not happy');
+        console.log(bondsPerConnection, element[4], bondsPerConnection, element[5]);
+        struc[_i][3].push([0, bondsPerConnection]);
+        struc[0][3].push([_i, bondsPerConnection]);
+      }
+
+      return { structure: struc, answer: 'y' };
+    };
+  }
+});
+
+/***/ }),
+/* 140 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(141)
+}
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(143),
+  /* template */
+  __webpack_require__(144),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/NomenclatureSession.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] NomenclatureSession.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1039c240", Component.options)
+  } else {
+    hotAPI.reload("data-v-1039c240", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 141 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(142);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(4)("23a28045", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-1039c240\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./NomenclatureSession.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-1039c240\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./NomenclatureSession.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 142 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(3)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 143 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      mode: 'Easy Mode',
+      notMode: 'Hard Mode',
+      modeBool: true
+    };
+  },
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    factsStatus: 'checkFactsReady',
+    statesStatus: 'checkStatesReady',
+    currentQuestionState: 'getCurrent',
+    setupReady: 'checkSetup',
+    finished: 'getFinished',
+    frustrated: 'isFrustrated',
+    bug: 'isBug',
+    suggestion: 'hasSuggestion',
+    message: 'getMessage'
+  }), {
+    ready: function ready() {
+      if (this.setupReady === true && typeof this.currentQuestionState !== 'undefined') {
+        return true;
+      } else return false;
+    }
+  }),
+  created: function created() {
+    var _this = this;
+
+    Promise.all([this.$store.dispatch('setupFacts')]).then(function (results) {
+      _this.$store.dispatch('setupStates', 9);
+    }).then(function (results) {
+      _this.$store.dispatch('setupIons');
+    }).then(function (results) {
+
+      //console.log(results);
+      //console.log('promise resolved, in then')
+      _this.$store.dispatch('setReady');
+      var curr = _this.currentQuestionState;
+      _this.$store.dispatch('setQuestionStart');
+    });
+  },
+
+  methods: {
+    setMode: function setMode() {
+      if (this.modeBool) {
+        this.mode = 'Hard Mode';
+        this.notMode = 'Easy Mode';
+      } else {
+        this.notMode = 'Hard Mode';
+        this.mode = 'Easy Mode';
+      }
+      this.modeBool != this.modeBool;
+    }
+  }
+});
+
+/***/ }),
+/* 144 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('div', [_vm._v("Currently set to " + _vm._s(_vm.mode))]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.setMode()
+      }
+    }
+  }, [_vm._v("Set " + _vm._s(_vm.notMode))]), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.finished),
+      expression: "finished"
+    }],
+    staticClass: "alert alert-success"
+  }, [_c('strong', [_vm._v("Congrats, you've finished studying everything you set for this session!")]), _vm._v("\n    Add more material by returning to your dashboard and setting a new session, or\n    check back in later to see if you have material to review. Or just keep studying, if you want.")]), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.message),
+      expression: "message"
+    }],
+    staticClass: "alert alert-info"
+  }, [_vm._v("\n      " + _vm._s(_vm.message))]), _vm._v(" "), (_vm.ready === false) ? _c('div', [_vm._v("Please wait, loading")]) : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[0] === -1) ? _c('div', {
+    staticClass: "alert alert-danger"
+  }, [_vm._v("\n    You haven't set up nomenclature! Please return to your dashboard and use Setup New Session\n    to add the topic nomenclature.")]) : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'fact') ? _c('fact-question') : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'skill') ? _c('skill-question') : _vm._e(), _vm._v(" "), _c('div', [_c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.bug),
+      expression: "!bug"
+    }],
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.$store.dispatch('toggleBug')
+      }
+    }
+  }, [_vm._v("Report Bug")]), _vm._v(" "), _c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.frustrated),
+      expression: "!frustrated"
+    }],
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.$store.dispatch('toggleFrustrated')
+      }
+    }
+  }, [_vm._v("I'm frustrated")]), _vm._v(" "), _c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.suggestion),
+      expression: "!suggestion"
+    }],
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.$store.dispatch('toggleSuggestion')
+      }
+    }
+  }, [_vm._v("Make a suggestion")])]), _vm._v(" "), (_vm.bug) ? _c('bug-report') : _vm._e(), (_vm.frustrated) ? _c('frustration-report') : _vm._e(), _vm._v(" "), (_vm.suggestion) ? _c('suggestion-box') : _vm._e(), _vm._v(" "), _c('hr')], 1)
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-1039c240", module.exports)
+  }
+}
+
+/***/ }),
+/* 145 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
+
+//import store from '../vuex/store';
+/* harmony default export */ __webpack_exports__["a"] = ({
+  install: function install(Vue) {
+
+    Vue.ionicNameFormula = function (cation, anion) {
+      var romanNums = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+      var catName = '';
+      var catCharge = 0;
+      var formula = '';
+      var name = '';
+      if (cation.romNum) {
+        catCharge = cation.charge[__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, cation.charge.length - 1)];
+        catName = cation.name + '(' + romanNums[catCharge] + ')';
+      } else {
+        catName = cation.name;
+        catCharge = cation.charge;
+      }
+      name = catName + ' ' + anion.name;
+
+      var regex1 = /[\w]+/g;
+      var anArray = anion.formula.match(regex1);
+      var catArray = cation.formula.match(regex1);
+      //console.log(catArray, anArray);
+      var anionCharge = anArray[1];
+      var anNum = catCharge;
+      var catNum = anionCharge;
+      if (anNum % 2 === 0 && catNum % 2 === 0) {
+        anNum /= 2;
+        catNum /= 2;
+      }
+      if (anNum % 3 === 0 && catNum % 3 === 0) {
+        anNum /= 3;
+        catNum /= 3;
+      }
+      //console.log(typeof anNum, anNum);
+      if (Number(anNum) === 1) {
+        anNum = '';
+      }
+      if (Number(catNum) === 1) {
+        catNum = '';
+      }
+
+      //check for more than 1 capital letter in anArray[0], catArray[0] to see if () needed
+      var regex2 = /[A-Z]/g;
+      var anNumEl = anArray[0].match(regex2).length;
+      var catNumEl = catArray[0].match(regex2).length;
+
+      var anFormula = void 0,
+          catFormula = '';
+
+      if (anNumEl > 1 && anNum) {
+        anFormula = '(' + anArray[0] + ')';
+      } else {
+        anFormula = anArray[0];
+      }
+
+      if (catNumEl > 1 && catNum) {
+        catFormula = '(' + catArray[0] + ')';
+      } else {
+        catFormula = catArray[0];
+      }
+
+      formula = catFormula + catNum + anFormula + anNum;
+      return { name: name, formula: formula };
+    };
+  }
+});
 
 /***/ })
 /******/ ]);
