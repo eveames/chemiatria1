@@ -18703,10 +18703,10 @@ const SET_USER = 'SET_USER'
 /* unused harmony export SET_USER */
 
 const UPDATE_STAGE = 'UPDATE_STAGE'
-/* harmony export (immutable) */ __webpack_exports__["p"] = UPDATE_STAGE;
+/* harmony export (immutable) */ __webpack_exports__["q"] = UPDATE_STAGE;
 
 const UPDATE_RTS_ACCS = 'UPDATE_RTS_ACCS'
-/* harmony export (immutable) */ __webpack_exports__["o"] = UPDATE_RTS_ACCS;
+/* harmony export (immutable) */ __webpack_exports__["p"] = UPDATE_RTS_ACCS;
 
 const INCREMENT_FRUSTRATION = 'INCREMENT_FRUSTRATION'
 /* unused harmony export INCREMENT_FRUSTRATION */
@@ -18716,13 +18716,13 @@ const INCREMENT_HINTS = 'INCREMENT_HINTS'
 
 //export const NEW_QUESTION = 'NEW_QUESTION'
 const SET_READY = 'SET_READY'
-/* harmony export (immutable) */ __webpack_exports__["k"] = SET_READY;
+/* harmony export (immutable) */ __webpack_exports__["l"] = SET_READY;
 
 const SET_QUESTION = 'SET_QUESTION'
-/* harmony export (immutable) */ __webpack_exports__["i"] = SET_QUESTION;
+/* harmony export (immutable) */ __webpack_exports__["j"] = SET_QUESTION;
 
 const SET_QUESTION_START = 'SET_QUESTION_START'
-/* harmony export (immutable) */ __webpack_exports__["j"] = SET_QUESTION_START;
+/* harmony export (immutable) */ __webpack_exports__["k"] = SET_QUESTION_START;
 
 const SET_MESSAGE = 'SET_MESSAGE'
 /* harmony export (immutable) */ __webpack_exports__["h"] = SET_MESSAGE;
@@ -18734,13 +18734,16 @@ const SET_FEEDBACK_TYPE = 'SET_FEEDBACK_TYPE'
 /* harmony export (immutable) */ __webpack_exports__["g"] = SET_FEEDBACK_TYPE;
 
 const TOGGLE_BUG = 'TOGGLE_BUG'
-/* harmony export (immutable) */ __webpack_exports__["l"] = TOGGLE_BUG;
+/* harmony export (immutable) */ __webpack_exports__["m"] = TOGGLE_BUG;
 
 const TOGGLE_FRUSTRATED = 'TOGGLE_FRUSTRATED'
-/* harmony export (immutable) */ __webpack_exports__["m"] = TOGGLE_FRUSTRATED;
+/* harmony export (immutable) */ __webpack_exports__["n"] = TOGGLE_FRUSTRATED;
 
 const TOGGLE_SUGGESTION = 'TOGGLE_SUGGESTION'
-/* harmony export (immutable) */ __webpack_exports__["n"] = TOGGLE_SUGGESTION;
+/* harmony export (immutable) */ __webpack_exports__["o"] = TOGGLE_SUGGESTION;
+
+const SET_NOMENCLATURE_SESSION = 'SET_NOMENCLATURE_SESSION'
+/* harmony export (immutable) */ __webpack_exports__["i"] = SET_NOMENCLATURE_SESSION;
 
 
 
@@ -29287,6 +29290,7 @@ Vue.component('element-group-question', __webpack_require__(85));
 Vue.component('sigfig-question', __webpack_require__(90));
 Vue.component('ionic-formula-question', __webpack_require__(95));
 Vue.component('lewis-structure-question', __webpack_require__(130));
+Vue.component('general-nomenclature-question', __webpack_require__(146));
 Vue.component('lewis-atom', __webpack_require__(135));
 Vue.component('bug-report', __webpack_require__(100));
 Vue.component('frustration-report', __webpack_require__(103));
@@ -43567,8 +43571,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       _this.$store.dispatch('setupIons');
     }).then(function (results) {
 
-      //console.log(results);
-      //console.log('promise resolved, in then')
+      console.log(results);
+      console.log('promise resolved, in then');
       _this.$store.dispatch('setReady');
       var curr = _this.currentQuestionState;
       _this.$store.dispatch('setQuestionStart');
@@ -47000,10 +47004,10 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         //check quantity of ions and correct identity
         //check parentheses
         else {
-            var reCatParen = /\((\w+)\)(\d?)(\w+)(\d?)/;
-            var reAnParen = /(\w+)(\d?)\((\w+)\)(\d?)/;
-            var reBothParen = /\((\w+)\)(\d?)\((\w+)\)(\d?)/;
-            var reNoParen = /(\w+)(\d?)(\w+)(\d?)/;
+            var reCatParen = /\(([A-Z][a-z]*)\)(\d?)([A-Z][a-z]*)(\d?)/;
+            var reAnParen = /([A-Z][a-z]*)(\d?)\(([A-Z][a-z]*)\)(\d?)/;
+            var reBothParen = /\(([A-Z][a-z]*)\)(\d?)\(([A-Z][a-z]*)\)(\d?)/;
+            var reNoParen = /([A-Z][a-z]*)(\d?)([A-Z][a-z]*)(\d?)/;
             var parensE = 0;
             var reArrayE = reCatParen.exec(this.entry);
             if (!reArrayE) {
@@ -47102,7 +47106,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     domProps: {
       "innerHTML": _vm._s(this.$options.filters.formatFormula('(NH4)3C6H5O7'))
     }
-  }), _vm._v(". Recall that compounds are always charge balanced."), _c('br'), _vm._v(" \n        Note that these questions are generated randomly from a list of common ions, and may not all be actual stable compounds.\n        ")]), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.requestFormula) ? _c('div', [_vm._v("\n          What is the formula of " + _vm._s(_vm.question.name) + "?\n\n          Your answer is: "), _c('span', {
+  }), _vm._v(". Recall that compounds are always charge balanced."), _c('br'), _vm._v("\n        Note that these questions are generated randomly from a list of common ions, and may not all be actual stable compounds.\n        ")]), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.requestFormula) ? _c('div', [_vm._v("\n          What is the formula of " + _vm._s(_vm.question.name) + "?\n\n          Your answer is: "), _c('span', {
     domProps: {
       "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.entry))
     }
@@ -47854,10 +47858,10 @@ var state = {
 var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["a" /* INITIALIZE_FACTS */], function (state, facts) {
   //console.log("in mutation, words is: " + words);
   state.facts = facts;
-  //console.log('facts set');
+  console.log('facts set');
   state.factsReady = true;
 }), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_IONS */], function (state, polyan, polycat) {
-  //console.log("in mutation, words is: " + words);
+  console.log("in INITIALIZE_IONS");
   state.polyanionsList = polyan;
   state.polycationsList = polycat;
 }), _mutations);
@@ -47930,6 +47934,7 @@ var state = {
 
     var url = '../api/student/states/active';
     if (topic) url = '../api/student/states/' + topic;
+    console.log(url);
     return new Promise(function (resolve, reject) {
       axios.get(url).then(function (response) {
         //console.log(response.data);
@@ -47946,9 +47951,9 @@ var state = {
           }
           states.push(thisState);
         }
-        //console.log(states);
+        console.log('states is ', states);
         commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* INITIALIZE_STATES */], states);
-        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_QUESTION */]);
+        if (!topic) commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_QUESTION */]);else if (topic === 9) commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_NOMENCLATURE_SESSION */], -1);
         resolve();
       }).catch(function (error) {
         console.log(error);
@@ -47979,12 +47984,12 @@ var state = {
   updateRtsAccs: function updateRtsAccs(_ref3, newState) {
     var commit = _ref3.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["o" /* UPDATE_RTS_ACCS */], newState);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["p" /* UPDATE_RTS_ACCS */], newState);
   },
   updateStage: function updateStage(_ref4, newState) {
     var commit = _ref4.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["p" /* UPDATE_STAGE */], newState);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["q" /* UPDATE_STAGE */], newState);
   },
   setQuestion: function setQuestion(_ref5) {
     var commit = _ref5.commit;
@@ -47998,19 +48003,53 @@ var state = {
     axios.post(url, state.states[prev]).catch(function (error) {
       console.log(error);
     });
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_QUESTION */]);
-    //console.log('after SET_QUESTION, prev is ', prev)
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_QUESTION */]);
+    console.log('after SET_QUESTION, prev is ', prev);
+  },
+  setNomenclatureSession: function setNomenclatureSession(_ref6) {
+    var commit = _ref6.commit;
+
+    var prev = state.currentIndex;
+    var state_id = state.currentStateID;
+    var url = '../api/student/states/' + state_id;
+    //console.log(url)
+    //console.log("state for updating: ", state.states[prev]);
+    axios.post(url, state.states[prev]).catch(function (error) {
+      console.log(error);
+    });
+    var index = prev;
+    if (!(state.currentSkill === 'general nomenclature')) index = -1;
+    console.log('before SET index is ', index);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_NOMENCLATURE_SESSION */], index);
   }
 };
 
 // mutations
 var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* INITIALIZE_STATES */], function (state, states) {
+  console.log('in INITIALIZE_STATES');
   state.states = states;
   state.statesReady = true;
 }), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_SKILLS */], function (state, skills) {
   state.skills = skills;
   state.skillsReady = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_QUESTION */], function (state) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_NOMENCLATURE_SESSION */], function (state, index) {
+  console.log('in SET_NOMENCLATURE_SESSION');
+  if (index === -1) {
+    index = state.states.findIndex(function (entry) {
+      return entry.name === 'general nomenclature';
+    });
+  }
+  //console.log(state.states[0])
+  state.currentIndex = index;
+  console.log('index is ', index, state.currentIndex);
+  state.currentTypeID = state.states[state.currentIndex].type_id;
+  state.currentType = state.states[state.currentIndex].type;
+  state.currentStage = state.states[state.currentIndex].stage;
+  state.currentStateID = state.states[state.currentIndex].id;
+  state.states[state.currentIndex].lastStudied = Date.now();
+  state.currentSubtype = 'nomenclature';
+  state.currentSkill = 'general nomenclature';
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_QUESTION */], function (state) {
   //console.log('before getNext index is ', state.currentIndex)
   state.currentIndex = getNext();
   console.log('after getNext index is ', state.currentIndex);
@@ -48035,12 +48074,12 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
       state.currentSkill = false;
     }
   }
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["o" /* UPDATE_RTS_ACCS */], function (state, newState) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["p" /* UPDATE_RTS_ACCS */], function (state, newState) {
   //console.log("newState is ", newState);
   state.states[state.currentIndex].accs.push(newState.accs);
   state.states[state.currentIndex].rts.push(newState.rts);
   //console.log("state is now ", state.states[state.currentIndex])
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["p" /* UPDATE_STAGE */], function (state, newState) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["q" /* UPDATE_STAGE */], function (state, newState) {
   //console.log("newState is ", newState)
   state.states[state.currentIndex].priority = newState.priority;
   state.states[state.currentIndex].stage = newState.stage;
@@ -48234,12 +48273,12 @@ var state = {
     var commit = _ref.commit;
 
     //console.log('setReady');
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_READY */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* SET_READY */]);
   },
   setQuestionStart: function setQuestionStart(_ref2) {
     var commit = _ref2.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_QUESTION_START */], Date.now());
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_QUESTION_START */], Date.now());
     commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_MESSAGE */], '');
   },
   setMessage: function setMessage(_ref3, message) {
@@ -48260,24 +48299,24 @@ var state = {
   toggleBug: function toggleBug(_ref6) {
     var commit = _ref6.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* TOGGLE_BUG */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* TOGGLE_BUG */]);
   },
   toggleFrustrated: function toggleFrustrated(_ref7) {
     var commit = _ref7.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* TOGGLE_FRUSTRATED */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["n" /* TOGGLE_FRUSTRATED */]);
   },
   toggleSuggestion: function toggleSuggestion(_ref8) {
     var commit = _ref8.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["n" /* TOGGLE_SUGGESTION */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["o" /* TOGGLE_SUGGESTION */]);
   }
 };
 
 // mutations
-var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_READY */], function (state) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* SET_READY */], function (state) {
   state.setupComplete = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_QUESTION_START */], function (state, time) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_QUESTION_START */], function (state, time) {
   state.questionSetTime = time;
 }), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_MESSAGE */], function (state, message) {
   state.message = message;
@@ -48285,11 +48324,11 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
   state.feedback = feedback;
 }), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_FEEDBACK_TYPE */], function (state, feedbackType) {
   state.feedbackType = feedbackType;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* TOGGLE_BUG */], function (state) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* TOGGLE_BUG */], function (state) {
   state.bug = !state.bug;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* TOGGLE_FRUSTRATED */], function (state) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["n" /* TOGGLE_FRUSTRATED */], function (state) {
   state.frustrated = !state.frustrated;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["n" /* TOGGLE_SUGGESTION */], function (state) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["o" /* TOGGLE_SUGGESTION */], function (state) {
   state.suggestion = !state.suggestion;
 }), _mutations);
 
@@ -48341,7 +48380,8 @@ var state = {
 
   LewisHomoDiatomics: ['H2', 'N2', 'O2', 'F2', 'Cl2', 'Br2', 'I2', 'S2', 'P2', 'Se2'],
   LewisHeteroDiatomics: ['HF', 'HCl', 'HBr', 'HI', 'ClF', 'BrF', 'IF', 'BrCl', 'ICl', 'IBr', 'CO', 'NO', 'SO', 'NP', 'HO', 'ClO'],
-  LewisSimpleCentralMulti: ['BH3', 'CH4', 'NH3', 'OH2', 'SiH4', 'PH3', 'SH2', 'AsH3', 'SeH2', 'BF3', 'CF4', 'SiF4', 'GeF4', 'PF3', 'PF5', 'AsF3', 'AsF5', 'SbF3', 'SbF5', 'SF2', 'SF4', 'SF6', 'SeF2', 'SeF4', 'SeF6', 'TeF2', 'TeF4', 'TeF6', 'ClF3', 'BrF3', 'BrF5', 'IF3', 'IF5', 'BeCl2', 'BCl3', 'CCl4', 'SiCl4', 'NCl3', 'PCl3', 'PCl5', 'AsCl3', 'AsCl5', 'SbCl3', 'SbCl5', 'SCl2', 'SCl4', 'SeCl2', 'SeCl4', 'TeCl2', 'TeCl4', 'BrCl3', 'ICl3', 'CBr4', 'CI4', 'CO2', 'CS2', 'SiO2', 'NO2', 'SO2', 'SO3', 'SeO2', 'SeO3', 'TeO2', 'TeO3', 'XeO2', 'XeO4', 'XeF2', 'XeF4', 'XeF6', 'O3']
+  LewisSimpleCentralMulti: ['BH3', 'CH4', 'NH3', 'OH2', 'SiH4', 'PH3', 'SH2', 'AsH3', 'SeH2', 'BF3', 'CF4', 'SiF4', 'GeF4', 'PF3', 'PF5', 'AsF3', 'AsF5', 'SbF3', 'SbF5', 'SF2', 'SF4', 'SF6', 'SeF2', 'SeF4', 'SeF6', 'TeF2', 'TeF4', 'TeF6', 'ClF3', 'BrF3', 'BrF5', 'IF3', 'IF5', 'BeCl2', 'BCl3', 'CCl4', 'SiCl4', 'NCl3', 'PCl3', 'PCl5', 'AsCl3', 'AsCl5', 'SbCl3', 'SbCl5', 'SCl2', 'SCl4', 'SeCl2', 'SeCl4', 'TeCl2', 'TeCl4', 'BrCl3', 'ICl3', 'CBr4', 'CI4', 'CO2', 'CS2', 'SiO2', 'NO2', 'SO2', 'SO3', 'SeO2', 'SeO3', 'TeO2', 'TeO3', 'XeO2', 'XeO4', 'XeF2', 'XeF4', 'XeF6', 'O3'],
+  covalentCompounds: [['CO', 'carbon monoxide'], ['BF3', 'boron trifluoride'], ['CF4', 'carbon tetrafluoride'], ['SiF4', 'silicon tetrafluoride'], ['PF3', 'phosphorus trifluoride'], ['PF5', 'phosphorus pentafluoride'], ['AsF3', 'arsenic trifluoride'], ['AsF5', 'arsenic pentafluoride'], ['SF2', 'sulfur difluoride'], ['SF4', 'sulfur tetrafluoride'], ['SF6', 'sulfur hexafluoride'], ['SeF2', 'selenium difluoride'], ['SeF4', 'selenium tetrafluoride'], ['SeF6', 'selenium hexafluoride'], ['TeF2', 'tellurium difluoride'], ['TeF4', 'tellurium tetrafluoride'], ['TeF6', 'tellurium hexafluoride'], ['ClF3', 'chlorine trifluoride'], ['BrF3', 'bromine trifluoride'], ['BrF5', 'bromine pentafluoride'], ['IF3', 'iodine trifluoride'], ['IF5', 'iodine pentafluoride'], ['BCl3', 'boron trichloride'], ['CCl4', 'carbon tetrachloride'], ['SiCl4', 'silicon tetrachloride'], ['NCl3', 'nitrogen trichloride'], ['PCl3', 'phosphorus trichloride'], ['PCl5', 'phosphorus pentachloride'], ['AsCl3', 'arsenic trichloride'], ['AsCl5', 'arsenic pentachloride'], ['SCl2', 'sulfur dichloride'], ['SCl4', 'sulfur tetrachloride'], ['SeCl2', 'selenium dichloride'], ['SeCl4', 'selenium tetrachloride'], ['TeCl2', 'tellurium dichloride'], ['TeCl4', 'tellurium tetrachloride'], ['BrCl3', 'bromine trichloride'], ['ICl3', 'iodine trichloride'], ['CBr4', 'carbon tetrabromide'], ['CI4', 'carbon tetriodide'], ['CO2', 'carbon dioxide'], ['CS2', 'carbon disulfide'], ['SiO2', 'silicon dioxide'], ['NO2', 'nitrogen dioxide'], ['SO2', 'sulfur dioxide'], ['SO3', 'sulfur trioxide'], ['SeO2', 'selenium dioxide'], ['SeO3', 'selenium trioxide'], ['TeO2', 'tellurium dioxide'], ['TeO3', 'tellurium trioxide'], ['XeO2', 'xenon dioxide'], ['XeO3', 'xenon trioxide'], ['XeO4', 'xenon tetroxide'], ['XeF2', 'xenon difluoride'], ['XeF4', 'xenon tetrafluoride'], ['XeF6', 'xenon hexafluoride'], ['N2O4', 'dinitrogen tetroxide'], ['N2O5', 'dinitrogen pentoxide'], ['P2O5', 'diphosphorus pentoxide'], ['B2F4', 'diboron tetrafluoride'], ['B2Cl4', 'diboron tetrachloride'], ['B2Br4', 'diboron tetrabromide'], ['B3F5', 'triboron pentafluoride'], ['B4Cl4', 'tetraboron tetrachloride'], ['B2O3', 'diboron trioxide'], ['N2F4', 'dinitrogen tetrafluoride'], ['N2F2', 'dinitrogen difluoride'], ['N3F', 'trinitrogen fluoride'], ['NO3', 'nitrogen trioxide'], ['N2O3', 'dinitrogen trioxide'], ['N2O2', 'dinitrogen dioxide'], ['P2F4', 'diphosphorus tetrafluoride'], ['P2Cl4', 'diphosphorus tetrachloride'], ['P2I4', 'diphosphorus tetraiodide'], ['P2S3', 'diphosphorus trisulfide'], ['P4O6', 'tetraphosphorus hexoxide'], ['P4S2', 'tetraphosphorus disulfide'], ['P4S3', 'tetraphosphorus trisulfide'], ['P4S4', 'tetraphosphorus tetrasulfide'], ['P4S5', 'tetraphosphorus pentasulfide'], ['S2F2', 'disulfur difluoride'], ['S2F4', 'disulfur tetrafluoride'], ['S2Cl2', 'disulfur dichloride'], ['S6O2', 'hexasulfur dioxide'], ['S4N4', 'tetrasulfur tetranitride'], ['S2N2', 'disulfur dinitride'], ['S4N2', 'tetrasulfur dinitride'], ['S5Cl2', 'pentasulfur dichloride'], ['S5N6', 'pentasulfur hexanitride'], ['I2O5', 'diodine pentoxide'], ['Cl2O', 'dichlorine monoxide'], ['ClO2', 'chlorine dioxide'], ['Cl2O4', 'dichlorine tetroxide'], ['Cl2O6', 'dichlorine hexoxide'], ['ClO3', 'chlorine trioxide'], ['BrO2', 'bromine dioxide'], ['HF', 'hydrogen fluoride'], ['HCl', 'hydrogen chloride'], ['HBr', 'hydrogen bromide'], ['HI', 'hydrogen iodide'], ['H2S', 'hydrogen sulfide']]
 
   // getters
 };var getters = {
@@ -48371,6 +48411,9 @@ var state = {
   },
   getLewisSimpleCentral: function getLewisSimpleCentral(state) {
     return state.LewisSimpleCentralMulti;
+  },
+  getCovalentCompounds: function getCovalentCompounds(state) {
+    return state.covalentCompounds;
   }
 };
 
@@ -49962,16 +50005,18 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       _this.$store.dispatch('setupIons');
     }).then(function (results) {
 
-      //console.log(results);
-      //console.log('promise resolved, in then')
+      console.log(results);
+      console.log('promise resolved, in then');
       _this.$store.dispatch('setReady');
       var curr = _this.currentQuestionState;
+      console.log(curr);
       _this.$store.dispatch('setQuestionStart');
     });
   },
 
   methods: {
     setMode: function setMode() {
+      console.log('called setMode');
       if (this.modeBool) {
         this.mode = 'Hard Mode';
         this.notMode = 'Easy Mode';
@@ -49979,7 +50024,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         this.notMode = 'Hard Mode';
         this.mode = 'Easy Mode';
       }
-      this.modeBool != this.modeBool;
+      this.modeBool = !this.modeBool;
     }
   }
 });
@@ -49989,7 +50034,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('div', [_vm._v("Currently set to " + _vm._s(_vm.mode))]), _vm._v(" "), _c('button', {
+  return _c('div', [_c('div', [_vm._v("Easy mode talks you through the decisions you need to make. Hard mode just asks for the answer.\n    Currently set to " + _vm._s(_vm.mode))]), _vm._v(" "), _c('button', {
     staticClass: "btn btn-default",
     attrs: {
       "type": "button"
@@ -50017,7 +50062,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "alert alert-info"
   }, [_vm._v("\n      " + _vm._s(_vm.message))]), _vm._v(" "), (_vm.ready === false) ? _c('div', [_vm._v("Please wait, loading")]) : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[0] === -1) ? _c('div', {
     staticClass: "alert alert-danger"
-  }, [_vm._v("\n    You haven't set up nomenclature! Please return to your dashboard and use Setup New Session\n    to add the topic nomenclature.")]) : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'fact') ? _c('fact-question') : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'skill') ? _c('skill-question') : _vm._e(), _vm._v(" "), _c('div', [_c('button', {
+  }, [_vm._v("\n    You haven't set up nomenclature! Please return to your dashboard and use Setup New Session\n    to add the topic nomenclature.")]) : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'skill') ? _c('general-nomenclature-question', {
+    attrs: {
+      "easymode": _vm.modeBool
+    }
+  }) : _vm._e(), _vm._v(" "), _c('div', [_c('button', {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -50087,6 +50136,25 @@ if (false) {
 /* harmony default export */ __webpack_exports__["a"] = ({
   install: function install(Vue) {
 
+    Vue.ionNameFormula = function (ion) {
+      var romanNums = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+      var charge = ion.charge;
+      var formula = ion.formula;
+      var name = '';
+      if (charge < 0) {
+        name = ion.name;
+      } else {
+        if (ion.romNum) {
+          charge = charge[__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, charge.length - 1)];
+          name = ion.name + '(' + romanNums[charge] + ') ion';
+        } else {
+          name = ion.name + ' ion';
+        }
+        if (!/\d/g.test(ion.formula)) formula = formula + '+' + charge;
+      }
+      return { name: name, formula: formula };
+    };
+
     Vue.ionicNameFormula = function (cation, anion) {
       var romanNums = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
       var catName = '';
@@ -50146,10 +50214,811 @@ if (false) {
       }
 
       formula = catFormula + catNum + anFormula + anNum;
-      return { name: name, formula: formula };
+      return { name: name, formula: formula, catCharge: catCharge, anCharge: anionCharge, romNum: cation.romNum };
     };
   }
 });
+
+/***/ }),
+/* 146 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(147)
+}
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(149),
+  /* template */
+  __webpack_require__(150),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/GeneralNomenclatureQuestion.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] GeneralNomenclatureQuestion.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-7e502546", Component.options)
+  } else {
+    hotAPI.reload("data-v-7e502546", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 147 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(148);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(4)("177a8e1d", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7e502546\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./GeneralNomenclatureQuestion.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7e502546\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./GeneralNomenclatureQuestion.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 148 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(3)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 149 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      tries: 0,
+      acc: 0,
+      rts: [],
+      startTime: 0,
+      //determines whether name or formula is given
+      requestFormula: true,
+      type: 0,
+      typeEntry: 0,
+      romanNums: ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'],
+      types: ['ion', 'ionic compound', 'covalent compound', 'acid'],
+      question: { name: '', formula: '' },
+      stage: 0,
+      successes: [],
+      stage1response: '',
+      stage2response: '',
+      stage3response: '',
+      //stage2explanations[type][typeEntry] for name given
+      stage2explanationsName: [[],
+      //ionic
+      ['', '', 'You can recognize an ionic compound because the first part of the name is a metal or ammonium. ', "This can't be an acid because the name doesn't include 'acid'. "],
+      //covalent
+      ['', 'You can recognize a covalent compound because the name will usually include a prefix, and\n          also the first element named will be a non-metal. ', '', "This is not named as an acid (because it doens't include 'acid') and unless it contains hydrogen, it isn't an acid at all. "],
+      //acid
+      ['', 'This is an acid, since it has "acid" in the name. ', 'Acids are covalent, but since it has acid in the name, pick "acid". ', '']],
+      stage2explanationsFormula: [[],
+      //ionic
+      ['', '', 'You can tell it\'s ionic because it begins with either NH4 or a metal', 'You can tell it\'s not an acid because it doesn\'t start with H. '],
+      //covalent
+      ['', 'You can tell it\'s not ionic because it starts with a non-metal (but not the NH4 group). ', '', 'If it doesn\'t start with H, it can\'t be an acid. '],
+      //acid
+      ['', 'Acids are sort of similar to ionic compounds, but since it starts with H, you should call it an acid. ', 'Acids are a type of covalent compound, but in this case we can\'t name it as covalent. ']],
+      num1: '',
+      num2: ''
+    };
+  },
+  props: ['easymode'],
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    currentQuestion: 'getCurrent',
+    questionSetTime: 'getQuestionSetTime',
+    stageData: 'getStageData',
+    facts: 'getFacts',
+    ions: 'getIons',
+    covalentCompounds: 'getCovalentCompounds',
+    feedback: 'getFeedback',
+    feedbackType: 'getFeedbackType'
+  }), {
+    cations: function cations() {
+      var cations = this.ions.cat;
+      cations.concat(this.ions.polycat);
+      return cations;
+    },
+    anions: function anions() {
+      var anions = this.ions.an;
+      anions.concat(this.ions.polyan);
+      return anions;
+    },
+    acids: function acids() {
+      var acids = this.facts.filter(function (entry) {
+        return entry.group_name === 'acids';
+      });
+      return acids;
+    }
+  }),
+  created: function created() {
+    this.requestFormula = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random() >= 0.5;
+    this.type = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 3);
+    if (this.type === 0) this.setIonQuestion();else if (this.type === 1) this.setIonicQuestion();else if (this.type === 2) this.setCovalentQuestion();else if (this.type === 3) this.setAcidQuestion();
+  },
+
+  methods: {
+    setIonQuestion: function setIonQuestion() {
+      var catOrAn = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random() >= 0.5;
+      var ion = 0;
+      if (catOrAn) {
+        ion = this.cations[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.cations.length - 1)];
+      } else ion = this.anions[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.anions.length - 1)];
+      var question = Vue.ionNameFormula(ion);
+      this.question = question;
+    },
+    setIonicQuestion: function setIonicQuestion() {
+      var setTime = this.questionSetTime;
+      var anions = this.ions.an;
+      var cations = this.ions.cat;
+      if (this.currentQuestion[6] === 'complex ionic formulas') {
+        anions.concat(this.ions.polyan);
+        cations.concat(this.ions.polycat);
+      }
+      var anion = anions[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, anions.length - 1)];
+      var cation = cations[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, cations.length - 1)];
+      var question = Vue.ionicNameFormula(cation, anion);
+      question.setTime = setTime;
+      this.question = question;
+    },
+    setCovalentQuestion: function setCovalentQuestion() {
+      var compounds = this.covalentCompounds;
+      var compound = compounds[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, compounds.length - 1)];
+      var regex = /[A-Z][a-z]*(\d*)[A-Z][a-z]*(\d*)/g;
+      var arr = regex.exec(compound[0]);
+      for (var i = 1; i < 3; i++) {
+        if (arr[i] === '') arr[i] = '1';
+      }
+      console.log(arr);
+      this.question = { name: compound[1], formula: compound[0], num1: arr[1], num2: arr[2] };
+    },
+    setAcidQuestion: function setAcidQuestion() {
+      var acid = this.acids[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.acids.length - 1)];
+      var regex = /^H(\d*)/;
+      var arr = regex.exec(acid.key);
+      if (arr[1] === '') arr[1] = '1';
+      console.log(arr);
+      this.question = { name: acid.prop, formula: acid.key, charge: -Number(arr[1]) };
+    },
+    neutralOrNot: function neutralOrNot(choice) {
+      //is ion
+      if (this.type === 0) {
+        //picked ion correctly
+        if (!choice) {
+          this.successes[0] = 1;
+          this.stage1response = "You picked ion. ";
+        } else {
+          this.successes[0] = 0;
+          this.stage1response = 'You picked compound, but this is an ion. ';
+        }
+      } else {
+        if (choice) {
+          this.successes[0] = 1;
+          this.stage1response = "You picked compound. ";
+        } else {
+          this.successes[0] = 0;
+          this.stage1response = "You picked ion, but this is a compound. ";
+        }
+      }
+      if (this.type !== 0) this.stage = 1;else this.stage = 4;
+    },
+    typeCheck: function typeCheck(typeEntry) {
+      this.typeEntry = typeEntry;
+      if (/^H/.test(this.question.formula) && !/O/.test(this.question.formula) && !this.requestFormula) {
+        if (typeEntry > 1) {
+          this.successes[1] = 1;
+          if (typeEntry === this.type) this.stage2response = 'You picked ' + this.types[this.type] + '. ';else {
+            this.stage2response = 'You picked ' + this.types[typeEntry] + ', which is reasonable, but let\'s use the rules for ' + this.types[this.type] + 's. ';
+          }
+        } else {
+          this.successes[1] = 0;
+          this.stage2response = 'You picked ' + this.types[typeEntry] + ', but this is a ' + this.types[this.type] + '. ';
+        }
+      } else if (typeEntry === this.type) {
+        this.successes[1] = 1;
+        this.stage2response = 'You picked ' + this.types[this.type] + '. ';
+      } else {
+        this.successes[1] = 0;
+        this.stage2response = 'You picked ' + this.types[typeEntry] + ', but this is a ' + this.types[this.type] + '. ';
+      }
+      this.stage = 2;
+    },
+    submitNum: function submitNum(event) {
+      if (this.type === 1) {
+        this.num1 = Number(this.num1.replace(/(\d+)([+])/g, '$2$1'));
+        this.num2 = Number(this.num2.replace(/(\d+)([-])/g, '$2$1'));
+        if (this.num1 === Number(this.question.catCharge) && this.num2 === -Number(this.question.anCharge)) {
+          this.successes[2] = 1;
+        } else this.successes[2] = 0;
+      } else if (this.type === 2) {
+        if (this.num1 === this.question.num1 && this.num2 === this.question.num2) {
+          this.successes[2] = 1;
+        } else this.successes[2] = 0;
+      } else if (this.type === 3) {
+        this.num1 = Number(this.num1.replace(/(\d+)([-])/g, '$2$1'));
+        if (this.num1 === this.question.charge) this.successes[2] = 1;else this.successes[2] = 0;
+      }
+      if (this.successes[2]) this.stage = 4;else this.stage = 3;
+    },
+    lastCheck: function lastCheck(choice) {
+      if (this.type === 1) {
+        if (Boolean(choice) === this.question.romNum) {
+          this.successes[2] = 1;
+        } else this.successes[2] = 0;
+      } else if (this.type === 2) {
+        if (choice === 1) {
+          this.successes[2] = 1;
+        } else this.successes[2] = 0;
+      } else if (this.type === 3) {
+        /^hydro/.test(this.question.name);
+        if (/^hydro/.test(this.question.name) === Boolean(choice)) this.successes[2] = 1;else this.successes[2] = 0;
+      }
+      if (this.successes[2]) this.stage = 4;else this.stage = 3;
+    },
+    submitEntry: function submitEntry(event) {
+      this.tries += 1;
+      var answerDetail = this.checkEntry();
+      if (this.startTime === 0) {
+        this.startTime = this.questionSetTime;
+      }
+      answerDetail.timeStamp = Date.now();
+
+      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
+      //console.log('rts is set to ', this.rts)
+      this.startTime = Date.now();
+
+      var correct = answerDetail.correct;
+      var moveOn = false;
+      var gotIt = false;
+
+      if (correct === 'correct') {
+        answerDetail.messageSent += ' Correct!';
+        moveOn = true;
+        gotIt = true;
+        this.acc = this.tries - 1;
+        this.$store.dispatch('setFeedbackType', { "alert-success": true });
+
+        //console.log('acc is set to ', this.acc)
+      } else if (correct === 'dontKnow') {
+        moveOn = true;
+      } else {
+        if (this.tries < 3) {
+          answerDetail.messageSent += " Try again!";
+        } else moveOn = true;
+      }
+      if (moveOn === true && gotIt === false) {
+        if (this.requestFormula) {
+          answerDetail.messageSent = 'The formula of "' + this.question.name + '" is\n          "' + this.question.formula + '". We\'ll come back to it.';
+          this.acc = 4;
+        } else {
+          answerDetail.messageSent = 'The name of "' + this.question.formula + '" is\n          "' + this.question.name + '". We\'ll come back to it.';
+          this.acc = 4;
+        }
+      }
+      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
+        this.$store.dispatch('setFeedbackType', { "alert-warning": true });
+      } else if (gotIt === false) this.$store.dispatch('setFeedbackType', { "alert-danger": true });
+      this.$store.dispatch('setFeedback', answerDetail.messageSent);
+      var action = {};
+      action.state_id = this.currentQuestion[4];
+      action.type = 'answer given-' + correct;
+      action.detail = answerDetail;
+      action.time = answerDetail.timeStamp;
+
+      //this code gives a 500 error now, should check laravel side
+      //console.log("action is ", action);
+      axios.post('../api/student/actions', action).catch(function (error) {
+        console.log(error);
+      });
+
+      if (moveOn) {
+        //update states
+
+        var updatedState = { rts: this.rts, accs: this.acc };
+        console.log("updatedState is", updatedState);
+        this.$store.dispatch('updateRtsAccs', updatedState);
+        updatedState = Vue.skillPriorityHelper(this.stageData);
+        this.$store.dispatch('updateStage', updatedState);
+
+        //set new question
+        //console.log('about to set new question');
+        //this.$store.dispatch('setQuestion');
+        this.$store.dispatch('setNomenclatureSession');
+
+        //update props
+        this.entry = '';
+        this.typeEntry = 0;
+        this.tries = 0;
+        this.acc = 0;
+        this.rts = [];
+        this.requestFormula = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random() >= 0.5;
+        //this.type = _.random(0,3);
+        this.type = 3;
+        if (this.type === 0) this.setIonQuestion();else if (this.type === 1) this.setIonicQuestion();else if (this.type === 2) this.setCovalentQuestion();else if (this.type === 3) this.setAcidQuestion();
+        this.stage = 0;
+        this.successes = [];
+        this.stage1response = '';
+        this.stage2response = '';
+        this.stage3response = '';
+        this.num1 = '';
+        this.num2 = '';
+      }
+    },
+
+    //checks the entry, returns answerDetail
+    checkEntry: function checkEntry() {
+      var answerDetailToReturn = { answer: this.entry, messageSent: '', correct: '' };
+      console.log('this.entry: ', this.entry);
+      //console.log('this.answer: ', this.answers);
+      if (this.entry === '') {
+        answerDetailToReturn.correct = 'noAnswer';
+        answerDetailToReturn.messageSent += 'If you don\'t know the answer, enter zero. ';
+      } else if (Number(this.entry) === 0) {
+        answerDetailToReturn.correct = 'dontKnow';
+      }
+      //if answer is formula:
+      if (this.requestFormula) {
+        if (this.entry === this.question.formula) {
+          answerDetailToReturn.correct = 'correct';
+        } else if (this.entry.toLowerCase() === this.question.formula.toLowerCase()) {
+          answerDetailToReturn.correct = 'close';
+          answerDetailToReturn.messageSent = 'Check your capitalization!';
+        }
+        //later, try to parse answer and give specific feedback
+        //break into cation and anion
+        //check quantity of ions and correct identity
+        //check parentheses
+        else if (this.type > 0) {
+            var reCatParen = /\(([A-Z][a-z]*)\)(\d?)([A-Z][a-z]*)(\d?)/;
+            var reAnParen = /([A-Z][a-z]*)(\d?)\(([A-Z][a-z]*)\)(\d?)/;
+            var reBothParen = /\(([A-Z][a-z]*)\)(\d?)\(([A-Z][a-z]*)\)(\d?)/;
+            var reNoParen = /([A-Z][a-z]*)(\d?)([A-Z][a-z]*)(\d?)/;
+            var parensE = 0;
+            var reArrayE = reCatParen.exec(this.entry);
+            if (!reArrayE) {
+              reArrayE = reAnParen.exec(this.entry);
+              parensE = 1;
+            }
+            if (!reArrayE) {
+              reArrayE = reBothParen.exec(this.entry);
+              parensE = 2;
+            }
+            if (!reArrayE) {
+              reArrayE = reNoParen.exec(this.entry);
+              parensE = 3;
+            }
+            if (!reArrayE) {
+              answerDetailToReturn.correct = 'unknownWrong';
+              answerDetailToReturn.messageSent = 'Make sure your answer is formatted correctly.';
+            } else {
+              var parensA = 0;
+              var reArrayA = reCatParen.exec(this.question.formula);
+              if (!reArrayA) {
+                reArrayA = reAnParen.exec(this.question.formula);
+                parensA = 1;
+              }
+              if (!reArrayA) {
+                reArrayA = reBothParen.exec(this.question.formula);
+                parensA = 2;
+              }
+              if (!reArrayA) {
+                reArrayA = reNoParen.exec(this.question.formula);
+                parensA = 3;
+              }
+              if (!reArrayA) {
+                answerDetailToReturn.correct = 'unknownWrong';
+                answerDetailToReturn.messageSent = 'check your formula';
+              } else if (parensA !== parensE) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your parentheses. ';
+              } else if (reArrayA[1] !== reArrayE[1]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your cation or first element. ';
+              } else if (reArrayA[3] !== reArrayE[3]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your anion or second element. ';
+              } else if (reArrayA[2] !== reArrayE[2] || reArrayA[4] !== reArrayE[4]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check the number of ions or atoms. ';
+              }
+            }
+          }
+      }
+
+      //if answer is name:
+      else {
+          //console.log(this.entry === this.question.name)
+          if (this.entry === this.question.name) {
+            answerDetailToReturn.correct = 'correct';
+          } else if (this.type === 0 && this.entry === this.question.name + ' ion') {
+            answerDetailToReturn.correct = 'correct';
+          } else if (this.entry.toLowerCase() === this.question.name.toLowerCase()) {
+            answerDetailToReturn.correct = 'close';
+            answerDetailToReturn.messageSent = 'Check your capitalization!';
+          } else {
+            var reName = /(\w+)(\([IVX]+\))?\s(\w+)/;
+            var reArrayNA = reName.exec(this.question.name);
+            var reArrayNE = reName.exec(this.entry);
+            if (!reArrayNE) {
+              answerDetailToReturn.correct = 'unknownWrong';
+              answerDetailToReturn.messageSent = 'Check the format of your answer. Include "ion" in cation names. ';
+            } else {
+              if (reArrayNE[1] !== reArrayNA[1] || reArrayNE[2] !== reArrayNA[2]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your cation, first element or acid name. ';
+              }
+              if (reArrayNE[3] !== reArrayNA[3]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your anion, second element or spelling of "acid". ';
+              }
+            }
+          }
+        }
+      return answerDetailToReturn;
+    }
+  }
+});
+
+/***/ }),
+/* 150 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._v("General Nomenclature Practice!")]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_c('div', [_vm._v("\n          Instructions: If you are asked for a formula,\n          use the following format: write 'VO2+1' for "), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula('VO2+1'))
+    }
+  }), _vm._v(". Recall that compounds are always charge balanced."), _c('br'), _vm._v("\n        Note that ionic compounds in this practice are generated randomly, and may not all actually exist. To the best of my\n        knowledge, the covalent example compounds do exist but may be quite unstable.\n        ")]), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.requestFormula) ? _c('h3', [_vm._v("\n          We need to convert " + _vm._s(_vm.question.name) + " to a formula.")]) : _vm._e(), _vm._v(" "), (!(_vm.requestFormula)) ? _c('h3', [_vm._v("\n          We need to convert "), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.question.formula))
+    }
+  }), _vm._v(" to a name.")]) : _vm._e(), _vm._v(" "), (_vm.easymode) ? _c('div', [_c('h4', [_vm._v("First, you need to decide if this is a compound or an ion.")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.neutralOrNot(0)
+      }
+    }
+  }, [_vm._v("Ion")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.neutralOrNot(1)
+      }
+    }
+  }, [_vm._v("Compound")])]) : _vm._e(), _vm._v(" "), (_vm.easymode && _vm.stage > 0) ? _c('div', [(_vm.successes[0]) ? _c('h4', [_vm._v(_vm._s(_vm.stage1response) + " Correct!")]) : _vm._e(), _vm._v(" "), (!_vm.successes[0]) ? _c('div', [_c('h4', [_vm._v(_vm._s(_vm.stage1response))]), _c('br'), _vm._v("\n            If given a formula, if a charge is not given, it is a neutral compound.\n            If given a name, an ion name will be one word or will be \"_____ ion\", while an ionic or binary covalent\n            compound name will have two words neither of which is \"ion\". (There are compounds with one word names, but\n            we haven't learned about them yet. Organic compounds like methane and ethanol are examples; they won't end in\n            '-ide', '-ate' or '-ite'.)")]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.type > 0) ? _c('div', [_c('h4', [_vm._v("Next, we need to decide which type of nomenclature to use. If it could be acid or covalent, pick acid.")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.typeCheck(1)
+      }
+    }
+  }, [_vm._v("Ionic")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.typeCheck(2)
+      }
+    }
+  }, [_vm._v("Covalent")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.typeCheck(3)
+      }
+    }
+  }, [_vm._v("Acid")])]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.easymode && _vm.stage > 1 && _vm.type > 0) ? _c('div', [(_vm.successes[1]) ? _c('h4', [_vm._v(_vm._s(_vm.stage2response) + " Correct!")]) : _vm._e(), _vm._v(" "), (!_vm.successes[1]) ? _c('div', [_c('h4', [_vm._v(_vm._s(_vm.stage2response))]), _vm._v(" "), (_vm.requestFormula) ? _c('div', [_vm._v(_vm._s(_vm.stage2explanationsName[_vm.type][_vm.typeEntry]))]) : _vm._e(), _vm._v(" "), (!_vm.requestFormula) ? _c('div', [_vm._v(_vm._s(_vm.stage2explanationsFormula[_vm.type][_vm.typeEntry]))]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.requestFormula) ? _c('div', [(_vm.type === 1) ? _c('h4', [_vm._v("What charges do the ions have? Enter cation and anion charge:")]) : _vm._e(), _vm._v(" "), (_vm.type === 2) ? _c('h4', [_vm._v("How many of each element do we need? Enter number of first and second:")]) : _vm._e(), _vm._v(" "), (_vm.type === 3) ? _c('h4', [_vm._v("What's the charge on the anion?")]) : _vm._e(), _vm._v(" "), _c('input', {
+    directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.num1),
+      expression: "num1"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text",
+      "autocapitalize": "off",
+      "autocorrect": "off"
+    },
+    domProps: {
+      "value": (_vm.num1)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitNum($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.num1 = $event.target.value
+      }
+    }
+  }), _vm._v(" "), (_vm.type < 3) ? _c('input', {
+    directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.num2),
+      expression: "num2"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text",
+      "autocapitalize": "off",
+      "autocorrect": "off"
+    },
+    domProps: {
+      "value": (_vm.num2)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitNum($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.num2 = $event.target.value
+      }
+    }
+  }) : _vm._e()]) : _vm._e(), _vm._v(" "), (!_vm.requestFormula) ? _c('div', [(_vm.type === 1) ? _c('h4', [_vm._v("Should we use Roman numerals?")]) : _vm._e(), _vm._v(" "), (_vm.type === 2) ? _c('h4', [_vm._v("Does this system use prefixes?")]) : _vm._e(), _vm._v(" "), (_vm.type === 3) ? _c('h4', [_vm._v("Should the name start with 'hydro-'?")]) : _vm._e(), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.lastCheck(1)
+      }
+    }
+  }, [_vm._v("Yes")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.lastCheck(0)
+      }
+    }
+  }, [_vm._v("No")])]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.easymode && _vm.stage > 2 && _vm.type > 0) ? _c('div', [(_vm.successes[2]) ? _c('h4', [_vm._v("Correct! Enter the answer!")]) : _vm._e(), _vm._v(" "), (!_vm.successes[2]) ? _c('h4', [_vm._v("Oops! Try again.")]) : _vm._e(), _vm._v(" "), (!_vm.successes[2] && !_vm.requestFormula && _vm.type === 1) ? _c('div', [_vm._v("Use Roman numerals unless the cation is an alkali\n            metal, an alkaline earth metal, aluminum or zinc.")]) : _vm._e(), _vm._v(" "), (!_vm.successes[2] && !_vm.requestFormula && _vm.type === 2) ? _c('div', [_vm._v("The covalent system uses prefixes, though in the specific case\n              of acids named as covalent compounds, prefixes are omitted.")]) : _vm._e(), _vm._v(" "), (!_vm.successes[2] && !_vm.requestFormula && _vm.type === 3) ? _c('div', [_vm._v("Use hydro if there is no oxygen in the anion.")]) : _vm._e()]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), (!_vm.easymode || _vm.stage > 3) ? _c('div', [(_vm.requestFormula) ? _c('div', [_vm._v("Your formatted answer is: "), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.entry))
+    }
+  })]) : _vm._e(), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_vm._v("\n            Your answer here:\n            "), _c('input', {
+    directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.entry),
+      expression: "entry"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text",
+      "autocapitalize": "off",
+      "autocorrect": "off"
+    },
+    domProps: {
+      "value": (_vm.entry)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.entry = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit answer!")])])])]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.feedback),
+      expression: "feedback"
+    }],
+    staticClass: "alert",
+    class: _vm.feedbackType
+  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-7e502546", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

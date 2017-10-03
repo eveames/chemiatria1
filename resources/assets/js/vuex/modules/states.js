@@ -47,6 +47,7 @@ const actions = {
   setupStates ({commit}, topic) {
     let url = '../api/student/states/active'
     if (topic) url = '../api/student/states/'+topic
+    console.log(url)
     return new Promise((resolve, reject) => {
       axios.get(url)
       .then((response) => {
@@ -66,9 +67,10 @@ const actions = {
         }
         states.push(thisState);
       }
-      //console.log(states);
+      console.log('states is ', states);
       commit(types.INITIALIZE_STATES, states);
-      commit(types.SET_QUESTION);
+      if (!topic) commit(types.SET_QUESTION);
+      else if (topic === 9) commit(types.SET_NOMENCLATURE_SESSION, -1)
       resolve();
       }).catch(function (error) {
         console.log(error);
@@ -114,19 +116,53 @@ const actions = {
       console.log(error);
     })
     commit(types.SET_QUESTION);
-    //console.log('after SET_QUESTION, prev is ', prev)
+    console.log('after SET_QUESTION, prev is ', prev)
+  },
+  setNomenclatureSession ({commit}) {
+    let prev = state.currentIndex;
+    let state_id = state.currentStateID;
+    let url = '../api/student/states/' + state_id;
+    //console.log(url)
+    //console.log("state for updating: ", state.states[prev]);
+    axios.post(url, state.states[prev])
+    .catch(function (error) {
+      console.log(error);
+    })
+    let index = prev
+    if (!(state.currentSkill === 'general nomenclature')) index = -1
+    console.log('before SET index is ', index)
+    commit(types.SET_NOMENCLATURE_SESSION, index);
   }
 }
 
 // mutations
 const mutations = {
   [types.INITIALIZE_STATES] (state, states) {
+    console.log('in INITIALIZE_STATES')
     state.states = states;
     state.statesReady = true;
   },
   [types.INITIALIZE_SKILLS] (state, skills) {
     state.skills = skills;
     state.skillsReady = true;
+  },
+  [types.SET_NOMENCLATURE_SESSION] (state, index) {
+    console.log('in SET_NOMENCLATURE_SESSION')
+    if (index === -1) {
+      index = state.states.findIndex(function(entry) {
+        return entry.name === 'general nomenclature'
+      })
+    }
+    //console.log(state.states[0])
+    state.currentIndex = index;
+    console.log('index is ', index, state.currentIndex)
+    state.currentTypeID = state.states[state.currentIndex].type_id;
+    state.currentType = state.states[state.currentIndex].type;
+    state.currentStage = state.states[state.currentIndex].stage;
+    state.currentStateID = state.states[state.currentIndex].id;
+    state.states[state.currentIndex].lastStudied = Date.now();
+    state.currentSubtype = 'nomenclature'
+    state.currentSkill = 'general nomenclature';
   },
   [types.SET_QUESTION] (state) {
     //console.log('before getNext index is ', state.currentIndex)

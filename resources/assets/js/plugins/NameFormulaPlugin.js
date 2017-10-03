@@ -3,6 +3,27 @@ import _ from "lodash";
 export default {
   install: function (Vue) {
 
+    Vue.ionNameFormula = function(ion) {
+      let romanNums = ['','I','II','III','IV','V','VI','VII', 'VIII'];
+      let charge = ion.charge;
+      let formula = ion.formula;
+      let name = '';
+      if (charge < 0) {
+        name = ion.name;
+      }
+      else {
+        if (ion.romNum) {
+          charge = charge[_.random(0, charge.length -1)];
+          name = ion.name + '(' + romanNums[charge] + ') ion';
+        }
+        else {
+          name = ion.name + ' ion'
+        }
+        if (!(/\d/g.test(ion.formula))) formula = formula + '+' + charge
+      }
+      return {name: name, formula: formula}
+    }
+
     Vue.ionicNameFormula = function(cation, anion) {
       let romanNums = ['','I','II','III','IV','V','VI','VII', 'VIII'];
       let catName = '';
@@ -56,7 +77,7 @@ export default {
     	else { catFormula = catArray[0];}
 
     	formula = catFormula + catNum + anFormula + anNum;
-      return {name: name, formula: formula};
+      return {name: name, formula: formula, catCharge: catCharge, anCharge: anionCharge, romNum: cation.romNum};
     }
   }
 }

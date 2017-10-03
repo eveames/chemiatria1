@@ -1,6 +1,7 @@
 <template>
 <div>
-  <div>Currently set to {{mode}}</div>
+  <div>Easy mode talks you through the decisions you need to make. Hard mode just asks for the answer.
+    Currently set to {{mode}}</div>
   <button @click="setMode()" class="btn btn-default"
     type="button">Set {{notMode}}</button>
   <div v-show="finished" class="alert alert-success">
@@ -13,10 +14,9 @@
   <div class="alert alert-danger" v-if="ready === true && currentQuestionState[0] === -1">
     You haven't set up nomenclature! Please return to your dashboard and use Setup New Session
     to add the topic nomenclature.</div>
-  <fact-question v-if="ready === true && currentQuestionState[2] === 'fact'">
-  </fact-question>
-  <skill-question v-if="ready === true && currentQuestionState[2] === 'skill'">
-  </skill-question>
+  <general-nomenclature-question v-if="ready === true && currentQuestionState[2] === 'skill'" :easymode='modeBool'>
+  </general-nomenclature-question>
+
   <div>
   <button @click="$store.dispatch('toggleBug')" class="btn btn-default"
     type="button" v-show="!bug">Report Bug</button>
@@ -68,16 +68,19 @@ export default {
     .then((results) => {this.$store.dispatch('setupIons')})
     .then((results) => {
 
-      //console.log(results);
-      //console.log('promise resolved, in then')
+      console.log(results);
+      console.log('promise resolved, in then')
       this.$store.dispatch('setReady')
       let curr = this.currentQuestionState;
+      console.log(curr)
       this.$store.dispatch('setQuestionStart');
     })
+
 
   },
   methods: {
     setMode() {
+      console.log('called setMode')
       if (this.modeBool) {
         this.mode = 'Hard Mode'
         this.notMode = 'Easy Mode'
@@ -86,7 +89,7 @@ export default {
         this.notMode = 'Hard Mode'
         this.mode = 'Easy Mode'
       }
-      this.modeBool != this.modeBool
+      this.modeBool = !this.modeBool
     }
   }
 }

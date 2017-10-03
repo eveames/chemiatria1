@@ -5,7 +5,7 @@
         <div class="panel-body">
           <div>Instructions: If you don't have any guesses, enter zero to see the answer.
           If you are asked for a formula, all numbers will be converted to subscripts, so write '(NH4)3C6H5O7' for
-          <span v-html="this.$options.filters.formatFormula('(NH4)3C6H5O7')"></span>. Recall that compounds are always charge balanced.<br> 
+          <span v-html="this.$options.filters.formatFormula('(NH4)3C6H5O7')"></span>. Recall that compounds are always charge balanced.<br>
           Note that these questions are generated randomly from a list of common ions, and may not all be actual stable compounds.
           </div>
           <br>
@@ -191,10 +191,10 @@ export default {
             //check quantity of ions and correct identity
             //check parentheses
             else {
-              const reCatParen = /\((\w+)\)(\d?)(\w+)(\d?)/;
-              const reAnParen = /(\w+)(\d?)\((\w+)\)(\d?)/;
-              const reBothParen = /\((\w+)\)(\d?)\((\w+)\)(\d?)/;
-              const reNoParen = /(\w+)(\d?)(\w+)(\d?)/;
+              const reCatParen = /\(([A-Z][a-z]*)\)(\d?)([A-Z][a-z]*)(\d?)/;
+              const reAnParen = /([A-Z][a-z]*)(\d?)\(([A-Z][a-z]*)\)(\d?)/;
+              const reBothParen = /\(([A-Z][a-z]*)\)(\d?)\(([A-Z][a-z]*)\)(\d?)/;
+              const reNoParen = /([A-Z][a-z]*)(\d?)([A-Z][a-z]*)(\d?)/;
               let parensE = 0;
               let reArrayE = reCatParen.exec(this.entry);
               if (!reArrayE) {

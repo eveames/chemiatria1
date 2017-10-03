@@ -30,6 +30,7 @@ Vue.component('element-group-question', require('./components/ElementGroupQuesti
 Vue.component('sigfig-question', require('./components/SigfigQuestion.vue'));
 Vue.component('ionic-formula-question', require('./components/IonicFormulaQuestion.vue'));
 Vue.component('lewis-structure-question', require('./components/LewisStructureQuestion.vue'));
+Vue.component('general-nomenclature-question', require('./components/GeneralNomenclatureQuestion.vue'));
 Vue.component('lewis-atom', require('./components/LewisAtom.vue'));
 Vue.component('bug-report', require('./components/BugReport.vue'));
 Vue.component('frustration-report', require('./components/FrustrationReport.vue'));

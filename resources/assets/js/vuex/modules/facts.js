@@ -115,11 +115,11 @@ const actions = {
     [types.INITIALIZE_FACTS] (state, facts) {
       //console.log("in mutation, words is: " + words);
       state.facts = facts;
-      //console.log('facts set');
+      console.log('facts set');
       state.factsReady = true;
     },
     [types.INITIALIZE_IONS] (state, polyan, polycat) {
-      //console.log("in mutation, words is: " + words);
+      console.log("in INITIALIZE_IONS");
       state.polyanionsList = polyan;
       state.polycationsList = polycat;
     }

@@ -63,8 +63,8 @@ export default {
     .then((results) => {this.$store.dispatch('setupIons')})
     .then((results) => {
 
-      //console.log(results);
-      //console.log('promise resolved, in then')
+      console.log(results);
+      console.log('promise resolved, in then')
       this.$store.dispatch('setReady')
       let curr = this.currentQuestionState;
       this.$store.dispatch('setQuestionStart');
