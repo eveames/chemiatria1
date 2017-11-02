@@ -91,16 +91,22 @@ const actions = {
           let polycat = [];
           let ion = {};
           let charge = 0;
-          //console.log(typeof(words));
+          let index = 0;
+          //console.log(temp);
           for(let i = 0; i < temp.length; i++ ) {
-            charge = Number(/((?:\+|-)\d)/.exec(state.facts[temp[i]].key)[0]);
-            if (charge > 0) ion = {name: state.facts[temp[i]].prop, formula: state.facts[temp[i]].key, charge: charge, romNum: false}
-            else ion = {name: state.facts[temp[i]].prop, formula: state.facts[temp[i]].key, charge: charge}
-            console.log(ion);
+            index = temp[i] - 1
+            //console.log(state.facts[index], temp[i])
+            charge = Number(/((?:\+|-)\d)/.exec(state.facts[index].key)[0]);
+            if (charge > 0) ion = {name: state.facts[index].prop, formula: state.facts[index].key, charge: charge, romNum: false}
+            else ion = {name: state.facts[index].prop, formula: state.facts[index].key, charge: charge}
+            //console.log(ion);
             if (charge < 0) polyan.push(ion);
             else polycat.push(ion);
+            //console.log(polycat.length, polyan.length, i)
           }
-            commit(types.INITIALIZE_IONS, polyan, polycat);
+          console.log('finished for', polycat)
+            commit(types.INITIALIZE_ANIONS, polyan);
+            commit(types.INITIALIZE_CATIONS, polycat);
             resolve()
         }).catch((error) => {
             console.log(error);
@@ -118,10 +124,13 @@ const actions = {
       console.log('facts set');
       state.factsReady = true;
     },
-    [types.INITIALIZE_IONS] (state, polyan, polycat) {
-      console.log("in INITIALIZE_IONS");
-      state.polyanionsList = polyan;
-      state.polycationsList = polycat;
+    [types.INITIALIZE_ANIONS] (state, ions) {
+      //console.log("in INITIALIZE_IONS");
+      state.polyanionsList = ions;
+    },
+    [types.INITIALIZE_CATIONS] (state, ions) {
+      //console.log("in INITIALIZE_IONS");
+      state.polycationsList = ions;
     }
   }
 

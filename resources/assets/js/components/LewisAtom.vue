@@ -25,8 +25,9 @@ export default {
     ...mapGetters({
       currentQuestion: 'getCurrent',
       elements: 'getLSE',
+      bboxes: 'getBBoxes'
     }),
-    baseRect: function() {
+    /*baseRect: function() {
       if (this.mounted) {
         let rect = document.getElementById('atom' + this.index).getBBox();
         console.log('in if')
@@ -39,7 +40,7 @@ export default {
         console.log('in else')
         return {x: 100, y: 100, width: 40, height: 30}
       }
-    },
+    },*/
     index: function() {
       return this.stats.index;
     },
@@ -78,15 +79,18 @@ export default {
       return temp;
     },
     textRect: function() {
-      let left = this.stats.center[0] - this.baseRect.width/2
-      let top = this.stats.center[1] - this.baseRect.height/2
-      let width = this.baseRect.width;
-      let height = this.baseRect.height;
-      let right = this.stats.center[0] + this.baseRect.width/2
-      let bottom = this.stats.center[1] + this.baseRect.height/2
+      //console.log(this.bboxes['P'])
+      let bbox = this.bboxes[this.element[0]]
+      //console.log(bbox.width, bbox.height)
+      let left = this.stats.center[0] - bbox.width/2
+      let top = this.stats.center[1] - bbox.height/2
+      let width = bbox.width;
+      let height = bbox.height;
+      let right = this.stats.center[0] + bbox.width/2
+      let bottom = this.stats.center[1] + bbox.height/2
       let centerx = this.stats.center[0];
       let centery = this.stats.center[1];
-      let baseline = this.stats.center[1] + this.baseRect.height/4;
+      let baseline = this.stats.center[1] + bbox.height/4;
       return {left: left, right: right, top: top, bottom: bottom,
         width: width, height: height, centerx: centerx, centery: centery, baseline: baseline}
     },
@@ -200,6 +204,7 @@ export default {
             let str = String(this.formalCharge);
             if (one) str = ''
             if (plus) str = str + '+';
+            if (one && !plus) str = '-'
             else str = str.replace(/(-)(\d+)/, '$2$1')
             formalChargeToDraw = {charge: str, position: fcpos}
             break;

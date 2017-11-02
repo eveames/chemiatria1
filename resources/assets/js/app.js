@@ -32,6 +32,7 @@ Vue.component('ionic-formula-question', require('./components/IonicFormulaQuesti
 Vue.component('lewis-structure-question', require('./components/LewisStructureQuestion.vue'));
 Vue.component('general-nomenclature-question', require('./components/GeneralNomenclatureQuestion.vue'));
 Vue.component('lewis-atom', require('./components/LewisAtom.vue'));
+Vue.component('lewis-tester', require('./components/LewisTester.vue'));
 Vue.component('bug-report', require('./components/BugReport.vue'));
 Vue.component('frustration-report', require('./components/FrustrationReport.vue'));
 Vue.component('suggestion-box', require('./components/SuggestionBox.vue'));

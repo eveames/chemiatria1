@@ -1,3 +1,4 @@
+import * as types from '../mutation_types'
 const state = {
   elementsList: [{name: 'hydrogen', symbol: 'H', family: 'non-metal', location: '1', charge: 1, valence: 1, findex: 8},
       {name: 'helium', symbol: 'He', family: 'noble gas', location: '2', charge: 0, valence: 2, findex: 4},
@@ -109,34 +110,37 @@ const state = {
     {alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less'}]],
     //element data for drawing Lewis structures
     //1: valence e-
-    //2: normal max e-
-    //3: min normal e-
-    //4: min/normal valence (num bonds)
+    //2: normal min e- (octet count)
+    //3: normal max e- (octet count)
+    //4: normal valence (num bonds)
     //5: max valence when oxidized (num bonds)
+    //6: min valence (num bonds)
     lewisElements: {
-      H: ['H', 1, 2, 2, 1,2],
-      He: ['He', 2, 2,2,0,0],
-      Li: ['Li',1,2,8,1,4],
-      Be: ['Be',2,4,8,2,4],
-      B: ['B',3,6,8,3,4],
-      C: ['C', 4, 8, 8, 4,4],
-      N: ['N', 5,7,8,3,4],
-      O: ['O', 6, 8, 8,2,2],
-      F: ['F', 7, 8,8,1,1],
-      Ne: ['Ne',8,8,8,0,0],
-      Si: ['Si',4,8,8,4,4],
-      P: ['P',5,8,12,3,5],
-      S: ['S', 6, 8, 12,2,6],
-      Cl: ['Cl',7,8,16,1,4],
-      Ge: ['Ge',4,8,8,4,4],
-      As: ['As',5,8,12,3,5],
-      Se: ['Se',6,8,12,2,6],
-      Br: ['Br', 7,8,16,1,5],
-      Sb: ['Sb',5,8,12,3,5],
-      Te: ['Te',6,8,12,2,6],
-      I: ['I',7,8,16,1,7],
-      Xe: ['Xe',8,8,16,0,8]
+      H: ['H', 1, 2, 2, 1,1,1],
+      He: ['He', 2, 2,2,0,0,0],
+      Li: ['Li',1,2,8,1,4,1],
+      Be: ['Be',2,4,8,2,4,2],
+      B: ['B',3,6,8,3,4,3],
+      C: ['C', 4, 8, 8, 4,4,3],
+      N: ['N', 5,7,8,3,4,1],
+      O: ['O', 6, 8, 8,2,3,1],
+      F: ['F', 7, 8,8,1,1,1],
+      Ne: ['Ne',8,8,8,0,0,0],
+      Si: ['Si',4,8,8,4,4,3],
+      P: ['P',5,8,12,3,5,2],
+      S: ['S', 6, 8, 12,2,6,1],
+      Cl: ['Cl',7,8,16,1,7,1],
+      Ge: ['Ge',4,8,8,4,4,3],
+      As: ['As',5,8,12,3,6,2],
+      Se: ['Se',6,8,12,2,6,1],
+      Br: ['Br', 7,8,16,1,7,1],
+      Sb: ['Sb',5,8,12,3,5,2],
+      Te: ['Te',6,8,12,2,6,1],
+      I: ['I',7,8,16,1,7,1],
+      Xe: ['Xe',8,8,16,0,8,0]
     },
+
+    bboxesForLewisText: {},
 
     LewisHomoDiatomics: ['H2', 'N2', 'O2', 'F2', 'Cl2', 'Br2', 'I2', 'S2', 'P2', 'Se2'],
     LewisHeteroDiatomics: ['HF', 'HCl', 'HBr', 'HI', 'ClF', 'BrF', 'IF', 'BrCl', 'ICl', 'IBr', 'CO', 'NO', 'SO', 'NP', 'HO', 'ClO'],
@@ -145,6 +149,8 @@ const state = {
     'BrF5', 'IF3', 'IF5', 'BeCl2', 'BCl3', 'CCl4', 'SiCl4', 'NCl3', 'PCl3', 'PCl5', 'AsCl3', 'AsCl5','SbCl3', 'SbCl5', 'SCl2',
     'SCl4', 'SeCl2', 'SeCl4', 'TeCl2', 'TeCl4', 'BrCl3', 'ICl3', 'CBr4', 'CI4','CO2', 'CS2', 'SiO2', 'NO2', 'SO2', 'SO3', 'SeO2', 'SeO3',
     'TeO2', 'TeO3', 'XeO2', 'XeO4', 'XeF2', 'XeF4', 'XeF6', 'O3'],
+    LewisTriatomicCentral: ['COCl2', 'COF2', 'COH2', 'CHF3', 'CH2F2', 'CH3F', 'CHCl3', 'CH2Cl2', 'CH3Cl', 'CHBr3', 'CH2Br2',
+    'CH3Br', 'CHI3', 'CH2I2', 'CH3I', 'CSO', 'POCl3', 'POF3', 'XeOF2', 'XeOF4', 'CHN'],
     covalentCompounds: [['CO', 'carbon monoxide'],['BF3', 'boron trifluoride'], ['CF4', 'carbon tetrafluoride'], ['SiF4','silicon tetrafluoride'],
      ['PF3','phosphorus trifluoride'], ['PF5', 'phosphorus pentafluoride'], ['AsF3', 'arsenic trifluoride'],
      ['AsF5', 'arsenic pentafluoride'], ['SF2', 'sulfur difluoride'], ['SF4', 'sulfur tetrafluoride'],
@@ -194,11 +200,27 @@ const getters = {
   getLewisHomoDiatomics: (state) => state.LewisHomoDiatomics,
   getLewisHeteroDiatomics: (state) => state.LewisHeteroDiatomics,
   getLewisSimpleCentral: (state) => state.LewisSimpleCentralMulti,
-  getCovalentCompounds: (state) => state.covalentCompounds
+  getLewisTriatomicCentral: (state) => state.LewisTriatomicCentral,
+  getCovalentCompounds: (state) => state.covalentCompounds,
+  getBBoxes: (state) => state.bboxesForLewisText,
 }
 
+const actions = {
+  setupBBoxes ({commit}, bboxes) {
+    commit(types.SET_BBOXES, bboxes);
+  }
+}
+
+const mutations = {
+  [types.SET_BBOXES] (state, bboxes) {
+    //console.log('in INITIALIZE_STATES')
+    state.bboxesForLewisText = bboxes;
+  }
+}
 
 export default {
   state,
-  getters
+  getters,
+  actions,
+  mutations
 }

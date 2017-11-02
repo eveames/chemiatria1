@@ -55,17 +55,19 @@ export default {
       lewisHomo: 'getLewisHomoDiatomics',
       lewisHetero: 'getLewisHeteroDiatomics',
       lewisMulti: 'getLewisSimpleCentral',
+      lewisTriCentral: 'getLewisTriatomicCentral',
       elements: 'getLSE'
     }),
     formulasArray: function() {
-      let temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti)
+      //let temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti)
+      let temp = this.lewisTriCentral
       return temp
     },
     formula: function() {
       return this.formulasArray[this.index]
     },
     question: function() {
-      return Vue.simpleCentralStructure(this.formula, this.elements)
+      return Vue.generalLewisStructure(this.formula, this.elements)
     },
     stats: function() {
       let directions = Array(12);
@@ -162,7 +164,7 @@ export default {
         this.acc = 0
         this.rts = []
         this.index = _.random(0, this.formulasArray.length -1)
-        //this.index =47
+        //this.index = 20
 
     	}
     },

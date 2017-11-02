@@ -11,9 +11,9 @@
           </div>
           <br>
           <h3 v-if="requestFormula">
-            We need to convert {{question.name}} to a formula.</h3>
+            We need to convert <strong>{{question.name}}</strong> to a formula.</h3>
           <h3 v-if="!(requestFormula)">
-            We need to convert <span v-html="this.$options.filters.formatFormula(question.formula)"></span> to a name.</h3>
+            We need to convert <strong><span v-html="this.$options.filters.formatFormula(question.formula)"></span></strong> to a name.</h3>
 
           <div v-if='easymode'><h4>First, you need to decide if this is a compound or an ion.</h4>
             <button @click="neutralOrNot(0)" class="btn btn-default"
@@ -76,6 +76,8 @@
             <div v-if='!successes[2] && !requestFormula && type === 3'>Use hydro if there is no oxygen in the anion.</div>
           </div>
             <br>
+          <div v-if="specifyType">You could use either of two naming systems for this compound,
+            but this time please use the system for {{types[type]}}s.</div>
           <div v-if="!easymode || stage > 3">
           <div v-if='requestFormula'>Your formatted answer is: <span v-html="this.$options.filters.formatFormula(entry)"></span></div>
           <div class="input-group">
@@ -159,12 +161,15 @@ export default {
     }),
     cations: function() {
       let cations = this.ions.cat;
-      cations.concat(this.ions.polycat);
+      console.log('cations length:' + cations.length)
+      console.log(this.ions.polycat)
+      cations = cations.concat(this.ions.polycat);
+      console.log('cations length after: ' + cations.length)
       return cations
     },
     anions: function() {
       let anions = this.ions.an;
-      anions.concat(this.ions.polyan);
+      anions = anions.concat(this.ions.polyan);
       return anions
     },
     acids: function() {
@@ -172,6 +177,14 @@ export default {
         return entry.group_name === 'acids'
       })
       return acids
+    },
+    specifyType: function() {
+      if (!this.easymode) {
+        if (!this.requestFormula && !(/O/.test(this.question.formula)) && /^H/.test(this.question.formula)) {
+          return true;
+        }
+      }
+      else return false
     }
   },
   created () {
@@ -195,14 +208,8 @@ export default {
     },
     setIonicQuestion: function() {
       let setTime = this.questionSetTime;
-      let anions = this.ions.an;
-      let cations = this.ions.cat;
-      if (this.currentQuestion[6] === 'complex ionic formulas') {
-        anions.concat(this.ions.polyan);
-        cations.concat(this.ions.polycat);
-      }
-      let anion = anions[_.random(0, anions.length-1)];
-      let cation = cations[_.random(0, cations.length-1)];
+      let anion = this.anions[_.random(0, this.anions.length-1)];
+      let cation = this.cations[_.random(0, this.cations.length-1)];
       let question = Vue.ionicNameFormula(cation, anion);
       question.setTime = setTime;
       this.question = question
@@ -404,8 +411,9 @@ export default {
         this.acc = 0
         this.rts = []
         this.requestFormula = _.random() >= 0.5;
-        //this.type = _.random(0,3);
-        this.type = 3;
+        //this.requestFormula = false
+        this.type = _.random(0,3);
+        //this.type = 2;
         if (this.type === 0) this.setIonQuestion();
         else if (this.type === 1) this.setIonicQuestion();
         else if (this.type === 2) this.setCovalentQuestion();

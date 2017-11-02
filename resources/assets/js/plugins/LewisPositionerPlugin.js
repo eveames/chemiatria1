@@ -62,7 +62,7 @@ export default {
       return [start,end]
   }
   Vue.newAtomPositioner = function(textRect, direction) {
-    let bondLength = 30;
+    let bondLength = 35;
     let end = [0,0]
     let start =[20,20]
     let height = textRect.height
@@ -278,7 +278,7 @@ export default {
       start = [textRect.left -4, textRect.centery+height/3]
       first = [start[0]+1, start[1]+4]
       second = [start[0]-1, start[1]-4]
-      end1 = [first[0] - bondLength*0.866, second[1]+bondLength/2]
+      end1 = [first[0] - bondLength*0.866, first[1]+bondLength/2]
       end2 = [second[0] - bondLength*0.866, second[1]+bondLength/2]
     }
     if (direction === 5) {
@@ -376,7 +376,7 @@ export default {
       end = [start[0] - bondLength*0.866, start[1]+bondLength/2]
       first = [start[0]+1, start[1]+4]
       second = [start[0]-1, start[1]-4]
-      end1 = [first[0] - bondLength*0.866, second[1]+bondLength/2]
+      end1 = [first[0] - bondLength*0.866, first[1]+bondLength/2]
       end2 = [second[0] - bondLength*0.866, second[1]+bondLength/2]
     }
     if (direction === 5) {

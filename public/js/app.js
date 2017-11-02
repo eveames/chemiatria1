@@ -976,316 +976,6 @@ module.exports = function normalizeComponent (
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var bind = __webpack_require__(9);
-var isBuffer = __webpack_require__(23);
-
-/*global toString:true*/
-
-// utils is a library of generic helper functions non-specific to axios
-
-var toString = Object.prototype.toString;
-
-/**
- * Determine if a value is an Array
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an Array, otherwise false
- */
-function isArray(val) {
-  return toString.call(val) === '[object Array]';
-}
-
-/**
- * Determine if a value is an ArrayBuffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an ArrayBuffer, otherwise false
- */
-function isArrayBuffer(val) {
-  return toString.call(val) === '[object ArrayBuffer]';
-}
-
-/**
- * Determine if a value is a FormData
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an FormData, otherwise false
- */
-function isFormData(val) {
-  return (typeof FormData !== 'undefined') && (val instanceof FormData);
-}
-
-/**
- * Determine if a value is a view on an ArrayBuffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
- */
-function isArrayBufferView(val) {
-  var result;
-  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
-    result = ArrayBuffer.isView(val);
-  } else {
-    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
-  }
-  return result;
-}
-
-/**
- * Determine if a value is a String
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a String, otherwise false
- */
-function isString(val) {
-  return typeof val === 'string';
-}
-
-/**
- * Determine if a value is a Number
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Number, otherwise false
- */
-function isNumber(val) {
-  return typeof val === 'number';
-}
-
-/**
- * Determine if a value is undefined
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if the value is undefined, otherwise false
- */
-function isUndefined(val) {
-  return typeof val === 'undefined';
-}
-
-/**
- * Determine if a value is an Object
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an Object, otherwise false
- */
-function isObject(val) {
-  return val !== null && typeof val === 'object';
-}
-
-/**
- * Determine if a value is a Date
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Date, otherwise false
- */
-function isDate(val) {
-  return toString.call(val) === '[object Date]';
-}
-
-/**
- * Determine if a value is a File
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a File, otherwise false
- */
-function isFile(val) {
-  return toString.call(val) === '[object File]';
-}
-
-/**
- * Determine if a value is a Blob
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Blob, otherwise false
- */
-function isBlob(val) {
-  return toString.call(val) === '[object Blob]';
-}
-
-/**
- * Determine if a value is a Function
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Function, otherwise false
- */
-function isFunction(val) {
-  return toString.call(val) === '[object Function]';
-}
-
-/**
- * Determine if a value is a Stream
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Stream, otherwise false
- */
-function isStream(val) {
-  return isObject(val) && isFunction(val.pipe);
-}
-
-/**
- * Determine if a value is a URLSearchParams object
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a URLSearchParams object, otherwise false
- */
-function isURLSearchParams(val) {
-  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
-}
-
-/**
- * Trim excess whitespace off the beginning and end of a string
- *
- * @param {String} str The String to trim
- * @returns {String} The String freed of excess whitespace
- */
-function trim(str) {
-  return str.replace(/^\s*/, '').replace(/\s*$/, '');
-}
-
-/**
- * Determine if we're running in a standard browser environment
- *
- * This allows axios to run in a web worker, and react-native.
- * Both environments support XMLHttpRequest, but not fully standard globals.
- *
- * web workers:
- *  typeof window -> undefined
- *  typeof document -> undefined
- *
- * react-native:
- *  navigator.product -> 'ReactNative'
- */
-function isStandardBrowserEnv() {
-  if (typeof navigator !== 'undefined' && navigator.product === 'ReactNative') {
-    return false;
-  }
-  return (
-    typeof window !== 'undefined' &&
-    typeof document !== 'undefined'
-  );
-}
-
-/**
- * Iterate over an Array or an Object invoking a function for each item.
- *
- * If `obj` is an Array callback will be called passing
- * the value, index, and complete array for each item.
- *
- * If 'obj' is an Object callback will be called passing
- * the value, key, and complete object for each property.
- *
- * @param {Object|Array} obj The object to iterate
- * @param {Function} fn The callback to invoke for each item
- */
-function forEach(obj, fn) {
-  // Don't bother if no value provided
-  if (obj === null || typeof obj === 'undefined') {
-    return;
-  }
-
-  // Force an array if not already something iterable
-  if (typeof obj !== 'object' && !isArray(obj)) {
-    /*eslint no-param-reassign:0*/
-    obj = [obj];
-  }
-
-  if (isArray(obj)) {
-    // Iterate over array values
-    for (var i = 0, l = obj.length; i < l; i++) {
-      fn.call(null, obj[i], i, obj);
-    }
-  } else {
-    // Iterate over object keys
-    for (var key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        fn.call(null, obj[key], key, obj);
-      }
-    }
-  }
-}
-
-/**
- * Accepts varargs expecting each argument to be an object, then
- * immutably merges the properties of each object and returns result.
- *
- * When multiple objects contain the same key the later object in
- * the arguments list will take precedence.
- *
- * Example:
- *
- * ```js
- * var result = merge({foo: 123}, {foo: 456});
- * console.log(result.foo); // outputs 456
- * ```
- *
- * @param {Object} obj1 Object to merge
- * @returns {Object} Result of all merge properties
- */
-function merge(/* obj1, obj2, obj3, ... */) {
-  var result = {};
-  function assignValue(val, key) {
-    if (typeof result[key] === 'object' && typeof val === 'object') {
-      result[key] = merge(result[key], val);
-    } else {
-      result[key] = val;
-    }
-  }
-
-  for (var i = 0, l = arguments.length; i < l; i++) {
-    forEach(arguments[i], assignValue);
-  }
-  return result;
-}
-
-/**
- * Extends object a by mutably adding to it the properties of object b.
- *
- * @param {Object} a The object to be extended
- * @param {Object} b The object to copy properties from
- * @param {Object} thisArg The object to bind function to
- * @return {Object} The resulting value of object a
- */
-function extend(a, b, thisArg) {
-  forEach(b, function assignValue(val, key) {
-    if (thisArg && typeof val === 'function') {
-      a[key] = bind(val, thisArg);
-    } else {
-      a[key] = val;
-    }
-  });
-  return a;
-}
-
-module.exports = {
-  isArray: isArray,
-  isArrayBuffer: isArrayBuffer,
-  isBuffer: isBuffer,
-  isFormData: isFormData,
-  isArrayBufferView: isArrayBufferView,
-  isString: isString,
-  isNumber: isNumber,
-  isObject: isObject,
-  isUndefined: isUndefined,
-  isDate: isDate,
-  isFile: isFile,
-  isBlob: isBlob,
-  isFunction: isFunction,
-  isStream: isStream,
-  isURLSearchParams: isURLSearchParams,
-  isStandardBrowserEnv: isStandardBrowserEnv,
-  forEach: forEach,
-  merge: merge,
-  extend: extend,
-  trim: trim
-};
-
-
-/***/ }),
-/* 3 */
 /***/ (function(module, exports) {
 
 /*
@@ -1367,7 +1057,7 @@ function toComment(sourceMap) {
 
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1588,7 +1278,7 @@ function applyToTag (styleElement, obj) {
 
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -18680,33 +18370,346 @@ function applyToTag (styleElement, obj) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8), __webpack_require__(18)(module)))
 
 /***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var bind = __webpack_require__(9);
+var isBuffer = __webpack_require__(23);
+
+/*global toString:true*/
+
+// utils is a library of generic helper functions non-specific to axios
+
+var toString = Object.prototype.toString;
+
+/**
+ * Determine if a value is an Array
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Array, otherwise false
+ */
+function isArray(val) {
+  return toString.call(val) === '[object Array]';
+}
+
+/**
+ * Determine if a value is an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an ArrayBuffer, otherwise false
+ */
+function isArrayBuffer(val) {
+  return toString.call(val) === '[object ArrayBuffer]';
+}
+
+/**
+ * Determine if a value is a FormData
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an FormData, otherwise false
+ */
+function isFormData(val) {
+  return (typeof FormData !== 'undefined') && (val instanceof FormData);
+}
+
+/**
+ * Determine if a value is a view on an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
+ */
+function isArrayBufferView(val) {
+  var result;
+  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
+    result = ArrayBuffer.isView(val);
+  } else {
+    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
+  }
+  return result;
+}
+
+/**
+ * Determine if a value is a String
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a String, otherwise false
+ */
+function isString(val) {
+  return typeof val === 'string';
+}
+
+/**
+ * Determine if a value is a Number
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Number, otherwise false
+ */
+function isNumber(val) {
+  return typeof val === 'number';
+}
+
+/**
+ * Determine if a value is undefined
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if the value is undefined, otherwise false
+ */
+function isUndefined(val) {
+  return typeof val === 'undefined';
+}
+
+/**
+ * Determine if a value is an Object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Object, otherwise false
+ */
+function isObject(val) {
+  return val !== null && typeof val === 'object';
+}
+
+/**
+ * Determine if a value is a Date
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Date, otherwise false
+ */
+function isDate(val) {
+  return toString.call(val) === '[object Date]';
+}
+
+/**
+ * Determine if a value is a File
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a File, otherwise false
+ */
+function isFile(val) {
+  return toString.call(val) === '[object File]';
+}
+
+/**
+ * Determine if a value is a Blob
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Blob, otherwise false
+ */
+function isBlob(val) {
+  return toString.call(val) === '[object Blob]';
+}
+
+/**
+ * Determine if a value is a Function
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Function, otherwise false
+ */
+function isFunction(val) {
+  return toString.call(val) === '[object Function]';
+}
+
+/**
+ * Determine if a value is a Stream
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Stream, otherwise false
+ */
+function isStream(val) {
+  return isObject(val) && isFunction(val.pipe);
+}
+
+/**
+ * Determine if a value is a URLSearchParams object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a URLSearchParams object, otherwise false
+ */
+function isURLSearchParams(val) {
+  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
+}
+
+/**
+ * Trim excess whitespace off the beginning and end of a string
+ *
+ * @param {String} str The String to trim
+ * @returns {String} The String freed of excess whitespace
+ */
+function trim(str) {
+  return str.replace(/^\s*/, '').replace(/\s*$/, '');
+}
+
+/**
+ * Determine if we're running in a standard browser environment
+ *
+ * This allows axios to run in a web worker, and react-native.
+ * Both environments support XMLHttpRequest, but not fully standard globals.
+ *
+ * web workers:
+ *  typeof window -> undefined
+ *  typeof document -> undefined
+ *
+ * react-native:
+ *  navigator.product -> 'ReactNative'
+ */
+function isStandardBrowserEnv() {
+  if (typeof navigator !== 'undefined' && navigator.product === 'ReactNative') {
+    return false;
+  }
+  return (
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined'
+  );
+}
+
+/**
+ * Iterate over an Array or an Object invoking a function for each item.
+ *
+ * If `obj` is an Array callback will be called passing
+ * the value, index, and complete array for each item.
+ *
+ * If 'obj' is an Object callback will be called passing
+ * the value, key, and complete object for each property.
+ *
+ * @param {Object|Array} obj The object to iterate
+ * @param {Function} fn The callback to invoke for each item
+ */
+function forEach(obj, fn) {
+  // Don't bother if no value provided
+  if (obj === null || typeof obj === 'undefined') {
+    return;
+  }
+
+  // Force an array if not already something iterable
+  if (typeof obj !== 'object' && !isArray(obj)) {
+    /*eslint no-param-reassign:0*/
+    obj = [obj];
+  }
+
+  if (isArray(obj)) {
+    // Iterate over array values
+    for (var i = 0, l = obj.length; i < l; i++) {
+      fn.call(null, obj[i], i, obj);
+    }
+  } else {
+    // Iterate over object keys
+    for (var key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        fn.call(null, obj[key], key, obj);
+      }
+    }
+  }
+}
+
+/**
+ * Accepts varargs expecting each argument to be an object, then
+ * immutably merges the properties of each object and returns result.
+ *
+ * When multiple objects contain the same key the later object in
+ * the arguments list will take precedence.
+ *
+ * Example:
+ *
+ * ```js
+ * var result = merge({foo: 123}, {foo: 456});
+ * console.log(result.foo); // outputs 456
+ * ```
+ *
+ * @param {Object} obj1 Object to merge
+ * @returns {Object} Result of all merge properties
+ */
+function merge(/* obj1, obj2, obj3, ... */) {
+  var result = {};
+  function assignValue(val, key) {
+    if (typeof result[key] === 'object' && typeof val === 'object') {
+      result[key] = merge(result[key], val);
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
+ * Extends object a by mutably adding to it the properties of object b.
+ *
+ * @param {Object} a The object to be extended
+ * @param {Object} b The object to copy properties from
+ * @param {Object} thisArg The object to bind function to
+ * @return {Object} The resulting value of object a
+ */
+function extend(a, b, thisArg) {
+  forEach(b, function assignValue(val, key) {
+    if (thisArg && typeof val === 'function') {
+      a[key] = bind(val, thisArg);
+    } else {
+      a[key] = val;
+    }
+  });
+  return a;
+}
+
+module.exports = {
+  isArray: isArray,
+  isArrayBuffer: isArrayBuffer,
+  isBuffer: isBuffer,
+  isFormData: isFormData,
+  isArrayBufferView: isArrayBufferView,
+  isString: isString,
+  isNumber: isNumber,
+  isObject: isObject,
+  isUndefined: isUndefined,
+  isDate: isDate,
+  isFile: isFile,
+  isBlob: isBlob,
+  isFunction: isFunction,
+  isStream: isStream,
+  isURLSearchParams: isURLSearchParams,
+  isStandardBrowserEnv: isStandardBrowserEnv,
+  forEach: forEach,
+  merge: merge,
+  extend: extend,
+  trim: trim
+};
+
+
+/***/ }),
 /* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 const INITIALIZE_WORDS = 'INITIALIZE_WORDS'
-/* harmony export (immutable) */ __webpack_exports__["e"] = INITIALIZE_WORDS;
+/* harmony export (immutable) */ __webpack_exports__["f"] = INITIALIZE_WORDS;
 
 const INITIALIZE_FACTS = 'INITIALIZE_FACTS'
-/* harmony export (immutable) */ __webpack_exports__["a"] = INITIALIZE_FACTS;
+/* harmony export (immutable) */ __webpack_exports__["c"] = INITIALIZE_FACTS;
 
 const INITIALIZE_STATES = 'INITIALIZE_STATES'
-/* harmony export (immutable) */ __webpack_exports__["d"] = INITIALIZE_STATES;
+/* harmony export (immutable) */ __webpack_exports__["e"] = INITIALIZE_STATES;
 
 const INITIALIZE_SKILLS = 'INITIALIZE_SKILLS'
-/* harmony export (immutable) */ __webpack_exports__["c"] = INITIALIZE_SKILLS;
+/* harmony export (immutable) */ __webpack_exports__["d"] = INITIALIZE_SKILLS;
 
-const INITIALIZE_IONS = 'INITIALIZE_IONS'
-/* harmony export (immutable) */ __webpack_exports__["b"] = INITIALIZE_IONS;
+const INITIALIZE_ANIONS = 'INITIALIZE_ANIONS'
+/* harmony export (immutable) */ __webpack_exports__["a"] = INITIALIZE_ANIONS;
+
+const INITIALIZE_CATIONS = 'INITIALIZE_CATIONS'
+/* harmony export (immutable) */ __webpack_exports__["b"] = INITIALIZE_CATIONS;
 
 const SET_USER = 'SET_USER'
 /* unused harmony export SET_USER */
 
 const UPDATE_STAGE = 'UPDATE_STAGE'
-/* harmony export (immutable) */ __webpack_exports__["q"] = UPDATE_STAGE;
+/* harmony export (immutable) */ __webpack_exports__["s"] = UPDATE_STAGE;
 
 const UPDATE_RTS_ACCS = 'UPDATE_RTS_ACCS'
-/* harmony export (immutable) */ __webpack_exports__["p"] = UPDATE_RTS_ACCS;
+/* harmony export (immutable) */ __webpack_exports__["r"] = UPDATE_RTS_ACCS;
 
 const INCREMENT_FRUSTRATION = 'INCREMENT_FRUSTRATION'
 /* unused harmony export INCREMENT_FRUSTRATION */
@@ -18716,34 +18719,37 @@ const INCREMENT_HINTS = 'INCREMENT_HINTS'
 
 //export const NEW_QUESTION = 'NEW_QUESTION'
 const SET_READY = 'SET_READY'
-/* harmony export (immutable) */ __webpack_exports__["l"] = SET_READY;
+/* harmony export (immutable) */ __webpack_exports__["n"] = SET_READY;
 
 const SET_QUESTION = 'SET_QUESTION'
-/* harmony export (immutable) */ __webpack_exports__["j"] = SET_QUESTION;
+/* harmony export (immutable) */ __webpack_exports__["l"] = SET_QUESTION;
 
 const SET_QUESTION_START = 'SET_QUESTION_START'
-/* harmony export (immutable) */ __webpack_exports__["k"] = SET_QUESTION_START;
+/* harmony export (immutable) */ __webpack_exports__["m"] = SET_QUESTION_START;
 
 const SET_MESSAGE = 'SET_MESSAGE'
-/* harmony export (immutable) */ __webpack_exports__["h"] = SET_MESSAGE;
+/* harmony export (immutable) */ __webpack_exports__["j"] = SET_MESSAGE;
 
 const SET_FEEDBACK = 'SET_FEEDBACK'
-/* harmony export (immutable) */ __webpack_exports__["f"] = SET_FEEDBACK;
+/* harmony export (immutable) */ __webpack_exports__["h"] = SET_FEEDBACK;
 
 const SET_FEEDBACK_TYPE = 'SET_FEEDBACK_TYPE'
-/* harmony export (immutable) */ __webpack_exports__["g"] = SET_FEEDBACK_TYPE;
+/* harmony export (immutable) */ __webpack_exports__["i"] = SET_FEEDBACK_TYPE;
 
 const TOGGLE_BUG = 'TOGGLE_BUG'
-/* harmony export (immutable) */ __webpack_exports__["m"] = TOGGLE_BUG;
+/* harmony export (immutable) */ __webpack_exports__["o"] = TOGGLE_BUG;
 
 const TOGGLE_FRUSTRATED = 'TOGGLE_FRUSTRATED'
-/* harmony export (immutable) */ __webpack_exports__["n"] = TOGGLE_FRUSTRATED;
+/* harmony export (immutable) */ __webpack_exports__["p"] = TOGGLE_FRUSTRATED;
 
 const TOGGLE_SUGGESTION = 'TOGGLE_SUGGESTION'
-/* harmony export (immutable) */ __webpack_exports__["o"] = TOGGLE_SUGGESTION;
+/* harmony export (immutable) */ __webpack_exports__["q"] = TOGGLE_SUGGESTION;
 
 const SET_NOMENCLATURE_SESSION = 'SET_NOMENCLATURE_SESSION'
-/* harmony export (immutable) */ __webpack_exports__["i"] = SET_NOMENCLATURE_SESSION;
+/* harmony export (immutable) */ __webpack_exports__["k"] = SET_NOMENCLATURE_SESSION;
+
+const SET_BBOXES = 'SET_BBOXES'
+/* harmony export (immutable) */ __webpack_exports__["g"] = SET_BBOXES;
 
 
 
@@ -18754,7 +18760,7 @@ const SET_NOMENCLATURE_SESSION = 'SET_NOMENCLATURE_SESSION'
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {
 
-var utils = __webpack_require__(2);
+var utils = __webpack_require__(5);
 var normalizeHeaderName = __webpack_require__(26);
 
 var DEFAULT_CONTENT_TYPE = {
@@ -18899,7 +18905,7 @@ module.exports = function bind(fn, thisArg) {
 "use strict";
 
 
-var utils = __webpack_require__(2);
+var utils = __webpack_require__(5);
 var settle = __webpack_require__(27);
 var buildURL = __webpack_require__(29);
 var parseHeaders = __webpack_require__(30);
@@ -29242,7 +29248,7 @@ module.exports = Vue$3;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(16);
-module.exports = __webpack_require__(121);
+module.exports = __webpack_require__(142);
 
 
 /***/ }),
@@ -29251,13 +29257,13 @@ module.exports = __webpack_require__(121);
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__vuex_store__ = __webpack_require__(109);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__plugins_RandomGeneratorPlugin_js__ = __webpack_require__(118);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__plugins_FactPriorityPlugin_js__ = __webpack_require__(119);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__plugins_SkillPriorityPlugin_js__ = __webpack_require__(120);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__plugins_LewisPositionerPlugin_js__ = __webpack_require__(138);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__plugins_LewisStructurePlugin_js__ = __webpack_require__(139);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__plugins_NameFormulaPlugin_js__ = __webpack_require__(145);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__vuex_store__ = __webpack_require__(127);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__plugins_RandomGeneratorPlugin_js__ = __webpack_require__(136);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__plugins_FactPriorityPlugin_js__ = __webpack_require__(137);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__plugins_SkillPriorityPlugin_js__ = __webpack_require__(138);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__plugins_LewisPositionerPlugin_js__ = __webpack_require__(139);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__plugins_LewisStructurePlugin_js__ = __webpack_require__(140);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__plugins_NameFormulaPlugin_js__ = __webpack_require__(141);
 
 /**
  * First we will load all of this project's JavaScript dependencies which
@@ -29279,22 +29285,23 @@ window.Vuex = __webpack_require__(0);
 Vue.component('example', __webpack_require__(41));
 Vue.component('test1', __webpack_require__(47));
 Vue.component('study-session', __webpack_require__(50));
-Vue.component('nomenclature-session', __webpack_require__(140));
-Vue.component('word-question', __webpack_require__(55));
-Vue.component('fact-question', __webpack_require__(60));
-Vue.component('skill-question', __webpack_require__(65));
-Vue.component('polyatomic-ion-question', __webpack_require__(70));
-Vue.component('element-symbol-question', __webpack_require__(75));
-Vue.component('element-charge-question', __webpack_require__(80));
-Vue.component('element-group-question', __webpack_require__(85));
-Vue.component('sigfig-question', __webpack_require__(90));
-Vue.component('ionic-formula-question', __webpack_require__(95));
-Vue.component('lewis-structure-question', __webpack_require__(130));
-Vue.component('general-nomenclature-question', __webpack_require__(146));
-Vue.component('lewis-atom', __webpack_require__(135));
-Vue.component('bug-report', __webpack_require__(100));
-Vue.component('frustration-report', __webpack_require__(103));
-Vue.component('suggestion-box', __webpack_require__(106));
+Vue.component('nomenclature-session', __webpack_require__(55));
+Vue.component('word-question', __webpack_require__(60));
+Vue.component('fact-question', __webpack_require__(65));
+Vue.component('skill-question', __webpack_require__(70));
+Vue.component('polyatomic-ion-question', __webpack_require__(75));
+Vue.component('element-symbol-question', __webpack_require__(80));
+Vue.component('element-charge-question', __webpack_require__(85));
+Vue.component('element-group-question', __webpack_require__(90));
+Vue.component('sigfig-question', __webpack_require__(95));
+Vue.component('ionic-formula-question', __webpack_require__(100));
+Vue.component('lewis-structure-question', __webpack_require__(105));
+Vue.component('general-nomenclature-question', __webpack_require__(110));
+Vue.component('lewis-atom', __webpack_require__(115));
+Vue.component('lewis-tester', __webpack_require__(151));
+Vue.component('bug-report', __webpack_require__(118));
+Vue.component('frustration-report', __webpack_require__(121));
+Vue.component('suggestion-box', __webpack_require__(124));
 
 
 
@@ -29343,7 +29350,7 @@ var app = new Vue({
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
-window._ = __webpack_require__(5);
+window._ = __webpack_require__(4);
 
 /**
  * We'll load jQuery and the Bootstrap jQuery plugin which provides support
@@ -42080,7 +42087,7 @@ module.exports = __webpack_require__(22);
 "use strict";
 
 
-var utils = __webpack_require__(2);
+var utils = __webpack_require__(5);
 var bind = __webpack_require__(9);
 var Axios = __webpack_require__(24);
 var defaults = __webpack_require__(7);
@@ -42167,7 +42174,7 @@ function isSlowBuffer (obj) {
 
 
 var defaults = __webpack_require__(7);
-var utils = __webpack_require__(2);
+var utils = __webpack_require__(5);
 var InterceptorManager = __webpack_require__(34);
 var dispatchRequest = __webpack_require__(35);
 var isAbsoluteURL = __webpack_require__(37);
@@ -42449,7 +42456,7 @@ process.umask = function() { return 0; };
 "use strict";
 
 
-var utils = __webpack_require__(2);
+var utils = __webpack_require__(5);
 
 module.exports = function normalizeHeaderName(headers, normalizedName) {
   utils.forEach(headers, function processHeader(value, name) {
@@ -42529,7 +42536,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
 "use strict";
 
 
-var utils = __webpack_require__(2);
+var utils = __webpack_require__(5);
 
 function encode(val) {
   return encodeURIComponent(val).
@@ -42604,7 +42611,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 "use strict";
 
 
-var utils = __webpack_require__(2);
+var utils = __webpack_require__(5);
 
 /**
  * Parse headers into an object
@@ -42648,7 +42655,7 @@ module.exports = function parseHeaders(headers) {
 "use strict";
 
 
-var utils = __webpack_require__(2);
+var utils = __webpack_require__(5);
 
 module.exports = (
   utils.isStandardBrowserEnv() ?
@@ -42766,7 +42773,7 @@ module.exports = btoa;
 "use strict";
 
 
-var utils = __webpack_require__(2);
+var utils = __webpack_require__(5);
 
 module.exports = (
   utils.isStandardBrowserEnv() ?
@@ -42826,7 +42833,7 @@ module.exports = (
 "use strict";
 
 
-var utils = __webpack_require__(2);
+var utils = __webpack_require__(5);
 
 function InterceptorManager() {
   this.handlers = [];
@@ -42885,7 +42892,7 @@ module.exports = InterceptorManager;
 "use strict";
 
 
-var utils = __webpack_require__(2);
+var utils = __webpack_require__(5);
 var transformData = __webpack_require__(36);
 var isCancel = __webpack_require__(12);
 var defaults = __webpack_require__(7);
@@ -42971,7 +42978,7 @@ module.exports = function dispatchRequest(config) {
 "use strict";
 
 
-var utils = __webpack_require__(2);
+var utils = __webpack_require__(5);
 
 /**
  * Transform the data for a request or a response
@@ -43186,7 +43193,7 @@ var content = __webpack_require__(43);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("5ef8e83e", content, false);
+var update = __webpack_require__(3)("5ef8e83e", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -43205,7 +43212,7 @@ if(false) {
 /* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
@@ -43469,7 +43476,7 @@ var content = __webpack_require__(52);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("315b6a78", content, false);
+var update = __webpack_require__(3)("315b6a78", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -43488,12 +43495,12 @@ if(false) {
 /* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -43505,6 +43512,8 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 //
@@ -43540,6 +43549,12 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
+//
+//
+//
+//
+//
+
 
 
 
@@ -43554,7 +43569,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     frustrated: 'isFrustrated',
     bug: 'isBug',
     suggestion: 'hasSuggestion',
-    message: 'getMessage'
+    message: 'getMessage',
+    elements: 'getLSE'
   }), {
     ready: function ready() {
       if (this.setupReady === true && typeof this.currentQuestionState !== 'undefined') {
@@ -43577,6 +43593,24 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       var curr = _this.currentQuestionState;
       _this.$store.dispatch('setQuestionStart');
     });
+  },
+  mounted: function mounted() {
+    var _this2 = this;
+
+    setTimeout(function () {
+      var boxArray = {};
+      var rect = 0;
+      var width = 0;
+      var height = 0;
+      console.log("this.elements: ", _this2.elements);
+      __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.forOwn(_this2.elements, function (element, key) {
+        rect = document.getElementById('atomForBox' + key).getBBox();
+        width = rect.width;
+        height = rect.height;
+        boxArray[key] = { width: width, height: height };
+      });
+      _this2.$store.dispatch('setupBBoxes', boxArray);
+    }, 10);
   }
 });
 
@@ -43651,7 +43685,23 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.$store.dispatch('toggleSuggestion')
       }
     }
-  }, [_vm._v("Make a suggestion")])]), _vm._v(" "), (_vm.bug) ? _c('bug-report') : _vm._e(), (_vm.frustrated) ? _c('frustration-report') : _vm._e(), _vm._v(" "), (_vm.suggestion) ? _c('suggestion-box') : _vm._e(), _vm._v(" "), _c('hr')], 1)
+  }, [_vm._v("Make a suggestion")])]), _vm._v(" "), (_vm.bug) ? _c('bug-report') : _vm._e(), (_vm.frustrated) ? _c('frustration-report') : _vm._e(), _vm._v(" "), (_vm.suggestion) ? _c('suggestion-box') : _vm._e(), _vm._v(" "), _c('svg', {
+    staticClass: "Lewis-Box-Sizes",
+    attrs: {
+      "width": "20",
+      "height": "20"
+    }
+  }, _vm._l((_vm.elements), function(element) {
+    return _c('text', {
+      attrs: {
+        "id": 'atomForBox' + element[0],
+        "x": 0,
+        "y": 0,
+        "font-family": "Verdana",
+        "font-size": "24"
+      }
+    }, [_vm._v(_vm._s(element[0]))])
+  })), _vm._v(" "), _c('hr')], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -43675,6 +43725,289 @@ var Component = __webpack_require__(1)(
   __webpack_require__(58),
   /* template */
   __webpack_require__(59),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/NomenclatureSession.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] NomenclatureSession.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1039c240", Component.options)
+  } else {
+    hotAPI.reload("data-v-1039c240", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 56 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(57);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(3)("23a28045", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-1039c240\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./NomenclatureSession.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-1039c240\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./NomenclatureSession.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 57 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(2)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 58 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      mode: 'Easy Mode',
+      notMode: 'Hard Mode',
+      modeBool: true
+    };
+  },
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    factsStatus: 'checkFactsReady',
+    statesStatus: 'checkStatesReady',
+    currentQuestionState: 'getCurrent',
+    setupReady: 'checkSetup',
+    finished: 'getFinished',
+    frustrated: 'isFrustrated',
+    bug: 'isBug',
+    suggestion: 'hasSuggestion',
+    message: 'getMessage'
+  }), {
+    ready: function ready() {
+      if (this.setupReady === true && typeof this.currentQuestionState !== 'undefined') {
+        return true;
+      } else return false;
+    }
+  }),
+  created: function created() {
+    var _this = this;
+
+    Promise.all([this.$store.dispatch('setupFacts')]).then(function (results) {
+      _this.$store.dispatch('setupStates', 9);
+    }).then(function (results) {
+      _this.$store.dispatch('setupIons');
+    }).then(function (results) {
+
+      console.log(results);
+      console.log('promise resolved, in then');
+      _this.$store.dispatch('setReady');
+      var curr = _this.currentQuestionState;
+      console.log(curr);
+      _this.$store.dispatch('setQuestionStart');
+    });
+  },
+
+  methods: {
+    setMode: function setMode() {
+      console.log('called setMode');
+      if (this.modeBool) {
+        this.mode = 'Hard Mode';
+        this.notMode = 'Easy Mode';
+      } else {
+        this.notMode = 'Hard Mode';
+        this.mode = 'Easy Mode';
+      }
+      this.modeBool = !this.modeBool;
+    }
+  }
+});
+
+/***/ }),
+/* 59 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('div', [_vm._v("Easy mode talks you through the decisions you need to make. Hard mode just asks for the answer.\n    Currently set to " + _vm._s(_vm.mode))]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.setMode()
+      }
+    }
+  }, [_vm._v("Set " + _vm._s(_vm.notMode))]), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.finished),
+      expression: "finished"
+    }],
+    staticClass: "alert alert-success"
+  }, [_c('strong', [_vm._v("Congrats, you've finished studying everything you set for this session!")]), _vm._v("\n    Add more material by returning to your dashboard and setting a new session, or\n    check back in later to see if you have material to review. Or just keep studying, if you want.")]), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.message),
+      expression: "message"
+    }],
+    staticClass: "alert alert-info"
+  }, [_vm._v("\n      " + _vm._s(_vm.message))]), _vm._v(" "), (_vm.ready === false) ? _c('div', [_vm._v("Please wait, loading")]) : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[0] === -1) ? _c('div', {
+    staticClass: "alert alert-danger"
+  }, [_vm._v("\n    You haven't set up nomenclature! Please return to your dashboard and use Setup New Session\n    to add the topic nomenclature.")]) : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'skill') ? _c('general-nomenclature-question', {
+    attrs: {
+      "easymode": _vm.modeBool
+    }
+  }) : _vm._e(), _vm._v(" "), _c('div', [_c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.bug),
+      expression: "!bug"
+    }],
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.$store.dispatch('toggleBug')
+      }
+    }
+  }, [_vm._v("Report Bug")]), _vm._v(" "), _c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.frustrated),
+      expression: "!frustrated"
+    }],
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.$store.dispatch('toggleFrustrated')
+      }
+    }
+  }, [_vm._v("I'm frustrated")]), _vm._v(" "), _c('button', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.suggestion),
+      expression: "!suggestion"
+    }],
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.$store.dispatch('toggleSuggestion')
+      }
+    }
+  }, [_vm._v("Make a suggestion")])]), _vm._v(" "), (_vm.bug) ? _c('bug-report') : _vm._e(), (_vm.frustrated) ? _c('frustration-report') : _vm._e(), _vm._v(" "), (_vm.suggestion) ? _c('suggestion-box') : _vm._e(), _vm._v(" "), _c('hr')], 1)
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-1039c240", module.exports)
+  }
+}
+
+/***/ }),
+/* 60 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(61)
+}
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(63),
+  /* template */
+  __webpack_require__(64),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -43706,17 +44039,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 56 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(57);
+var content = __webpack_require__(62);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("229eac3a", content, false);
+var update = __webpack_require__(3)("229eac3a", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -43732,10 +44065,10 @@ if(false) {
 }
 
 /***/ }),
-/* 57 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
@@ -43746,7 +44079,7 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 58 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -43935,7 +44268,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 59 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -44012,19 +44345,19 @@ if (false) {
 }
 
 /***/ }),
-/* 60 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(61)
+  __webpack_require__(66)
 }
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(63),
+  __webpack_require__(68),
   /* template */
-  __webpack_require__(64),
+  __webpack_require__(69),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -44056,17 +44389,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 61 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(62);
+var content = __webpack_require__(67);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("2697d6f9", content, false);
+var update = __webpack_require__(3)("2697d6f9", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -44082,10 +44415,10 @@ if(false) {
 }
 
 /***/ }),
-/* 62 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
@@ -44096,7 +44429,7 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 
 /***/ }),
-/* 63 */
+/* 68 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -44137,7 +44470,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 64 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -44159,19 +44492,19 @@ if (false) {
 }
 
 /***/ }),
-/* 65 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(66)
+  __webpack_require__(71)
 }
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(68),
+  __webpack_require__(73),
   /* template */
-  __webpack_require__(69),
+  __webpack_require__(74),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -44203,17 +44536,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 66 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(67);
+var content = __webpack_require__(72);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("0fbd3fa6", content, false);
+var update = __webpack_require__(3)("0fbd3fa6", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -44229,21 +44562,21 @@ if(false) {
 }
 
 /***/ }),
-/* 67 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 68 */
+/* 73 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -44251,6 +44584,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+//
 //
 //
 //
@@ -44278,7 +44612,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 69 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -44288,7 +44622,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "row"
   }, [_c('div', {
     staticClass: "col-md-8 col-md-offset-2"
-  }, [(_vm.currentQuestion[5] === 'sigfig') ? _c('sigfig-question') : _vm._e(), _vm._v(" "), (_vm.currentQuestion[5] === 'ionicFormula') ? _c('ionic-formula-question') : _vm._e(), _vm._v(" "), (_vm.currentQuestion[5] === 'LewisStructure') ? _c('lewis-structure-question') : _vm._e()], 1)])])
+  }, [(_vm.currentQuestion[5] === 'sigfig') ? _c('sigfig-question') : _vm._e(), _vm._v(" "), (_vm.currentQuestion[5] === 'ionicFormula') ? _c('ionic-formula-question') : _vm._e(), _vm._v(" "), (_vm.currentQuestion[5] === 'LewisStructure') ? _c('lewis-tester') : _vm._e()], 1)])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -44299,19 +44633,19 @@ if (false) {
 }
 
 /***/ }),
-/* 70 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(71)
+  __webpack_require__(76)
 }
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(73),
+  __webpack_require__(78),
   /* template */
-  __webpack_require__(74),
+  __webpack_require__(79),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -44343,17 +44677,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 71 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(72);
+var content = __webpack_require__(77);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("7300aa3e", content, false);
+var update = __webpack_require__(3)("7300aa3e", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -44369,10 +44703,10 @@ if(false) {
 }
 
 /***/ }),
-/* 72 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
@@ -44383,7 +44717,7 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 73 */
+/* 78 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -44659,7 +44993,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 74 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -44792,19 +45126,19 @@ if (false) {
 }
 
 /***/ }),
-/* 75 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(76)
+  __webpack_require__(81)
 }
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(78),
+  __webpack_require__(83),
   /* template */
-  __webpack_require__(79),
+  __webpack_require__(84),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -44836,17 +45170,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 76 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(77);
+var content = __webpack_require__(82);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("e7ccfafe", content, false);
+var update = __webpack_require__(3)("e7ccfafe", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -44862,10 +45196,10 @@ if(false) {
 }
 
 /***/ }),
-/* 77 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
@@ -44876,7 +45210,7 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
 
 
 /***/ }),
-/* 78 */
+/* 83 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -45104,7 +45438,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 79 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -45175,19 +45509,19 @@ if (false) {
 }
 
 /***/ }),
-/* 80 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(81)
+  __webpack_require__(86)
 }
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(83),
+  __webpack_require__(88),
   /* template */
-  __webpack_require__(84),
+  __webpack_require__(89),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -45219,17 +45553,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 81 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(82);
+var content = __webpack_require__(87);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("51903fda", content, false);
+var update = __webpack_require__(3)("51903fda", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -45245,10 +45579,10 @@ if(false) {
 }
 
 /***/ }),
-/* 82 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
@@ -45259,13 +45593,13 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 83 */
+/* 88 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -45559,7 +45893,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 84 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -45629,19 +45963,19 @@ if (false) {
 }
 
 /***/ }),
-/* 85 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(86)
+  __webpack_require__(91)
 }
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(88),
+  __webpack_require__(93),
   /* template */
-  __webpack_require__(89),
+  __webpack_require__(94),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -45673,17 +46007,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 86 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(87);
+var content = __webpack_require__(92);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("374f6bdc", content, false);
+var update = __webpack_require__(3)("374f6bdc", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -45699,10 +46033,10 @@ if(false) {
 }
 
 /***/ }),
-/* 87 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
@@ -45713,7 +46047,7 @@ exports.push([module.i, "\n.table-cell-bordered {\n  border: none;\n  width: 100
 
 
 /***/ }),
-/* 88 */
+/* 93 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -45997,7 +46331,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 89 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -46347,19 +46681,19 @@ if (false) {
 }
 
 /***/ }),
-/* 90 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(91)
+  __webpack_require__(96)
 }
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(93),
+  __webpack_require__(98),
   /* template */
-  __webpack_require__(94),
+  __webpack_require__(99),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -46391,17 +46725,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 91 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(92);
+var content = __webpack_require__(97);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("62bf7d00", content, false);
+var update = __webpack_require__(3)("62bf7d00", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -46417,10 +46751,10 @@ if(false) {
 }
 
 /***/ }),
-/* 92 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
@@ -46431,13 +46765,13 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 93 */
+/* 98 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -46652,7 +46986,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 94 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -46727,19 +47061,19 @@ if (false) {
 }
 
 /***/ }),
-/* 95 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(96)
+  __webpack_require__(101)
 }
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(98),
+  __webpack_require__(103),
   /* template */
-  __webpack_require__(99),
+  __webpack_require__(104),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -46771,17 +47105,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 96 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(97);
+var content = __webpack_require__(102);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("a48afeca", content, false);
+var update = __webpack_require__(3)("a48afeca", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -46797,10 +47131,10 @@ if(false) {
 }
 
 /***/ }),
-/* 97 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
@@ -46811,7 +47145,7 @@ exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\
 
 
 /***/ }),
-/* 98 */
+/* 103 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -46885,8 +47219,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       var anions = this.ions.an;
       var cations = this.ions.cat;
       if (this.currentQuestion[6] === 'complex ionic formulas') {
-        anions.concat(this.ions.polyan);
-        cations.concat(this.ions.polycat);
+        anions = anions.concat(this.ions.polyan);
+        cations = cations.concat(this.ions.polycat);
       }
       var anion = anions[_.random(0, anions.length - 1)];
       var cation = cations[_.random(0, cations.length - 1)];
@@ -46934,7 +47268,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       }
       if (moveOn === true && gotIt === false) {
         if (this.requestFormula) {
-          answerDetail.messageSent = 'The formula of "' + this.question.name + '" is\n          "' + this.question.answer + '". We\'ll come back to it.';
+          answerDetail.messageSent = 'The formula of "' + this.question.name + '" is\n          "' + this.question.formula + '". We\'ll come back to it.';
           this.acc = 4;
         } else {
           answerDetail.messageSent = 'The name of "' + this.question.formula + '" is\n          "' + this.question.name + '". We\'ll come back to it.';
@@ -47016,7 +47350,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
             }
             if (!reArrayE) {
               reArrayE = reBothParen.exec(this.entry);
-              parentheses = 2;
+              parensE = 2;
             }
             if (!reArrayE) {
               reArrayE = reNoParen.exec(this.entry);
@@ -47092,7 +47426,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 99 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -47175,15 +47509,1520 @@ if (false) {
 }
 
 /***/ }),
-/* 100 */
+/* 105 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(106)
+}
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(108),
+  /* template */
+  __webpack_require__(109),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/LewisStructureQuestion.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] LewisStructureQuestion.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-fb5daf40", Component.options)
+  } else {
+    hotAPI.reload("data-v-fb5daf40", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 106 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(107);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(3)("62e56123", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-fb5daf40\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./LewisStructureQuestion.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-fb5daf40\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./LewisStructureQuestion.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 107 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(2)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 108 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      tries: 0,
+      acc: 0,
+      rts: [],
+      startTime: 0,
+      index: 0
+      //determines whether name or formula is given
+    };
+  },
+  //props: ['questionTypeID'],
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    currentQuestion: 'getCurrent',
+    questionSetTime: 'getQuestionSetTime',
+    stageData: 'getStageData',
+    feedback: 'getFeedback',
+    feedbackType: 'getFeedbackType',
+    lewisHomo: 'getLewisHomoDiatomics',
+    lewisHetero: 'getLewisHeteroDiatomics',
+    lewisMulti: 'getLewisSimpleCentral',
+    lewisTriCentral: 'getLewisTriatomicCentral',
+    elements: 'getLSE'
+  }), {
+    formulasArray: function formulasArray() {
+      //let temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti)
+      var temp = this.lewisTriCentral;
+      return temp;
+    },
+    formula: function formula() {
+      return this.formulasArray[this.index];
+    },
+    question: function question() {
+      return Vue.generalLewisStructure(this.formula, this.elements);
+    },
+    stats: function stats() {
+      var directions = Array(12);
+      directions.fill(0);
+      var drawnAtoms = Array(this.question.structure.length);
+      drawnAtoms.fill(0);
+      return {
+        center: [100, 100],
+        directions: directions,
+        atomsArray: this.question.structure,
+        drawnAtoms: drawnAtoms,
+        index: 0
+      };
+    }
+  }),
+  created: function created() {
+    this.index = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.formulasArray.length - 1);
+  },
+  mounted: function mounted() {},
+
+  methods: {
+
+    submitEntry: function submitEntry(event) {
+      this.tries += 1;
+      var answerDetail = this.checkEntry();
+      if (this.startTime === 0) {
+        this.startTime = this.questionSetTime;
+      }
+      answerDetail.timeStamp = Date.now();
+
+      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
+      //console.log('rts is set to ', this.rts)
+      this.startTime = Date.now();
+
+      var correct = answerDetail.correct;
+      var moveOn = false;
+      var gotIt = false;
+
+      if (correct === 'correct') {
+        answerDetail.messageSent += ' Correct!';
+        moveOn = true;
+        gotIt = true;
+        this.acc = this.tries - 1;
+        this.$store.dispatch('setFeedbackType', { "alert-success": true });
+
+        //console.log('acc is set to ', this.acc)
+      } else if (correct === 'dontKnow') {
+        moveOn = true;
+      } else {
+        if (this.tries === 1) {
+          answerDetail.messageSent += " Try again!";
+        } else if (answerDetail.correct === 'formatError' || answerDetail.correct === 'noAnswer') {
+          answerDetail.messageSent += " Try again!";
+        } else moveOn = true;
+      }
+      if (moveOn === true && gotIt === false) this.acc = 4;
+      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
+        this.$store.dispatch('setFeedbackType', { "alert-warning": true });
+      } else if (gotIt === false) this.$store.dispatch('setFeedbackType', { "alert-danger": true });
+      this.$store.dispatch('setFeedback', answerDetail.messageSent);
+      var action = {};
+      action.state_id = this.currentQuestion[4];
+      action.type = 'answer given-' + correct;
+      action.detail = answerDetail;
+      action.time = answerDetail.timeStamp;
+
+      //this code gives a 500 error now, should check laravel side
+      //console.log("action is ", action);
+      axios.post('../api/student/actions', action).catch(function (error) {
+        console.log(error);
+      });
+
+      if (moveOn) {
+        //update states
+
+        var updatedState = { rts: this.rts, accs: this.acc };
+        //console.log("updatedState is", updatedState)
+        this.$store.dispatch('updateRtsAccs', updatedState);
+        updatedState = Vue.skillPriorityHelper(this.stageData);
+        this.$store.dispatch('updateStage', updatedState);
+
+        //set new question
+        //console.log('about to set new question');
+        this.$store.dispatch('setQuestion');
+        this.$store.dispatch('setQuestionStart');
+
+        //update props
+        this.entry = '';
+        this.tries = 0;
+        this.acc = 0;
+        this.rts = [];
+        this.index = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.formulasArray.length - 1);
+        //this.index = 20
+      }
+    },
+
+    //checks the entry, returns answerDetail
+    checkEntry: function checkEntry() {
+      var answerDetailToReturn = { answer: this.entry, messageSent: '', correct: '' };
+      var entryTemp = this.entry.toLowerCase();
+      //console.log('this.entry: ', this.entry);
+      //console.log('this.answer: ', this.answers);
+      if (entryTemp === '') {
+        answerDetailToReturn.correct = 'noAnswer';
+        answerDetailToReturn.messageSent += 'Please enter an answer. ';
+      } else {
+        var yArray = ['y', 'yes', 't', 'true'];
+        var nArray = ['n', 'no', 'f', 'false'];
+        if (yArray.indexOf(entryTemp) > -1) {
+          entryTemp = 'y';
+        } else if (nArray.indexOf(entryTemp) > -1) {
+          entryTemp = 'n';
+        } else {
+          answerDetailToReturn.correct = 'formatError';
+          answerDetailToReturn.messageSent = 'Please check the format of your answer. ';
+        }
+        if (entryTemp === this.question.answer) {
+          answerDetailToReturn.correct = 'correct';
+        } else answerDetailToReturn.correct = 'knownWrong';
+      }
+
+      //console.log(entryTemp, answerDetailToReturn)
+      return answerDetailToReturn;
+    }
+
+  }
+});
+
+/***/ }),
+/* 109 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._v("Lewis Structure Practice")]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_c('div', [_vm._v("\n            Instructions: Enter y or n. By \"good structure\", I mean the best (or among the best) Lewis\n            structures for the formula given.\n            "), _c('br'), _c('br'), _vm._v("\n            Is this a good Lewis structure for "), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.formula))
+    }
+  }), _vm._v("?")]), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_c('input', {
+    directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.entry),
+      expression: "entry"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text",
+      "autocorrect": "off"
+    },
+    domProps: {
+      "value": (_vm.entry)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.entry = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), _c('svg', {
+    attrs: {
+      "width": "200",
+      "height": "200"
+    }
+  }, [_c('lewis-atom', {
+    attrs: {
+      "stats": _vm.stats
+    }
+  })], 1), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.feedback),
+      expression: "feedback"
+    }],
+    staticClass: "alert",
+    class: _vm.feedbackType
+  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-fb5daf40", module.exports)
+  }
+}
+
+/***/ }),
+/* 110 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(111)
+}
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(113),
+  /* template */
+  __webpack_require__(114),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/GeneralNomenclatureQuestion.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] GeneralNomenclatureQuestion.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-7e502546", Component.options)
+  } else {
+    hotAPI.reload("data-v-7e502546", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 111 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(112);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(3)("177a8e1d", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7e502546\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./GeneralNomenclatureQuestion.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7e502546\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./GeneralNomenclatureQuestion.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 112 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(2)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 113 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      tries: 0,
+      acc: 0,
+      rts: [],
+      startTime: 0,
+      //determines whether name or formula is given
+      requestFormula: true,
+      type: 0,
+      typeEntry: 0,
+      romanNums: ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'],
+      types: ['ion', 'ionic compound', 'covalent compound', 'acid'],
+      question: { name: '', formula: '' },
+      stage: 0,
+      successes: [],
+      stage1response: '',
+      stage2response: '',
+      stage3response: '',
+      //stage2explanations[type][typeEntry] for name given
+      stage2explanationsName: [[],
+      //ionic
+      ['', '', 'You can recognize an ionic compound because the first part of the name is a metal or ammonium. ', "This can't be an acid because the name doesn't include 'acid'. "],
+      //covalent
+      ['', 'You can recognize a covalent compound because the name will usually include a prefix, and\n          also the first element named will be a non-metal. ', '', "This is not named as an acid (because it doens't include 'acid') and unless it contains hydrogen, it isn't an acid at all. "],
+      //acid
+      ['', 'This is an acid, since it has "acid" in the name. ', 'Acids are covalent, but since it has acid in the name, pick "acid". ', '']],
+      stage2explanationsFormula: [[],
+      //ionic
+      ['', '', 'You can tell it\'s ionic because it begins with either NH4 or a metal', 'You can tell it\'s not an acid because it doesn\'t start with H. '],
+      //covalent
+      ['', 'You can tell it\'s not ionic because it starts with a non-metal (but not the NH4 group). ', '', 'If it doesn\'t start with H, it can\'t be an acid. '],
+      //acid
+      ['', 'Acids are sort of similar to ionic compounds, but since it starts with H, you should call it an acid. ', 'Acids are a type of covalent compound, but in this case we can\'t name it as covalent. ']],
+      num1: '',
+      num2: ''
+    };
+  },
+  props: ['easymode'],
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    currentQuestion: 'getCurrent',
+    questionSetTime: 'getQuestionSetTime',
+    stageData: 'getStageData',
+    facts: 'getFacts',
+    ions: 'getIons',
+    covalentCompounds: 'getCovalentCompounds',
+    feedback: 'getFeedback',
+    feedbackType: 'getFeedbackType'
+  }), {
+    cations: function cations() {
+      var cations = this.ions.cat;
+      console.log('cations length:' + cations.length);
+      console.log(this.ions.polycat);
+      cations = cations.concat(this.ions.polycat);
+      console.log('cations length after: ' + cations.length);
+      return cations;
+    },
+    anions: function anions() {
+      var anions = this.ions.an;
+      anions = anions.concat(this.ions.polyan);
+      return anions;
+    },
+    acids: function acids() {
+      var acids = this.facts.filter(function (entry) {
+        return entry.group_name === 'acids';
+      });
+      return acids;
+    },
+    specifyType: function specifyType() {
+      if (!this.easymode) {
+        if (!this.requestFormula && !/O/.test(this.question.formula) && /^H/.test(this.question.formula)) {
+          return true;
+        }
+      } else return false;
+    }
+  }),
+  created: function created() {
+    this.requestFormula = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random() >= 0.5;
+    this.type = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 3);
+    if (this.type === 0) this.setIonQuestion();else if (this.type === 1) this.setIonicQuestion();else if (this.type === 2) this.setCovalentQuestion();else if (this.type === 3) this.setAcidQuestion();
+  },
+
+  methods: {
+    setIonQuestion: function setIonQuestion() {
+      var catOrAn = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random() >= 0.5;
+      var ion = 0;
+      if (catOrAn) {
+        ion = this.cations[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.cations.length - 1)];
+      } else ion = this.anions[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.anions.length - 1)];
+      var question = Vue.ionNameFormula(ion);
+      this.question = question;
+    },
+    setIonicQuestion: function setIonicQuestion() {
+      var setTime = this.questionSetTime;
+      var anion = this.anions[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.anions.length - 1)];
+      var cation = this.cations[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.cations.length - 1)];
+      var question = Vue.ionicNameFormula(cation, anion);
+      question.setTime = setTime;
+      this.question = question;
+    },
+    setCovalentQuestion: function setCovalentQuestion() {
+      var compounds = this.covalentCompounds;
+      var compound = compounds[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, compounds.length - 1)];
+      var regex = /[A-Z][a-z]*(\d*)[A-Z][a-z]*(\d*)/g;
+      var arr = regex.exec(compound[0]);
+      for (var i = 1; i < 3; i++) {
+        if (arr[i] === '') arr[i] = '1';
+      }
+      console.log(arr);
+      this.question = { name: compound[1], formula: compound[0], num1: arr[1], num2: arr[2] };
+    },
+    setAcidQuestion: function setAcidQuestion() {
+      var acid = this.acids[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.acids.length - 1)];
+      var regex = /^H(\d*)/;
+      var arr = regex.exec(acid.key);
+      if (arr[1] === '') arr[1] = '1';
+      console.log(arr);
+      this.question = { name: acid.prop, formula: acid.key, charge: -Number(arr[1]) };
+    },
+    neutralOrNot: function neutralOrNot(choice) {
+      //is ion
+      if (this.type === 0) {
+        //picked ion correctly
+        if (!choice) {
+          this.successes[0] = 1;
+          this.stage1response = "You picked ion. ";
+        } else {
+          this.successes[0] = 0;
+          this.stage1response = 'You picked compound, but this is an ion. ';
+        }
+      } else {
+        if (choice) {
+          this.successes[0] = 1;
+          this.stage1response = "You picked compound. ";
+        } else {
+          this.successes[0] = 0;
+          this.stage1response = "You picked ion, but this is a compound. ";
+        }
+      }
+      if (this.type !== 0) this.stage = 1;else this.stage = 4;
+    },
+    typeCheck: function typeCheck(typeEntry) {
+      this.typeEntry = typeEntry;
+      if (/^H/.test(this.question.formula) && !/O/.test(this.question.formula) && !this.requestFormula) {
+        if (typeEntry > 1) {
+          this.successes[1] = 1;
+          if (typeEntry === this.type) this.stage2response = 'You picked ' + this.types[this.type] + '. ';else {
+            this.stage2response = 'You picked ' + this.types[typeEntry] + ', which is reasonable, but let\'s use the rules for ' + this.types[this.type] + 's. ';
+          }
+        } else {
+          this.successes[1] = 0;
+          this.stage2response = 'You picked ' + this.types[typeEntry] + ', but this is a ' + this.types[this.type] + '. ';
+        }
+      } else if (typeEntry === this.type) {
+        this.successes[1] = 1;
+        this.stage2response = 'You picked ' + this.types[this.type] + '. ';
+      } else {
+        this.successes[1] = 0;
+        this.stage2response = 'You picked ' + this.types[typeEntry] + ', but this is a ' + this.types[this.type] + '. ';
+      }
+      this.stage = 2;
+    },
+    submitNum: function submitNum(event) {
+      if (this.type === 1) {
+        this.num1 = Number(this.num1.replace(/(\d+)([+])/g, '$2$1'));
+        this.num2 = Number(this.num2.replace(/(\d+)([-])/g, '$2$1'));
+        if (this.num1 === Number(this.question.catCharge) && this.num2 === -Number(this.question.anCharge)) {
+          this.successes[2] = 1;
+        } else this.successes[2] = 0;
+      } else if (this.type === 2) {
+        if (this.num1 === this.question.num1 && this.num2 === this.question.num2) {
+          this.successes[2] = 1;
+        } else this.successes[2] = 0;
+      } else if (this.type === 3) {
+        this.num1 = Number(this.num1.replace(/(\d+)([-])/g, '$2$1'));
+        if (this.num1 === this.question.charge) this.successes[2] = 1;else this.successes[2] = 0;
+      }
+      if (this.successes[2]) this.stage = 4;else this.stage = 3;
+    },
+    lastCheck: function lastCheck(choice) {
+      if (this.type === 1) {
+        if (Boolean(choice) === this.question.romNum) {
+          this.successes[2] = 1;
+        } else this.successes[2] = 0;
+      } else if (this.type === 2) {
+        if (choice === 1) {
+          this.successes[2] = 1;
+        } else this.successes[2] = 0;
+      } else if (this.type === 3) {
+        /^hydro/.test(this.question.name);
+        if (/^hydro/.test(this.question.name) === Boolean(choice)) this.successes[2] = 1;else this.successes[2] = 0;
+      }
+      if (this.successes[2]) this.stage = 4;else this.stage = 3;
+    },
+    submitEntry: function submitEntry(event) {
+      this.tries += 1;
+      var answerDetail = this.checkEntry();
+      if (this.startTime === 0) {
+        this.startTime = this.questionSetTime;
+      }
+      answerDetail.timeStamp = Date.now();
+
+      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
+      //console.log('rts is set to ', this.rts)
+      this.startTime = Date.now();
+
+      var correct = answerDetail.correct;
+      var moveOn = false;
+      var gotIt = false;
+
+      if (correct === 'correct') {
+        answerDetail.messageSent += ' Correct!';
+        moveOn = true;
+        gotIt = true;
+        this.acc = this.tries - 1;
+        this.$store.dispatch('setFeedbackType', { "alert-success": true });
+
+        //console.log('acc is set to ', this.acc)
+      } else if (correct === 'dontKnow') {
+        moveOn = true;
+      } else {
+        if (this.tries < 3) {
+          answerDetail.messageSent += " Try again!";
+        } else moveOn = true;
+      }
+      if (moveOn === true && gotIt === false) {
+        if (this.requestFormula) {
+          answerDetail.messageSent = 'The formula of "' + this.question.name + '" is\n          "' + this.question.formula + '". We\'ll come back to it.';
+          this.acc = 4;
+        } else {
+          answerDetail.messageSent = 'The name of "' + this.question.formula + '" is\n          "' + this.question.name + '". We\'ll come back to it.';
+          this.acc = 4;
+        }
+      }
+      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
+        this.$store.dispatch('setFeedbackType', { "alert-warning": true });
+      } else if (gotIt === false) this.$store.dispatch('setFeedbackType', { "alert-danger": true });
+      this.$store.dispatch('setFeedback', answerDetail.messageSent);
+      var action = {};
+      action.state_id = this.currentQuestion[4];
+      action.type = 'answer given-' + correct;
+      action.detail = answerDetail;
+      action.time = answerDetail.timeStamp;
+
+      //this code gives a 500 error now, should check laravel side
+      //console.log("action is ", action);
+      axios.post('../api/student/actions', action).catch(function (error) {
+        console.log(error);
+      });
+
+      if (moveOn) {
+        //update states
+
+        var updatedState = { rts: this.rts, accs: this.acc };
+        console.log("updatedState is", updatedState);
+        this.$store.dispatch('updateRtsAccs', updatedState);
+        updatedState = Vue.skillPriorityHelper(this.stageData);
+        this.$store.dispatch('updateStage', updatedState);
+
+        //set new question
+        //console.log('about to set new question');
+        //this.$store.dispatch('setQuestion');
+        this.$store.dispatch('setNomenclatureSession');
+
+        //update props
+        this.entry = '';
+        this.typeEntry = 0;
+        this.tries = 0;
+        this.acc = 0;
+        this.rts = [];
+        this.requestFormula = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random() >= 0.5;
+        //this.requestFormula = false
+        this.type = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 3);
+        //this.type = 2;
+        if (this.type === 0) this.setIonQuestion();else if (this.type === 1) this.setIonicQuestion();else if (this.type === 2) this.setCovalentQuestion();else if (this.type === 3) this.setAcidQuestion();
+        this.stage = 0;
+        this.successes = [];
+        this.stage1response = '';
+        this.stage2response = '';
+        this.stage3response = '';
+        this.num1 = '';
+        this.num2 = '';
+      }
+    },
+
+    //checks the entry, returns answerDetail
+    checkEntry: function checkEntry() {
+      var answerDetailToReturn = { answer: this.entry, messageSent: '', correct: '' };
+      console.log('this.entry: ', this.entry);
+      //console.log('this.answer: ', this.answers);
+      if (this.entry === '') {
+        answerDetailToReturn.correct = 'noAnswer';
+        answerDetailToReturn.messageSent += 'If you don\'t know the answer, enter zero. ';
+      } else if (Number(this.entry) === 0) {
+        answerDetailToReturn.correct = 'dontKnow';
+      }
+      //if answer is formula:
+      if (this.requestFormula) {
+        if (this.entry === this.question.formula) {
+          answerDetailToReturn.correct = 'correct';
+        } else if (this.entry.toLowerCase() === this.question.formula.toLowerCase()) {
+          answerDetailToReturn.correct = 'close';
+          answerDetailToReturn.messageSent = 'Check your capitalization!';
+        }
+        //later, try to parse answer and give specific feedback
+        //break into cation and anion
+        //check quantity of ions and correct identity
+        //check parentheses
+        else if (this.type > 0) {
+            var reCatParen = /\(([A-Z][a-z]*)\)(\d?)([A-Z][a-z]*)(\d?)/;
+            var reAnParen = /([A-Z][a-z]*)(\d?)\(([A-Z][a-z]*)\)(\d?)/;
+            var reBothParen = /\(([A-Z][a-z]*)\)(\d?)\(([A-Z][a-z]*)\)(\d?)/;
+            var reNoParen = /([A-Z][a-z]*)(\d?)([A-Z][a-z]*)(\d?)/;
+            var parensE = 0;
+            var reArrayE = reCatParen.exec(this.entry);
+            if (!reArrayE) {
+              reArrayE = reAnParen.exec(this.entry);
+              parensE = 1;
+            }
+            if (!reArrayE) {
+              reArrayE = reBothParen.exec(this.entry);
+              parensE = 2;
+            }
+            if (!reArrayE) {
+              reArrayE = reNoParen.exec(this.entry);
+              parensE = 3;
+            }
+            if (!reArrayE) {
+              answerDetailToReturn.correct = 'unknownWrong';
+              answerDetailToReturn.messageSent = 'Make sure your answer is formatted correctly.';
+            } else {
+              var parensA = 0;
+              var reArrayA = reCatParen.exec(this.question.formula);
+              if (!reArrayA) {
+                reArrayA = reAnParen.exec(this.question.formula);
+                parensA = 1;
+              }
+              if (!reArrayA) {
+                reArrayA = reBothParen.exec(this.question.formula);
+                parensA = 2;
+              }
+              if (!reArrayA) {
+                reArrayA = reNoParen.exec(this.question.formula);
+                parensA = 3;
+              }
+              if (!reArrayA) {
+                answerDetailToReturn.correct = 'unknownWrong';
+                answerDetailToReturn.messageSent = 'check your formula';
+              } else if (parensA !== parensE) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your parentheses. ';
+              } else if (reArrayA[1] !== reArrayE[1]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your cation or first element. ';
+              } else if (reArrayA[3] !== reArrayE[3]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your anion or second element. ';
+              } else if (reArrayA[2] !== reArrayE[2] || reArrayA[4] !== reArrayE[4]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check the number of ions or atoms. ';
+              }
+            }
+          }
+      }
+
+      //if answer is name:
+      else {
+          //console.log(this.entry === this.question.name)
+          if (this.entry === this.question.name) {
+            answerDetailToReturn.correct = 'correct';
+          } else if (this.type === 0 && this.entry === this.question.name + ' ion') {
+            answerDetailToReturn.correct = 'correct';
+          } else if (this.entry.toLowerCase() === this.question.name.toLowerCase()) {
+            answerDetailToReturn.correct = 'close';
+            answerDetailToReturn.messageSent = 'Check your capitalization!';
+          } else {
+            var reName = /(\w+)(\([IVX]+\))?\s(\w+)/;
+            var reArrayNA = reName.exec(this.question.name);
+            var reArrayNE = reName.exec(this.entry);
+            if (!reArrayNE) {
+              answerDetailToReturn.correct = 'unknownWrong';
+              answerDetailToReturn.messageSent = 'Check the format of your answer. Include "ion" in cation names. ';
+            } else {
+              if (reArrayNE[1] !== reArrayNA[1] || reArrayNE[2] !== reArrayNA[2]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your cation, first element or acid name. ';
+              }
+              if (reArrayNE[3] !== reArrayNA[3]) {
+                answerDetailToReturn.correct = 'knownWrong';
+                answerDetailToReturn.messageSent += 'Check your anion, second element or spelling of "acid". ';
+              }
+            }
+          }
+        }
+      return answerDetailToReturn;
+    }
+  }
+});
+
+/***/ }),
+/* 114 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._v("General Nomenclature Practice!")]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_c('div', [_vm._v("\n          Instructions: If you are asked for a formula,\n          use the following format: write 'VO2+1' for "), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula('VO2+1'))
+    }
+  }), _vm._v(". Recall that compounds are always charge balanced."), _c('br'), _vm._v("\n        Note that ionic compounds in this practice are generated randomly, and may not all actually exist. To the best of my\n        knowledge, the covalent example compounds do exist but may be quite unstable.\n        ")]), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.requestFormula) ? _c('h3', [_vm._v("\n          We need to convert "), _c('strong', [_vm._v(_vm._s(_vm.question.name))]), _vm._v(" to a formula.")]) : _vm._e(), _vm._v(" "), (!(_vm.requestFormula)) ? _c('h3', [_vm._v("\n          We need to convert "), _c('strong', [_c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.question.formula))
+    }
+  })]), _vm._v(" to a name.")]) : _vm._e(), _vm._v(" "), (_vm.easymode) ? _c('div', [_c('h4', [_vm._v("First, you need to decide if this is a compound or an ion.")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.neutralOrNot(0)
+      }
+    }
+  }, [_vm._v("Ion")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.neutralOrNot(1)
+      }
+    }
+  }, [_vm._v("Compound")])]) : _vm._e(), _vm._v(" "), (_vm.easymode && _vm.stage > 0) ? _c('div', [(_vm.successes[0]) ? _c('h4', [_vm._v(_vm._s(_vm.stage1response) + " Correct!")]) : _vm._e(), _vm._v(" "), (!_vm.successes[0]) ? _c('div', [_c('h4', [_vm._v(_vm._s(_vm.stage1response))]), _c('br'), _vm._v("\n            If given a formula, if a charge is not given, it is a neutral compound.\n            If given a name, an ion name will be one word or will be \"_____ ion\", while an ionic or binary covalent\n            compound name will have two words neither of which is \"ion\". (There are compounds with one word names, but\n            we haven't learned about them yet. Organic compounds like methane and ethanol are examples; they won't end in\n            '-ide', '-ate' or '-ite'.)")]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.type > 0) ? _c('div', [_c('h4', [_vm._v("Next, we need to decide which type of nomenclature to use. If it could be acid or covalent, pick acid.")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.typeCheck(1)
+      }
+    }
+  }, [_vm._v("Ionic")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.typeCheck(2)
+      }
+    }
+  }, [_vm._v("Covalent")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.typeCheck(3)
+      }
+    }
+  }, [_vm._v("Acid")])]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.easymode && _vm.stage > 1 && _vm.type > 0) ? _c('div', [(_vm.successes[1]) ? _c('h4', [_vm._v(_vm._s(_vm.stage2response) + " Correct!")]) : _vm._e(), _vm._v(" "), (!_vm.successes[1]) ? _c('div', [_c('h4', [_vm._v(_vm._s(_vm.stage2response))]), _vm._v(" "), (_vm.requestFormula) ? _c('div', [_vm._v(_vm._s(_vm.stage2explanationsName[_vm.type][_vm.typeEntry]))]) : _vm._e(), _vm._v(" "), (!_vm.requestFormula) ? _c('div', [_vm._v(_vm._s(_vm.stage2explanationsFormula[_vm.type][_vm.typeEntry]))]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.requestFormula) ? _c('div', [(_vm.type === 1) ? _c('h4', [_vm._v("What charges do the ions have? Enter cation and anion charge:")]) : _vm._e(), _vm._v(" "), (_vm.type === 2) ? _c('h4', [_vm._v("How many of each element do we need? Enter number of first and second:")]) : _vm._e(), _vm._v(" "), (_vm.type === 3) ? _c('h4', [_vm._v("What's the charge on the anion?")]) : _vm._e(), _vm._v(" "), _c('input', {
+    directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.num1),
+      expression: "num1"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text",
+      "autocapitalize": "off",
+      "autocorrect": "off"
+    },
+    domProps: {
+      "value": (_vm.num1)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitNum($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.num1 = $event.target.value
+      }
+    }
+  }), _vm._v(" "), (_vm.type < 3) ? _c('input', {
+    directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.num2),
+      expression: "num2"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text",
+      "autocapitalize": "off",
+      "autocorrect": "off"
+    },
+    domProps: {
+      "value": (_vm.num2)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitNum($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.num2 = $event.target.value
+      }
+    }
+  }) : _vm._e()]) : _vm._e(), _vm._v(" "), (!_vm.requestFormula) ? _c('div', [(_vm.type === 1) ? _c('h4', [_vm._v("Should we use Roman numerals?")]) : _vm._e(), _vm._v(" "), (_vm.type === 2) ? _c('h4', [_vm._v("Does this system use prefixes?")]) : _vm._e(), _vm._v(" "), (_vm.type === 3) ? _c('h4', [_vm._v("Should the name start with 'hydro-'?")]) : _vm._e(), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.lastCheck(1)
+      }
+    }
+  }, [_vm._v("Yes")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        _vm.lastCheck(0)
+      }
+    }
+  }, [_vm._v("No")])]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.easymode && _vm.stage > 2 && _vm.type > 0) ? _c('div', [(_vm.successes[2]) ? _c('h4', [_vm._v("Correct! Enter the answer!")]) : _vm._e(), _vm._v(" "), (!_vm.successes[2]) ? _c('h4', [_vm._v("Oops! Try again.")]) : _vm._e(), _vm._v(" "), (!_vm.successes[2] && !_vm.requestFormula && _vm.type === 1) ? _c('div', [_vm._v("Use Roman numerals unless the cation is an alkali\n            metal, an alkaline earth metal, aluminum or zinc.")]) : _vm._e(), _vm._v(" "), (!_vm.successes[2] && !_vm.requestFormula && _vm.type === 2) ? _c('div', [_vm._v("The covalent system uses prefixes, though in the specific case\n              of acids named as covalent compounds, prefixes are omitted.")]) : _vm._e(), _vm._v(" "), (!_vm.successes[2] && !_vm.requestFormula && _vm.type === 3) ? _c('div', [_vm._v("Use hydro if there is no oxygen in the anion.")]) : _vm._e()]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.specifyType) ? _c('div', [_vm._v("You could use either of two naming systems for this compound,\n          but this time please use the system for " + _vm._s(_vm.types[_vm.type]) + "s.")]) : _vm._e(), _vm._v(" "), (!_vm.easymode || _vm.stage > 3) ? _c('div', [(_vm.requestFormula) ? _c('div', [_vm._v("Your formatted answer is: "), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.entry))
+    }
+  })]) : _vm._e(), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_vm._v("\n            Your answer here:\n            "), _c('input', {
+    directives: [{
+      name: "focus",
+      rawName: "v-focus"
+    }, {
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.entry),
+      expression: "entry"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text",
+      "autocapitalize": "off",
+      "autocorrect": "off"
+    },
+    domProps: {
+      "value": (_vm.entry)
+    },
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      },
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.entry = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit answer!")])])])]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.feedback),
+      expression: "feedback"
+    }],
+    staticClass: "alert",
+    class: _vm.feedbackType
+  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-7e502546", module.exports)
+  }
+}
+
+/***/ }),
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(101),
+  __webpack_require__(116),
   /* template */
-  __webpack_require__(102),
+  __webpack_require__(117),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/LewisAtom.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] LewisAtom.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-cc85718c", Component.options)
+  } else {
+    hotAPI.reload("data-v-cc85718c", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 116 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      mounted: false
+    };
+  },
+  props: ['stats'],
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    currentQuestion: 'getCurrent',
+    elements: 'getLSE',
+    bboxes: 'getBBoxes'
+  }), {
+    /*baseRect: function() {
+      if (this.mounted) {
+        let rect = document.getElementById('atom' + this.index).getBBox();
+        console.log('in if')
+        let width = rect.width;
+        let height = rect.height;
+        return {x: rect.x, y: rect.y, width: width, height: height}
+        //console.log(this.element, this.baseRect)
+      }
+      else {
+        console.log('in else')
+        return {x: 100, y: 100, width: 40, height: 30}
+      }
+    },*/
+    index: function index() {
+      return this.stats.index;
+    },
+    atom: function atom() {
+      return this.stats.atomsArray[this.index];
+    },
+    numUnbondedE: function numUnbondedE() {
+      return this.atom[1];
+    },
+    element: function element() {
+      //console.log(this.elements, this.atom)
+      return this.elements[this.atom[2]];
+    },
+    numBonds: function numBonds() {
+      var numBonds = 0;
+      for (var i = 0; i < this.atom[3].length; i++) {
+        numBonds += this.atom[3][i][1];
+      }
+      return numBonds;
+    },
+    numConnections: function numConnections() {
+      return this.atom[3].length;
+    },
+    numDomains: function numDomains() {
+      return this.numConnections + __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.ceil(this.numUnbondedE / 2);
+    },
+    formalCharge: function formalCharge() {
+      return this.element[1] - (this.numUnbondedE + this.numBonds);
+    },
+    directions: function directions() {
+      return this.stats.directions.slice(0);
+    },
+    drawnAtoms: function drawnAtoms() {
+      var temp = this.stats.drawnAtoms.slice(0);
+      temp[this.index] = 1;
+      return temp;
+    },
+    textRect: function textRect() {
+      //console.log(this.bboxes['P'])
+      var bbox = this.bboxes[this.element[0]];
+      //console.log(bbox.width, bbox.height)
+      var left = this.stats.center[0] - bbox.width / 2;
+      var top = this.stats.center[1] - bbox.height / 2;
+      var width = bbox.width;
+      var height = bbox.height;
+      var right = this.stats.center[0] + bbox.width / 2;
+      var bottom = this.stats.center[1] + bbox.height / 2;
+      var centerx = this.stats.center[0];
+      var centery = this.stats.center[1];
+      var baseline = this.stats.center[1] + bbox.height / 4;
+      return { left: left, right: right, top: top, bottom: bottom,
+        width: width, height: height, centerx: centerx, centery: centery, baseline: baseline };
+    },
+    numBondsAlready: function numBondsAlready() {
+      var numBondsAlready = 0;
+      for (var i = 0; i < this.directions.length; i++) {
+        numBondsAlready += this.directions[i];
+      }
+      if (numBondsAlready > 1) console.log('not setup for cylic molecules');
+      return numBondsAlready;
+    },
+    toDraw: function toDraw() {
+      var _this = this;
+
+      var x = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 11);
+      var posOccupied = [];
+      if (this.numBondsAlready === 1) {
+        x = this.directions.indexOf(1);
+        posOccupied.push(x);
+      }
+      var domains = this.numDomains;
+      var posToAdd = [];
+      var bondsArray = [];
+      var newAtomsArray = [];
+      var dotsArray = [];
+      var formalChargeToDraw = false;
+      if (this.formalCharge !== 0) domains += 1;
+      if (domains === 7) posToAdd = [(x + 6) % 12, (x + 2) % 12, (x + 4) % 12, (x + 8) % 12, (x + 10) % 12, (x + 5) % 12, x];else if (domains === 6) posToAdd = [(x + 6) % 12, (x + 2) % 12, (x + 4) % 12, (x + 8) % 12, (x + 10) % 12, x];else if (domains === 5) posToAdd = [(x + 5) % 12, (x + 2) % 12, (x + 7) % 12, (x + 10) % 12, x];else if (domains === 4) posToAdd = [(x + 6) % 12, (x + 3) % 12, (x + 9) % 12, x];else if (domains === 3) posToAdd = [(x + 4) % 12, (x + 8) % 12, x];else if (domains === 2) posToAdd = [(x + 6) % 12, x];else if (domains === 1) posToAdd = [x];else console.log("bad number of domains");
+      //add bond and atoms
+      var bondsToDraw = this.numConnections - this.numBondsAlready;
+      //draw lines at angles defined by posToAdd
+      var connections = this.atom[3];
+      connections.forEach(function (item) {
+        if (_this.drawnAtoms[item[0]] === 0) {
+          var direction = posToAdd.shift();
+          posOccupied.push(direction);
+          if (item[1] === 1) {
+            var ends = Vue.bondPositioner(_this.textRect, direction);
+            bondsArray.push({ start: ends[0], end: ends[1] });
+          }
+          //need to fix these
+          if (item[1] === 2) {
+            var _ends = Vue.doubleBondPositioner(_this.textRect, direction);
+            bondsArray.push({ start: _ends[0], end: _ends[1] });
+            bondsArray.push({ start: _ends[2], end: _ends[3] });
+          }
+          if (item[1] === 3) {
+            var _ends2 = Vue.tripleBondPositioner(_this.textRect, direction);
+            bondsArray.push({ start: _ends2[0], end: _ends2[1] });
+            bondsArray.push({ start: _ends2[2], end: _ends2[3] });
+            bondsArray.push({ start: _ends2[4], end: _ends2[5] });
+          }
+          //add atoms
+          var directions = Array(12);
+          directions.fill(0);
+          var newDirectionIndex = (direction + 6) % 12;
+          directions[newDirectionIndex] = 1;
+          var newCenter = Vue.newAtomPositioner(_this.textRect, direction);
+          newAtomsArray.push({ stats: {
+              center: newCenter,
+              directions: directions,
+              atomsArray: _this.stats.atomsArray,
+              drawnAtoms: _this.drawnAtoms,
+              index: item[0]
+            } });
+        }
+      });
+      //add lone pairs and radicals
+      if (this.numUnbondedE % 2 === 1 || this.atom[5] !== 0) {
+        //radical
+        var numRad = 1;
+        if (this.atom[5] !== 0) numRad = this.atom[5];
+        for (var i = 0; i < numRad; i++) {
+          var direction = posToAdd.shift();
+          posOccupied.push(direction);
+          //console.log(direction)
+          var position = Vue.lpPositioner(this.textRect, direction, 1);
+          dotsArray.push({ position: position });
+        }
+      }
+      var lpToAdd = 0;
+      if (this.atom[5] !== 0) {
+        lpToAdd = (this.numUnbondedE - this.atom[5]) / 2;
+        if (lpToAdd !== __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.floor(lpToAdd)) console.log("bad value for numUnpairedE");
+      } else lpToAdd = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.floor(this.numUnbondedE / 2);
+      //console.log('lpToAdd is: ', lpToAdd)
+      for (var _i = 0; _i < lpToAdd; _i++) {
+        var _direction = posToAdd.shift();
+        posOccupied.push(_direction);
+        var dotPositions = Vue.lpPositioner(this.textRect, _direction, 0);
+        //console.log("dotPositions is ", dotPositions)
+        dotsArray.push({ position: dotPositions[0] });
+        dotsArray.push({ position: dotPositions[1] });
+      }
+      if (this.formalCharge !== 0) {
+        console.log("posOccupied", posOccupied);
+        for (var _i2 = 0; _i2 < 12; _i2++) {
+          if (posOccupied.indexOf(_i2) === -1) {
+            console.log("setting up fc, i is ", _i2);
+            var fcpos = Vue.lpPositioner(this.textRect, _i2, 1);
+            var plus = this.formalCharge > 0;
+            var one = this.formalCharge === 1 || this.formalCharge === -1;
+            var str = String(this.formalCharge);
+            if (one) str = '';
+            if (plus) str = str + '+';
+            if (one && !plus) str = '-';else str = str.replace(/(-)(\d+)/, '$2$1');
+            formalChargeToDraw = { charge: str, position: fcpos };
+            break;
+          }
+        }
+      }
+      //console.log("textRect:", this.textRect )
+      //console.log('bonds: ', bondsArray)
+      //console.log('newAtoms: ', newAtomsArray)
+      return { bonds: bondsArray, dots: dotsArray, newAtoms: newAtomsArray, formalCharge: formalChargeToDraw };
+    }
+  }),
+  mounted: function mounted() {
+    this.mounted = true;
+  },
+  updated: function updated() {}
+});
+
+/***/ }),
+/* 117 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('g', [_c('text', {
+    attrs: {
+      "id": 'atom' + _vm.index,
+      "x": _vm.textRect.left,
+      "y": _vm.textRect.baseline,
+      "font-family": "Verdana",
+      "font-size": "24"
+    }
+  }, [_vm._v(_vm._s(_vm.element[0]))]), _vm._v(" "), _vm._l((_vm.toDraw.bonds), function(bond) {
+    return _c('line', {
+      attrs: {
+        "x1": bond.start[0],
+        "y1": bond.start[1],
+        "x2": bond.end[0],
+        "y2": bond.end[1],
+        "stroke-width": "2",
+        "stroke": "black"
+      }
+    })
+  }), _vm._v(" "), _vm._l((_vm.toDraw.dots), function(dot) {
+    return _c('circle', {
+      attrs: {
+        "cx": dot.position[0],
+        "cy": dot.position[1],
+        "r": "2"
+      }
+    })
+  }), _vm._v(" "), (_vm.toDraw.formalCharge) ? _c('text', {
+    attrs: {
+      "x": _vm.toDraw.formalCharge.position[0] - 8,
+      "y": _vm.toDraw.formalCharge.position[1],
+      "font-family": "Verdana",
+      "font-size": "14"
+    }
+  }, [_vm._v(_vm._s(_vm.toDraw.formalCharge.charge))]) : _vm._e(), _vm._v(" "), _vm._l((_vm.toDraw.newAtoms), function(atom) {
+    return _c('lewis-atom', {
+      key: atom.stats.index,
+      attrs: {
+        "stats": atom.stats
+      }
+    })
+  })], 2)
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-cc85718c", module.exports)
+  }
+}
+
+/***/ }),
+/* 118 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(119),
+  /* template */
+  __webpack_require__(120),
   /* styles */
   null,
   /* scopeId */
@@ -47215,7 +49054,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 101 */
+/* 119 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -47284,7 +49123,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 102 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -47352,15 +49191,15 @@ if (false) {
 }
 
 /***/ }),
-/* 103 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(104),
+  __webpack_require__(122),
   /* template */
-  __webpack_require__(105),
+  __webpack_require__(123),
   /* styles */
   null,
   /* scopeId */
@@ -47392,7 +49231,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 104 */
+/* 122 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -47461,7 +49300,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 105 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -47523,15 +49362,15 @@ if (false) {
 }
 
 /***/ }),
-/* 106 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(107),
+  __webpack_require__(125),
   /* template */
-  __webpack_require__(108),
+  __webpack_require__(126),
   /* styles */
   null,
   /* scopeId */
@@ -47563,7 +49402,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 107 */
+/* 125 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -47632,7 +49471,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 108 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -47698,24 +49537,24 @@ if (false) {
 }
 
 /***/ }),
-/* 109 */
+/* 127 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vuex__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__getters__ = __webpack_require__(110);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__getters__ = __webpack_require__(128);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__getters___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__getters__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__actions__ = __webpack_require__(111);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__actions__ = __webpack_require__(129);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__actions___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__actions__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__mutations__ = __webpack_require__(112);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__mutations__ = __webpack_require__(130);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__mutations___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__mutations__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__modules_facts__ = __webpack_require__(113);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__modules_states__ = __webpack_require__(114);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__modules_words__ = __webpack_require__(115);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__modules_session__ = __webpack_require__(116);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__modules_elements__ = __webpack_require__(117);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__modules_facts__ = __webpack_require__(131);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__modules_states__ = __webpack_require__(132);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__modules_words__ = __webpack_require__(133);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__modules_session__ = __webpack_require__(134);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__modules_elements__ = __webpack_require__(135);
 
 
 
@@ -47743,25 +49582,25 @@ __WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_1_vuex
 }));
 
 /***/ }),
-/* 110 */
+/* 128 */
 /***/ (function(module, exports) {
 
 
 
 /***/ }),
-/* 111 */
+/* 129 */
 /***/ (function(module, exports) {
 
 
 
 /***/ }),
-/* 112 */
+/* 130 */
 /***/ (function(module, exports) {
 
 
 
 /***/ }),
-/* 113 */
+/* 131 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -47819,7 +49658,7 @@ var state = {
         }
         //console.log(words);
         //console.log(typeof(words));
-        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["a" /* INITIALIZE_FACTS */], facts);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_FACTS */], facts);
         resolve();
       }).catch(function (error) {
         console.log(error);
@@ -47837,14 +49676,20 @@ var state = {
         var polycat = [];
         var ion = {};
         var charge = 0;
-        //console.log(typeof(words));
+        var index = 0;
+        //console.log(temp);
         for (var i = 0; i < temp.length; i++) {
-          charge = Number(/((?:\+|-)\d)/.exec(state.facts[temp[i]].key)[0]);
-          if (charge > 0) ion = { name: state.facts[temp[i]].prop, formula: state.facts[temp[i]].key, charge: charge, romNum: false };else ion = { name: state.facts[temp[i]].prop, formula: state.facts[temp[i]].key, charge: charge };
-          console.log(ion);
-          if (charge < 0) polyan.push(ion);else polycat.push(ion);
+          index = temp[i] - 1;
+          //console.log(state.facts[index], temp[i])
+          charge = Number(/((?:\+|-)\d)/.exec(state.facts[index].key)[0]);
+          if (charge > 0) ion = { name: state.facts[index].prop, formula: state.facts[index].key, charge: charge, romNum: false };else ion = { name: state.facts[index].prop, formula: state.facts[index].key, charge: charge
+            //console.log(ion);
+          };if (charge < 0) polyan.push(ion);else polycat.push(ion);
+          //console.log(polycat.length, polyan.length, i)
         }
-        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_IONS */], polyan, polycat);
+        console.log('finished for', polycat);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["a" /* INITIALIZE_ANIONS */], polyan);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_CATIONS */], polycat);
         resolve();
       }).catch(function (error) {
         console.log(error);
@@ -47855,15 +49700,17 @@ var state = {
 };
 
 // mutations
-var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["a" /* INITIALIZE_FACTS */], function (state, facts) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_FACTS */], function (state, facts) {
   //console.log("in mutation, words is: " + words);
   state.facts = facts;
   console.log('facts set');
   state.factsReady = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_IONS */], function (state, polyan, polycat) {
-  console.log("in INITIALIZE_IONS");
-  state.polyanionsList = polyan;
-  state.polycationsList = polycat;
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["a" /* INITIALIZE_ANIONS */], function (state, ions) {
+  //console.log("in INITIALIZE_IONS");
+  state.polyanionsList = ions;
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["b" /* INITIALIZE_CATIONS */], function (state, ions) {
+  //console.log("in INITIALIZE_IONS");
+  state.polycationsList = ions;
 }), _mutations);
 
 /* harmony default export */ __webpack_exports__["a"] = ({
@@ -47874,7 +49721,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
 });
 
 /***/ }),
-/* 114 */
+/* 132 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -47934,7 +49781,7 @@ var state = {
 
     var url = '../api/student/states/active';
     if (topic) url = '../api/student/states/' + topic;
-    console.log(url);
+    //console.log(url)
     return new Promise(function (resolve, reject) {
       axios.get(url).then(function (response) {
         //console.log(response.data);
@@ -47951,9 +49798,14 @@ var state = {
           }
           states.push(thisState);
         }
-        console.log('states is ', states);
-        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* INITIALIZE_STATES */], states);
-        if (!topic) commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_QUESTION */]);else if (topic === 9) commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_NOMENCLATURE_SESSION */], -1);
+        //console.log('states is ', states);
+        if (!topic) {
+          states = states.filter(function (entry) {
+            return entry.subtype != 'nomenclature';
+          });
+        }
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* INITIALIZE_STATES */], states);
+        if (!topic) commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* SET_QUESTION */]);else if (topic === 9) commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_NOMENCLATURE_SESSION */], -1);
         resolve();
       }).catch(function (error) {
         console.log(error);
@@ -47973,7 +49825,7 @@ var state = {
           skills.push(temp[i]);
         }
         //console.log(skills);
-        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_SKILLS */], skills);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* INITIALIZE_SKILLS */], skills);
         resolve();
       }).catch(function (error) {
         console.log(error);
@@ -47984,12 +49836,12 @@ var state = {
   updateRtsAccs: function updateRtsAccs(_ref3, newState) {
     var commit = _ref3.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["p" /* UPDATE_RTS_ACCS */], newState);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["r" /* UPDATE_RTS_ACCS */], newState);
   },
   updateStage: function updateStage(_ref4, newState) {
     var commit = _ref4.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["q" /* UPDATE_STAGE */], newState);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["s" /* UPDATE_STAGE */], newState);
   },
   setQuestion: function setQuestion(_ref5) {
     var commit = _ref5.commit;
@@ -48003,8 +49855,8 @@ var state = {
     axios.post(url, state.states[prev]).catch(function (error) {
       console.log(error);
     });
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_QUESTION */]);
-    console.log('after SET_QUESTION, prev is ', prev);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* SET_QUESTION */]);
+    //console.log('after SET_QUESTION, prev is ', prev)
   },
   setNomenclatureSession: function setNomenclatureSession(_ref6) {
     var commit = _ref6.commit;
@@ -48019,21 +49871,21 @@ var state = {
     });
     var index = prev;
     if (!(state.currentSkill === 'general nomenclature')) index = -1;
-    console.log('before SET index is ', index);
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_NOMENCLATURE_SESSION */], index);
+    //console.log('before SET index is ', index)
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_NOMENCLATURE_SESSION */], index);
   }
 };
 
 // mutations
-var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* INITIALIZE_STATES */], function (state, states) {
-  console.log('in INITIALIZE_STATES');
+var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* INITIALIZE_STATES */], function (state, states) {
+  //console.log('in INITIALIZE_STATES')
   state.states = states;
   state.statesReady = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["c" /* INITIALIZE_SKILLS */], function (state, skills) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* INITIALIZE_SKILLS */], function (state, skills) {
   state.skills = skills;
   state.skillsReady = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_NOMENCLATURE_SESSION */], function (state, index) {
-  console.log('in SET_NOMENCLATURE_SESSION');
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_NOMENCLATURE_SESSION */], function (state, index) {
+  //console.log('in SET_NOMENCLATURE_SESSION')
   if (index === -1) {
     index = state.states.findIndex(function (entry) {
       return entry.name === 'general nomenclature';
@@ -48041,7 +49893,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
   }
   //console.log(state.states[0])
   state.currentIndex = index;
-  console.log('index is ', index, state.currentIndex);
+  //console.log('index is ', index, state.currentIndex)
   state.currentTypeID = state.states[state.currentIndex].type_id;
   state.currentType = state.states[state.currentIndex].type;
   state.currentStage = state.states[state.currentIndex].stage;
@@ -48049,10 +49901,10 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
   state.states[state.currentIndex].lastStudied = Date.now();
   state.currentSubtype = 'nomenclature';
   state.currentSkill = 'general nomenclature';
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_QUESTION */], function (state) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* SET_QUESTION */], function (state) {
   //console.log('before getNext index is ', state.currentIndex)
   state.currentIndex = getNext();
-  console.log('after getNext index is ', state.currentIndex);
+  //console.log('after getNext index is ', state.currentIndex)
   if (state.currentIndex === -1) {
     state.currentTypeID = false;
     state.currentType = false;
@@ -48074,12 +49926,12 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
       state.currentSkill = false;
     }
   }
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["p" /* UPDATE_RTS_ACCS */], function (state, newState) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["r" /* UPDATE_RTS_ACCS */], function (state, newState) {
   //console.log("newState is ", newState);
   state.states[state.currentIndex].accs.push(newState.accs);
   state.states[state.currentIndex].rts.push(newState.rts);
   //console.log("state is now ", state.states[state.currentIndex])
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["q" /* UPDATE_STAGE */], function (state, newState) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["s" /* UPDATE_STAGE */], function (state, newState) {
   //console.log("newState is ", newState)
   state.states[state.currentIndex].priority = newState.priority;
   state.states[state.currentIndex].stage = newState.stage;
@@ -48095,7 +49947,7 @@ var getNext = function getNext() {
   var unseen = [];
 
   for (var i = 0; i < state.states.length; i++) {
-    console.log('state.states[i] is: ', state.states[i]);
+    //console.log('state.states[i] is: ', state.states[i]);
     //console.log('state.states[i -1] is: ', state.states[i-1]);
     if (state.states[i].priority < 100) {
       unseen.push(i);
@@ -48118,14 +49970,14 @@ var getNext = function getNext() {
       }
     }
   }
-  console.log(readiest);
+  //console.log(readiest);
   if (unseen.length > 0) {
     var r = _.random(0, unseen.length - 1);
     return unseen[r];
   } else if (readiest !== -1) {
     return readiest;
   } else {
-    console.log("in final else");
+    //console.log("in final else")
     if (readiestUnready !== -1) {
       if (state.states[readiestUnready].priority > currentTime + 1800000) {
         state.finished = true;
@@ -48143,7 +49995,7 @@ var getNext = function getNext() {
 });
 
 /***/ }),
-/* 115 */
+/* 133 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -48185,7 +50037,7 @@ var state = {
           var word = { word: temp[i].word, type_id: temp[i].id, altwords: alts, prompts: prompts };
           words.push(word);
         }
-        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* INITIALIZE_WORDS */], words);
+        commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* INITIALIZE_WORDS */], words);
         resolve();
       }).catch(function (error) {
         console.log(error);
@@ -48196,7 +50048,7 @@ var state = {
 };
 
 // mutations
-var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* INITIALIZE_WORDS */], function (state, words) {
+var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* INITIALIZE_WORDS */], function (state, words) {
   //console.log("in INITIALIZE_WORDS, words is: " + words);
   state.words = words;
   //console.log(state.words[1].altwords[0]);
@@ -48211,7 +50063,7 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
 });
 
 /***/ }),
-/* 116 */
+/* 134 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -48273,62 +50125,62 @@ var state = {
     var commit = _ref.commit;
 
     //console.log('setReady');
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* SET_READY */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["n" /* SET_READY */]);
   },
   setQuestionStart: function setQuestionStart(_ref2) {
     var commit = _ref2.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_QUESTION_START */], Date.now());
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_MESSAGE */], '');
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* SET_QUESTION_START */], Date.now());
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_MESSAGE */], '');
   },
   setMessage: function setMessage(_ref3, message) {
     var commit = _ref3.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_MESSAGE */], message);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_MESSAGE */], message);
   },
   setFeedback: function setFeedback(_ref4, feedback) {
     var commit = _ref4.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_FEEDBACK */], feedback);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_FEEDBACK */], feedback);
   },
   setFeedbackType: function setFeedbackType(_ref5, feedbackType) {
     var commit = _ref5.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_FEEDBACK_TYPE */], feedbackType);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_FEEDBACK_TYPE */], feedbackType);
   },
   toggleBug: function toggleBug(_ref6) {
     var commit = _ref6.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* TOGGLE_BUG */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["o" /* TOGGLE_BUG */]);
   },
   toggleFrustrated: function toggleFrustrated(_ref7) {
     var commit = _ref7.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["n" /* TOGGLE_FRUSTRATED */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["p" /* TOGGLE_FRUSTRATED */]);
   },
   toggleSuggestion: function toggleSuggestion(_ref8) {
     var commit = _ref8.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["o" /* TOGGLE_SUGGESTION */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["q" /* TOGGLE_SUGGESTION */]);
   }
 };
 
 // mutations
-var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* SET_READY */], function (state) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["n" /* SET_READY */], function (state) {
   state.setupComplete = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_QUESTION_START */], function (state, time) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* SET_QUESTION_START */], function (state, time) {
   state.questionSetTime = time;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_MESSAGE */], function (state, message) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_MESSAGE */], function (state, message) {
   state.message = message;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["f" /* SET_FEEDBACK */], function (state, feedback) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_FEEDBACK */], function (state, feedback) {
   state.feedback = feedback;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_FEEDBACK_TYPE */], function (state, feedbackType) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_FEEDBACK_TYPE */], function (state, feedbackType) {
   state.feedbackType = feedbackType;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* TOGGLE_BUG */], function (state) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["o" /* TOGGLE_BUG */], function (state) {
   state.bug = !state.bug;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["n" /* TOGGLE_FRUSTRATED */], function (state) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["p" /* TOGGLE_FRUSTRATED */], function (state) {
   state.frustrated = !state.frustrated;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["o" /* TOGGLE_SUGGESTION */], function (state) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["q" /* TOGGLE_SUGGESTION */], function (state) {
   state.suggestion = !state.suggestion;
 }), _mutations);
 
@@ -48340,47 +50192,55 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
 });
 
 /***/ }),
-/* 117 */
+/* 135 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mutation_types__ = __webpack_require__(6);
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 var state = {
   elementsList: [{ name: 'hydrogen', symbol: 'H', family: 'non-metal', location: '1', charge: 1, valence: 1, findex: 8 }, { name: 'helium', symbol: 'He', family: 'noble gas', location: '2', charge: 0, valence: 2, findex: 4 }, { name: 'lithium', symbol: 'Li', family: 'alkali metal', location: '3', charge: 1, valence: 1, findex: 2 }, { name: 'beryllium', symbol: 'Be', family: 'alkaline earth metal', location: '4', charge: 2, valence: 2, findex: 3 }, { name: 'boron', symbol: 'B', family: 'Boron group', location: '5', charge: 3, valence: 3, findex: 8 }, { name: 'carbon', symbol: 'C', family: 'Carbon group', location: '6', charge: 0, valence: 4, findex: 8 }, { name: 'nitrogen', symbol: 'N', family: 'Nitrogen group (pnictogen)', location: '7', charge: -3, valence: 5, findex: 8 }, { name: 'oxygen', symbol: 'O', family: 'chalcogen', location: '8', charge: -2, valence: 6, findex: 1 }, { name: 'fluorine', symbol: 'F', family: 'halogen', location: '9', charge: -1, valence: 7, findex: 0 }, { name: 'bromine', symbol: 'Br', family: 'halogen', location: 'Hal', charge: -1, valence: 7, findex: 0 }, { name: 'iodine', symbol: 'I', family: 'halogen', location: 'Hal', charge: -1, valence: 7, findex: 0 }, { name: 'sodium', symbol: 'Na', family: 'alkali metal', location: '11', charge: 1, valence: 1, findex: 2 }, { name: 'magnesium', symbol: 'Mg', family: 'alkaline earth metal', location: '12', charge: 2, valence: 2, findex: 3 }, { name: 'aluminum', symbol: 'Al', family: 'Boron group', location: '13', charge: 3, valence: 3, findex: 9 }, { name: 'silicon', symbol: 'Si', family: 'Carbon group', location: '14', charge: 4, valence: 4, findex: 8 }, { name: 'phosphorus', symbol: 'P', family: 'Nitrogen group (pnictogen)', location: '15', charge: -3, valence: 5, findex: 8 }, { name: 'sulfur', symbol: 'S', family: 'chalcogen', location: '16', charge: -2, valence: 6, findex: 1 }, { name: 'chlorine', symbol: 'Cl', family: 'halogen', location: '17', charge: -1, valence: 7, findex: 0 }, { name: 'argon', symbol: 'Ar', family: 'noble gas', location: 'NG', charge: 0, valence: 8, findex: 4 }, { name: 'potassium', symbol: 'K', family: 'alkali metal', location: '19', charge: 1, valence: 1, findex: 2 }, { name: 'calcium', symbol: 'Ca', family: 'alkaline earth metal', location: '20', charge: 2, valence: 2, findex: 3 }, { name: 'titanium', symbol: 'Ti', family: 'transition metal', location: 'ETM', charge: 4, findex: 7 }, { name: 'iron', symbol: 'Fe', family: 'transition metal', location: 'MTM', charge: [3, 2], findex: 7 }, { name: 'copper', symbol: 'Cu', family: 'coinage metal', location: 'CM', charge: [2, 1], findex: 6 }, { name: 'mercury', symbol: 'Hg', family: '(post-)transition metal', location: 'PTM', charge: [2, 1], findex: 57 }, { name: 'silver', symbol: 'Ag', family: 'coinage metal', location: 'CM', charge: [2, 1], findex: 6 }, { name: 'gold', symbol: 'Au', family: 'coinage metal', location: 'CM', charge: [3, 1], findex: 6 }, { name: 'tin', symbol: 'Sn', family: 'post-transition metal', location: 'PTM', charge: [2, 4], valence: 4, findex: 5 }, { name: 'lead', symbol: 'Pb', family: 'post-transition metal', location: 'PTM', charge: [2, 4], valence: 4, findex: 5 }, { name: 'zinc', symbol: 'Zn', family: '(post-)transition metal', location: 'PTM', charge: [2], findex: 57 }],
   elementsCharges: [[{ alt: 1, correct: 'correct', message: 'H is usually +1', op: 'equals' }, { alt: -1, correct: 'close', message: 'Possible, but in special circumstances. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: 'H only has one electron to lose, so it can\'t have a charge above +1. ', op: 'greater' }, { alt: -1, correct: 'knownWrong', message: 'It would be almost impossible to add more than 1 electron to H. ', op: 'less' }], [{ alt: 0, correct: 'correct', message: 'Noble gases pretty much never have charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Noble gases pretty much never have charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 3, correct: 'correct', message: 'Boron often has a +3 charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Like carbon, boron forms many compounds in which it shares electrons, but it does form ionic compounds also. ', op: 'equals' }], [{ alt: 0, correct: 'correct', message: 'Carbon usually shares electrons, rather than forming ions. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Carbon usually shares electrons, and rarely forms ions. ', op: 'notEqual' }], [{ alt: -3, correct: 'correct', message: 'When nitrogen forms an ion, it\'s usually -3 charge. ', op: 'equals' }, { alt: -3, correct: 'close', message: 'In some situations, N can have many different charges, but this isn\'t the usual charge. ', op: 'notEqual' }], [{ alt: -2, correct: 'correct', message: 'O almost always has a -2 charge. ', op: 'equals' }, { alt: -2, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'F always has a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Halogens almost always have a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Halogens almost always have a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 3, correct: 'correct', message: 'Aluminum always has +3 charge. ', op: 'equals' }, { alt: 3, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 4, correct: 'correct', message: 'Si often has a 4+ charge when it occurs in rocks. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Si doesn\'t share electrons as much as C. ', op: 'equals' }], [{ alt: -3, correct: 'correct', message: 'When P forms an ion, it\'s usually -3 charge. ', op: 'equals' }, { alt: -3, correct: 'close', message: 'P can have many different charges, but this is not the usual one. ', op: 'notEqual' }], [{ alt: -2, correct: 'correct', message: 'S usually has a -2 charge. ', op: 'equals' }, { alt: -2, correct: 'knownWrong', message: 'S can have many different charges, but this is not the usual one. ', op: 'notEqual' }], [{ alt: -1, correct: 'correct', message: 'Cl almost always has a -1 charge. ', op: 'equals' }, { alt: -1, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 0, correct: 'correct', message: 'Noble gases pretty much never have charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Noble gases pretty much never have charge. ', op: 'notEqual' }], [{ alt: 1, correct: 'correct', message: 'Alkali metals always have +1 charge. ', op: 'equals' }, { alt: 1, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 2, correct: 'correct', message: 'Alkaline earth metals always have +2 charge. ', op: 'equals' }, { alt: 2, correct: 'knownWrong', message: '', op: 'notEqual' }], [{ alt: 4, correct: 'correct', message: 'Ti usually has a 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Transition elements often have multiple charges, but Ti is usually +4. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 3, correct: 'correct', message: 'Fe usually has a 3+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Fe usually has a 3+ or 2+ charge. ', op: 'equals' }, { alt: 0, correct: 'close', message: 'Fe can have a range of charges, but is +2 or +3 normally. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Cu usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 1, correct: 'correct', message: 'Cu usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Cu rarely has a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 1, correct: 'correct', message: 'Hg usually has a 1+ or 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Hg does\'t have a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 1, correct: 'correct', message: 'Ag usually has a 1+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Ag occasionally has a 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Ag rarely has a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 1, correct: 'correct', message: 'Au usually has a 1+ or +3 charge. ', op: 'equals' }, { alt: 3, correct: 'correct', message: 'Au usually has a 1+ or 3+ charge. ', op: 'equals' }, { alt: 3, correct: 'close', message: 'Au rarely has a charge above 3+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }], [{ alt: 4, correct: 'correct', message: 'Sn usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Sn usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less' }], [{ alt: 4, correct: 'correct', message: 'Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 2, correct: 'correct', message: 'Pb usually has a 2+ or 4+ charge. ', op: 'equals' }, { alt: 0, correct: 'knownWrong', message: 'Metals may have multiple charges, but always positive. ', op: 'less' }], [{ alt: 2, correct: 'correct', message: 'Zn always has a 2+ charge. ', op: 'equals' }, { alt: 2, correct: 'close', message: 'Zn does\'t have a charge above 2+. ', op: 'greater' }, { alt: 0, correct: 'knownWrong', message: 'Transition elements often have multiple charges, but always positive. ', op: 'less' }]],
   //element data for drawing Lewis structures
   //1: valence e-
-  //2: normal max e-
-  //3: min normal e-
-  //4: min/normal valence (num bonds)
+  //2: normal min e- (octet count)
+  //3: normal max e- (octet count)
+  //4: normal valence (num bonds)
   //5: max valence when oxidized (num bonds)
+  //6: min valence (num bonds)
   lewisElements: {
-    H: ['H', 1, 2, 2, 1, 2],
-    He: ['He', 2, 2, 2, 0, 0],
-    Li: ['Li', 1, 2, 8, 1, 4],
-    Be: ['Be', 2, 4, 8, 2, 4],
-    B: ['B', 3, 6, 8, 3, 4],
-    C: ['C', 4, 8, 8, 4, 4],
-    N: ['N', 5, 7, 8, 3, 4],
-    O: ['O', 6, 8, 8, 2, 2],
-    F: ['F', 7, 8, 8, 1, 1],
-    Ne: ['Ne', 8, 8, 8, 0, 0],
-    Si: ['Si', 4, 8, 8, 4, 4],
-    P: ['P', 5, 8, 12, 3, 5],
-    S: ['S', 6, 8, 12, 2, 6],
-    Cl: ['Cl', 7, 8, 16, 1, 4],
-    Ge: ['Ge', 4, 8, 8, 4, 4],
-    As: ['As', 5, 8, 12, 3, 5],
-    Se: ['Se', 6, 8, 12, 2, 6],
-    Br: ['Br', 7, 8, 16, 1, 5],
-    Sb: ['Sb', 5, 8, 12, 3, 5],
-    Te: ['Te', 6, 8, 12, 2, 6],
-    I: ['I', 7, 8, 16, 1, 7],
-    Xe: ['Xe', 8, 8, 16, 0, 8]
+    H: ['H', 1, 2, 2, 1, 1, 1],
+    He: ['He', 2, 2, 2, 0, 0, 0],
+    Li: ['Li', 1, 2, 8, 1, 4, 1],
+    Be: ['Be', 2, 4, 8, 2, 4, 2],
+    B: ['B', 3, 6, 8, 3, 4, 3],
+    C: ['C', 4, 8, 8, 4, 4, 3],
+    N: ['N', 5, 7, 8, 3, 4, 1],
+    O: ['O', 6, 8, 8, 2, 3, 1],
+    F: ['F', 7, 8, 8, 1, 1, 1],
+    Ne: ['Ne', 8, 8, 8, 0, 0, 0],
+    Si: ['Si', 4, 8, 8, 4, 4, 3],
+    P: ['P', 5, 8, 12, 3, 5, 2],
+    S: ['S', 6, 8, 12, 2, 6, 1],
+    Cl: ['Cl', 7, 8, 16, 1, 7, 1],
+    Ge: ['Ge', 4, 8, 8, 4, 4, 3],
+    As: ['As', 5, 8, 12, 3, 6, 2],
+    Se: ['Se', 6, 8, 12, 2, 6, 1],
+    Br: ['Br', 7, 8, 16, 1, 7, 1],
+    Sb: ['Sb', 5, 8, 12, 3, 5, 2],
+    Te: ['Te', 6, 8, 12, 2, 6, 1],
+    I: ['I', 7, 8, 16, 1, 7, 1],
+    Xe: ['Xe', 8, 8, 16, 0, 8, 0]
   },
+
+  bboxesForLewisText: {},
 
   LewisHomoDiatomics: ['H2', 'N2', 'O2', 'F2', 'Cl2', 'Br2', 'I2', 'S2', 'P2', 'Se2'],
   LewisHeteroDiatomics: ['HF', 'HCl', 'HBr', 'HI', 'ClF', 'BrF', 'IF', 'BrCl', 'ICl', 'IBr', 'CO', 'NO', 'SO', 'NP', 'HO', 'ClO'],
   LewisSimpleCentralMulti: ['BH3', 'CH4', 'NH3', 'OH2', 'SiH4', 'PH3', 'SH2', 'AsH3', 'SeH2', 'BF3', 'CF4', 'SiF4', 'GeF4', 'PF3', 'PF5', 'AsF3', 'AsF5', 'SbF3', 'SbF5', 'SF2', 'SF4', 'SF6', 'SeF2', 'SeF4', 'SeF6', 'TeF2', 'TeF4', 'TeF6', 'ClF3', 'BrF3', 'BrF5', 'IF3', 'IF5', 'BeCl2', 'BCl3', 'CCl4', 'SiCl4', 'NCl3', 'PCl3', 'PCl5', 'AsCl3', 'AsCl5', 'SbCl3', 'SbCl5', 'SCl2', 'SCl4', 'SeCl2', 'SeCl4', 'TeCl2', 'TeCl4', 'BrCl3', 'ICl3', 'CBr4', 'CI4', 'CO2', 'CS2', 'SiO2', 'NO2', 'SO2', 'SO3', 'SeO2', 'SeO3', 'TeO2', 'TeO3', 'XeO2', 'XeO4', 'XeF2', 'XeF4', 'XeF6', 'O3'],
+  LewisTriatomicCentral: ['COCl2', 'COF2', 'COH2', 'CHF3', 'CH2F2', 'CH3F', 'CHCl3', 'CH2Cl2', 'CH3Cl', 'CHBr3', 'CH2Br2', 'CH3Br', 'CHI3', 'CH2I2', 'CH3I', 'CSO', 'POCl3', 'POF3', 'XeOF2', 'XeOF4', 'CHN'],
   covalentCompounds: [['CO', 'carbon monoxide'], ['BF3', 'boron trifluoride'], ['CF4', 'carbon tetrafluoride'], ['SiF4', 'silicon tetrafluoride'], ['PF3', 'phosphorus trifluoride'], ['PF5', 'phosphorus pentafluoride'], ['AsF3', 'arsenic trifluoride'], ['AsF5', 'arsenic pentafluoride'], ['SF2', 'sulfur difluoride'], ['SF4', 'sulfur tetrafluoride'], ['SF6', 'sulfur hexafluoride'], ['SeF2', 'selenium difluoride'], ['SeF4', 'selenium tetrafluoride'], ['SeF6', 'selenium hexafluoride'], ['TeF2', 'tellurium difluoride'], ['TeF4', 'tellurium tetrafluoride'], ['TeF6', 'tellurium hexafluoride'], ['ClF3', 'chlorine trifluoride'], ['BrF3', 'bromine trifluoride'], ['BrF5', 'bromine pentafluoride'], ['IF3', 'iodine trifluoride'], ['IF5', 'iodine pentafluoride'], ['BCl3', 'boron trichloride'], ['CCl4', 'carbon tetrachloride'], ['SiCl4', 'silicon tetrachloride'], ['NCl3', 'nitrogen trichloride'], ['PCl3', 'phosphorus trichloride'], ['PCl5', 'phosphorus pentachloride'], ['AsCl3', 'arsenic trichloride'], ['AsCl5', 'arsenic pentachloride'], ['SCl2', 'sulfur dichloride'], ['SCl4', 'sulfur tetrachloride'], ['SeCl2', 'selenium dichloride'], ['SeCl4', 'selenium tetrachloride'], ['TeCl2', 'tellurium dichloride'], ['TeCl4', 'tellurium tetrachloride'], ['BrCl3', 'bromine trichloride'], ['ICl3', 'iodine trichloride'], ['CBr4', 'carbon tetrabromide'], ['CI4', 'carbon tetriodide'], ['CO2', 'carbon dioxide'], ['CS2', 'carbon disulfide'], ['SiO2', 'silicon dioxide'], ['NO2', 'nitrogen dioxide'], ['SO2', 'sulfur dioxide'], ['SO3', 'sulfur trioxide'], ['SeO2', 'selenium dioxide'], ['SeO3', 'selenium trioxide'], ['TeO2', 'tellurium dioxide'], ['TeO3', 'tellurium trioxide'], ['XeO2', 'xenon dioxide'], ['XeO3', 'xenon trioxide'], ['XeO4', 'xenon tetroxide'], ['XeF2', 'xenon difluoride'], ['XeF4', 'xenon tetrafluoride'], ['XeF6', 'xenon hexafluoride'], ['N2O4', 'dinitrogen tetroxide'], ['N2O5', 'dinitrogen pentoxide'], ['P2O5', 'diphosphorus pentoxide'], ['B2F4', 'diboron tetrafluoride'], ['B2Cl4', 'diboron tetrachloride'], ['B2Br4', 'diboron tetrabromide'], ['B3F5', 'triboron pentafluoride'], ['B4Cl4', 'tetraboron tetrachloride'], ['B2O3', 'diboron trioxide'], ['N2F4', 'dinitrogen tetrafluoride'], ['N2F2', 'dinitrogen difluoride'], ['N3F', 'trinitrogen fluoride'], ['NO3', 'nitrogen trioxide'], ['N2O3', 'dinitrogen trioxide'], ['N2O2', 'dinitrogen dioxide'], ['P2F4', 'diphosphorus tetrafluoride'], ['P2Cl4', 'diphosphorus tetrachloride'], ['P2I4', 'diphosphorus tetraiodide'], ['P2S3', 'diphosphorus trisulfide'], ['P4O6', 'tetraphosphorus hexoxide'], ['P4S2', 'tetraphosphorus disulfide'], ['P4S3', 'tetraphosphorus trisulfide'], ['P4S4', 'tetraphosphorus tetrasulfide'], ['P4S5', 'tetraphosphorus pentasulfide'], ['S2F2', 'disulfur difluoride'], ['S2F4', 'disulfur tetrafluoride'], ['S2Cl2', 'disulfur dichloride'], ['S6O2', 'hexasulfur dioxide'], ['S4N4', 'tetrasulfur tetranitride'], ['S2N2', 'disulfur dinitride'], ['S4N2', 'tetrasulfur dinitride'], ['S5Cl2', 'pentasulfur dichloride'], ['S5N6', 'pentasulfur hexanitride'], ['I2O5', 'diodine pentoxide'], ['Cl2O', 'dichlorine monoxide'], ['ClO2', 'chlorine dioxide'], ['Cl2O4', 'dichlorine tetroxide'], ['Cl2O6', 'dichlorine hexoxide'], ['ClO3', 'chlorine trioxide'], ['BrO2', 'bromine dioxide'], ['HF', 'hydrogen fluoride'], ['HCl', 'hydrogen chloride'], ['HBr', 'hydrogen bromide'], ['HI', 'hydrogen iodide'], ['H2S', 'hydrogen sulfide']]
 
   // getters
@@ -48412,22 +50272,43 @@ var state = {
   getLewisSimpleCentral: function getLewisSimpleCentral(state) {
     return state.LewisSimpleCentralMulti;
   },
+  getLewisTriatomicCentral: function getLewisTriatomicCentral(state) {
+    return state.LewisTriatomicCentral;
+  },
   getCovalentCompounds: function getCovalentCompounds(state) {
     return state.covalentCompounds;
+  },
+  getBBoxes: function getBBoxes(state) {
+    return state.bboxesForLewisText;
   }
 };
 
+var actions = {
+  setupBBoxes: function setupBBoxes(_ref, bboxes) {
+    var commit = _ref.commit;
+
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_BBOXES */], bboxes);
+  }
+};
+
+var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["g" /* SET_BBOXES */], function (state, bboxes) {
+  //console.log('in INITIALIZE_STATES')
+  state.bboxesForLewisText = bboxes;
+});
+
 /* harmony default export */ __webpack_exports__["a"] = ({
   state: state,
-  getters: getters
+  getters: getters,
+  actions: actions,
+  mutations: mutations
 });
 
 /***/ }),
-/* 118 */
+/* 136 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
 
 /* harmony default export */ __webpack_exports__["a"] = ({
@@ -48459,11 +50340,11 @@ var state = {
 });
 
 /***/ }),
-/* 119 */
+/* 137 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
 
 /* harmony default export */ __webpack_exports__["a"] = ({
@@ -48512,11 +50393,11 @@ var state = {
 });
 
 /***/ }),
-/* 120 */
+/* 138 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
 
 /* harmony default export */ __webpack_exports__["a"] = ({
@@ -48626,715 +50507,11 @@ var state = {
 });
 
 /***/ }),
-/* 121 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 122 */,
-/* 123 */,
-/* 124 */,
-/* 125 */,
-/* 126 */,
-/* 127 */,
-/* 128 */,
-/* 129 */,
-/* 130 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(131)
-}
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(133),
-  /* template */
-  __webpack_require__(134),
-  /* styles */
-  injectStyle,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/LewisStructureQuestion.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] LewisStructureQuestion.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-fb5daf40", Component.options)
-  } else {
-    hotAPI.reload("data-v-fb5daf40", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 131 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(132);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(4)("62e56123", content, false);
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-fb5daf40\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./LewisStructureQuestion.vue", function() {
-     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-fb5daf40\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./LewisStructureQuestion.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 132 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(3)(undefined);
-// imports
-
-
-// module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 133 */
+/* 139 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {
-      entry: '',
-      tries: 0,
-      acc: 0,
-      rts: [],
-      startTime: 0,
-      index: 0
-      //determines whether name or formula is given
-    };
-  },
-  //props: ['questionTypeID'],
-  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
-    currentQuestion: 'getCurrent',
-    questionSetTime: 'getQuestionSetTime',
-    stageData: 'getStageData',
-    feedback: 'getFeedback',
-    feedbackType: 'getFeedbackType',
-    lewisHomo: 'getLewisHomoDiatomics',
-    lewisHetero: 'getLewisHeteroDiatomics',
-    lewisMulti: 'getLewisSimpleCentral',
-    elements: 'getLSE'
-  }), {
-    formulasArray: function formulasArray() {
-      var temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti);
-      return temp;
-    },
-    formula: function formula() {
-      return this.formulasArray[this.index];
-    },
-    question: function question() {
-      return Vue.simpleCentralStructure(this.formula, this.elements);
-    },
-    stats: function stats() {
-      var directions = Array(12);
-      directions.fill(0);
-      var drawnAtoms = Array(this.question.structure.length);
-      drawnAtoms.fill(0);
-      return {
-        center: [100, 100],
-        directions: directions,
-        atomsArray: this.question.structure,
-        drawnAtoms: drawnAtoms,
-        index: 0
-      };
-    }
-  }),
-  created: function created() {
-    this.index = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.formulasArray.length - 1);
-  },
-  mounted: function mounted() {},
-
-  methods: {
-
-    submitEntry: function submitEntry(event) {
-      this.tries += 1;
-      var answerDetail = this.checkEntry();
-      if (this.startTime === 0) {
-        this.startTime = this.questionSetTime;
-      }
-      answerDetail.timeStamp = Date.now();
-
-      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
-      //console.log('rts is set to ', this.rts)
-      this.startTime = Date.now();
-
-      var correct = answerDetail.correct;
-      var moveOn = false;
-      var gotIt = false;
-
-      if (correct === 'correct') {
-        answerDetail.messageSent += ' Correct!';
-        moveOn = true;
-        gotIt = true;
-        this.acc = this.tries - 1;
-        this.$store.dispatch('setFeedbackType', { "alert-success": true });
-
-        //console.log('acc is set to ', this.acc)
-      } else if (correct === 'dontKnow') {
-        moveOn = true;
-      } else {
-        if (this.tries === 1) {
-          answerDetail.messageSent += " Try again!";
-        } else if (answerDetail.correct === 'formatError' || answerDetail.correct === 'noAnswer') {
-          answerDetail.messageSent += " Try again!";
-        } else moveOn = true;
-      }
-      if (moveOn === true && gotIt === false) this.acc = 4;
-      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
-        this.$store.dispatch('setFeedbackType', { "alert-warning": true });
-      } else if (gotIt === false) this.$store.dispatch('setFeedbackType', { "alert-danger": true });
-      this.$store.dispatch('setFeedback', answerDetail.messageSent);
-      var action = {};
-      action.state_id = this.currentQuestion[4];
-      action.type = 'answer given-' + correct;
-      action.detail = answerDetail;
-      action.time = answerDetail.timeStamp;
-
-      //this code gives a 500 error now, should check laravel side
-      //console.log("action is ", action);
-      axios.post('../api/student/actions', action).catch(function (error) {
-        console.log(error);
-      });
-
-      if (moveOn) {
-        //update states
-
-        var updatedState = { rts: this.rts, accs: this.acc };
-        //console.log("updatedState is", updatedState)
-        this.$store.dispatch('updateRtsAccs', updatedState);
-        updatedState = Vue.skillPriorityHelper(this.stageData);
-        this.$store.dispatch('updateStage', updatedState);
-
-        //set new question
-        //console.log('about to set new question');
-        this.$store.dispatch('setQuestion');
-        this.$store.dispatch('setQuestionStart');
-
-        //update props
-        this.entry = '';
-        this.tries = 0;
-        this.acc = 0;
-        this.rts = [];
-        this.index = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.formulasArray.length - 1);
-        //this.index =47
-      }
-    },
-
-    //checks the entry, returns answerDetail
-    checkEntry: function checkEntry() {
-      var answerDetailToReturn = { answer: this.entry, messageSent: '', correct: '' };
-      var entryTemp = this.entry.toLowerCase();
-      //console.log('this.entry: ', this.entry);
-      //console.log('this.answer: ', this.answers);
-      if (entryTemp === '') {
-        answerDetailToReturn.correct = 'noAnswer';
-        answerDetailToReturn.messageSent += 'Please enter an answer. ';
-      } else {
-        var yArray = ['y', 'yes', 't', 'true'];
-        var nArray = ['n', 'no', 'f', 'false'];
-        if (yArray.indexOf(entryTemp) > -1) {
-          entryTemp = 'y';
-        } else if (nArray.indexOf(entryTemp) > -1) {
-          entryTemp = 'n';
-        } else {
-          answerDetailToReturn.correct = 'formatError';
-          answerDetailToReturn.messageSent = 'Please check the format of your answer. ';
-        }
-        if (entryTemp === this.question.answer) {
-          answerDetailToReturn.correct = 'correct';
-        } else answerDetailToReturn.correct = 'knownWrong';
-      }
-
-      //console.log(entryTemp, answerDetailToReturn)
-      return answerDetailToReturn;
-    }
-
-  }
-});
-
-/***/ }),
-/* 134 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "panel panel-default"
-  }, [_c('div', {
-    staticClass: "panel-heading"
-  }, [_vm._v("Lewis Structure Practice")]), _vm._v(" "), _c('div', {
-    staticClass: "panel-body"
-  }, [_c('div', [_vm._v("\n            Instructions: Enter y or n. By \"good structure\", I mean the best (or among the best) Lewis\n            structures for the formula given.\n            "), _c('br'), _c('br'), _vm._v("\n            Is this a good Lewis structure for "), _c('span', {
-    domProps: {
-      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.formula))
-    }
-  }), _vm._v("?")]), _vm._v(" "), _c('div', {
-    staticClass: "input-group"
-  }, [_c('input', {
-    directives: [{
-      name: "focus",
-      rawName: "v-focus"
-    }, {
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.entry),
-      expression: "entry"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      "type": "text",
-      "autocorrect": "off"
-    },
-    domProps: {
-      "value": (_vm.entry)
-    },
-    on: {
-      "keyup": function($event) {
-        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
-        _vm.submitEntry($event)
-      },
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.entry = $event.target.value
-      }
-    }
-  }), _vm._v(" "), _c('span', {
-    staticClass: "input-group-btn"
-  }, [_c('button', {
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": _vm.submitEntry
-    }
-  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), _c('svg', {
-    attrs: {
-      "width": "200",
-      "height": "200"
-    }
-  }, [_c('lewis-atom', {
-    attrs: {
-      "stats": _vm.stats
-    }
-  })], 1), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (_vm.feedback),
-      expression: "feedback"
-    }],
-    staticClass: "alert",
-    class: _vm.feedbackType
-  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])])])
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-fb5daf40", module.exports)
-  }
-}
-
-/***/ }),
-/* 135 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(136),
-  /* template */
-  __webpack_require__(137),
-  /* styles */
-  null,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/LewisAtom.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] LewisAtom.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-cc85718c", Component.options)
-  } else {
-    hotAPI.reload("data-v-cc85718c", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 136 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {
-      mounted: false
-    };
-  },
-  props: ['stats'],
-  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
-    currentQuestion: 'getCurrent',
-    elements: 'getLSE'
-  }), {
-    baseRect: function baseRect() {
-      if (this.mounted) {
-        var rect = document.getElementById('atom' + this.index).getBBox();
-        console.log('in if');
-        var width = rect.width;
-        var height = rect.height;
-        return { x: rect.x, y: rect.y, width: width, height: height
-          //console.log(this.element, this.baseRect)
-        };
-      } else {
-        console.log('in else');
-        return { x: 100, y: 100, width: 40, height: 30 };
-      }
-    },
-    index: function index() {
-      return this.stats.index;
-    },
-    atom: function atom() {
-      return this.stats.atomsArray[this.index];
-    },
-    numUnbondedE: function numUnbondedE() {
-      return this.atom[1];
-    },
-    element: function element() {
-      //console.log(this.elements, this.atom)
-      return this.elements[this.atom[2]];
-    },
-    numBonds: function numBonds() {
-      var numBonds = 0;
-      for (var i = 0; i < this.atom[3].length; i++) {
-        numBonds += this.atom[3][i][1];
-      }
-      return numBonds;
-    },
-    numConnections: function numConnections() {
-      return this.atom[3].length;
-    },
-    numDomains: function numDomains() {
-      return this.numConnections + __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.ceil(this.numUnbondedE / 2);
-    },
-    formalCharge: function formalCharge() {
-      return this.element[1] - (this.numUnbondedE + this.numBonds);
-    },
-    directions: function directions() {
-      return this.stats.directions.slice(0);
-    },
-    drawnAtoms: function drawnAtoms() {
-      var temp = this.stats.drawnAtoms.slice(0);
-      temp[this.index] = 1;
-      return temp;
-    },
-    textRect: function textRect() {
-      var left = this.stats.center[0] - this.baseRect.width / 2;
-      var top = this.stats.center[1] - this.baseRect.height / 2;
-      var width = this.baseRect.width;
-      var height = this.baseRect.height;
-      var right = this.stats.center[0] + this.baseRect.width / 2;
-      var bottom = this.stats.center[1] + this.baseRect.height / 2;
-      var centerx = this.stats.center[0];
-      var centery = this.stats.center[1];
-      var baseline = this.stats.center[1] + this.baseRect.height / 4;
-      return { left: left, right: right, top: top, bottom: bottom,
-        width: width, height: height, centerx: centerx, centery: centery, baseline: baseline };
-    },
-    numBondsAlready: function numBondsAlready() {
-      var numBondsAlready = 0;
-      for (var i = 0; i < this.directions.length; i++) {
-        numBondsAlready += this.directions[i];
-      }
-      if (numBondsAlready > 1) console.log('not setup for cylic molecules');
-      return numBondsAlready;
-    },
-    toDraw: function toDraw() {
-      var _this = this;
-
-      var x = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 11);
-      var posOccupied = [];
-      if (this.numBondsAlready === 1) {
-        x = this.directions.indexOf(1);
-        posOccupied.push(x);
-      }
-      var domains = this.numDomains;
-      var posToAdd = [];
-      var bondsArray = [];
-      var newAtomsArray = [];
-      var dotsArray = [];
-      var formalChargeToDraw = false;
-      if (this.formalCharge !== 0) domains += 1;
-      if (domains === 7) posToAdd = [(x + 6) % 12, (x + 2) % 12, (x + 4) % 12, (x + 8) % 12, (x + 10) % 12, (x + 5) % 12, x];else if (domains === 6) posToAdd = [(x + 6) % 12, (x + 2) % 12, (x + 4) % 12, (x + 8) % 12, (x + 10) % 12, x];else if (domains === 5) posToAdd = [(x + 5) % 12, (x + 2) % 12, (x + 7) % 12, (x + 10) % 12, x];else if (domains === 4) posToAdd = [(x + 6) % 12, (x + 3) % 12, (x + 9) % 12, x];else if (domains === 3) posToAdd = [(x + 4) % 12, (x + 8) % 12, x];else if (domains === 2) posToAdd = [(x + 6) % 12, x];else if (domains === 1) posToAdd = [x];else console.log("bad number of domains");
-      //add bond and atoms
-      var bondsToDraw = this.numConnections - this.numBondsAlready;
-      //draw lines at angles defined by posToAdd
-      var connections = this.atom[3];
-      connections.forEach(function (item) {
-        if (_this.drawnAtoms[item[0]] === 0) {
-          var direction = posToAdd.shift();
-          posOccupied.push(direction);
-          if (item[1] === 1) {
-            var ends = Vue.bondPositioner(_this.textRect, direction);
-            bondsArray.push({ start: ends[0], end: ends[1] });
-          }
-          //need to fix these
-          if (item[1] === 2) {
-            var _ends = Vue.doubleBondPositioner(_this.textRect, direction);
-            bondsArray.push({ start: _ends[0], end: _ends[1] });
-            bondsArray.push({ start: _ends[2], end: _ends[3] });
-          }
-          if (item[1] === 3) {
-            var _ends2 = Vue.tripleBondPositioner(_this.textRect, direction);
-            bondsArray.push({ start: _ends2[0], end: _ends2[1] });
-            bondsArray.push({ start: _ends2[2], end: _ends2[3] });
-            bondsArray.push({ start: _ends2[4], end: _ends2[5] });
-          }
-          //add atoms
-          var directions = Array(12);
-          directions.fill(0);
-          var newDirectionIndex = (direction + 6) % 12;
-          directions[newDirectionIndex] = 1;
-          var newCenter = Vue.newAtomPositioner(_this.textRect, direction);
-          newAtomsArray.push({ stats: {
-              center: newCenter,
-              directions: directions,
-              atomsArray: _this.stats.atomsArray,
-              drawnAtoms: _this.drawnAtoms,
-              index: item[0]
-            } });
-        }
-      });
-      //add lone pairs and radicals
-      if (this.numUnbondedE % 2 === 1 || this.atom[5] !== 0) {
-        //radical
-        var numRad = 1;
-        if (this.atom[5] !== 0) numRad = this.atom[5];
-        for (var i = 0; i < numRad; i++) {
-          var direction = posToAdd.shift();
-          posOccupied.push(direction);
-          //console.log(direction)
-          var position = Vue.lpPositioner(this.textRect, direction, 1);
-          dotsArray.push({ position: position });
-        }
-      }
-      var lpToAdd = 0;
-      if (this.atom[5] !== 0) {
-        lpToAdd = (this.numUnbondedE - this.atom[5]) / 2;
-        if (lpToAdd !== __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.floor(lpToAdd)) console.log("bad value for numUnpairedE");
-      } else lpToAdd = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.floor(this.numUnbondedE / 2);
-      //console.log('lpToAdd is: ', lpToAdd)
-      for (var _i = 0; _i < lpToAdd; _i++) {
-        var _direction = posToAdd.shift();
-        posOccupied.push(_direction);
-        var dotPositions = Vue.lpPositioner(this.textRect, _direction, 0);
-        //console.log("dotPositions is ", dotPositions)
-        dotsArray.push({ position: dotPositions[0] });
-        dotsArray.push({ position: dotPositions[1] });
-      }
-      if (this.formalCharge !== 0) {
-        console.log("posOccupied", posOccupied);
-        for (var _i2 = 0; _i2 < 12; _i2++) {
-          if (posOccupied.indexOf(_i2) === -1) {
-            console.log("setting up fc, i is ", _i2);
-            var fcpos = Vue.lpPositioner(this.textRect, _i2, 1);
-            var plus = this.formalCharge > 0;
-            var one = this.formalCharge === 1 || this.formalCharge === -1;
-            var str = String(this.formalCharge);
-            if (one) str = '';
-            if (plus) str = str + '+';else str = str.replace(/(-)(\d+)/, '$2$1');
-            formalChargeToDraw = { charge: str, position: fcpos };
-            break;
-          }
-        }
-      }
-      //console.log("textRect:", this.textRect )
-      //console.log('bonds: ', bondsArray)
-      //console.log('newAtoms: ', newAtomsArray)
-      return { bonds: bondsArray, dots: dotsArray, newAtoms: newAtomsArray, formalCharge: formalChargeToDraw };
-    }
-  }),
-  mounted: function mounted() {
-    this.mounted = true;
-  },
-  updated: function updated() {}
-});
-
-/***/ }),
-/* 137 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('g', [_c('text', {
-    attrs: {
-      "id": 'atom' + _vm.index,
-      "x": _vm.textRect.left,
-      "y": _vm.textRect.baseline,
-      "font-family": "Verdana",
-      "font-size": "24"
-    }
-  }, [_vm._v(_vm._s(_vm.element[0]))]), _vm._v(" "), _vm._l((_vm.toDraw.bonds), function(bond) {
-    return _c('line', {
-      attrs: {
-        "x1": bond.start[0],
-        "y1": bond.start[1],
-        "x2": bond.end[0],
-        "y2": bond.end[1],
-        "stroke-width": "2",
-        "stroke": "black"
-      }
-    })
-  }), _vm._v(" "), _vm._l((_vm.toDraw.dots), function(dot) {
-    return _c('circle', {
-      attrs: {
-        "cx": dot.position[0],
-        "cy": dot.position[1],
-        "r": "2"
-      }
-    })
-  }), _vm._v(" "), (_vm.toDraw.formalCharge) ? _c('text', {
-    attrs: {
-      "x": _vm.toDraw.formalCharge.position[0] - 8,
-      "y": _vm.toDraw.formalCharge.position[1],
-      "font-family": "Verdana",
-      "font-size": "14"
-    }
-  }, [_vm._v(_vm._s(_vm.toDraw.formalCharge.charge))]) : _vm._e(), _vm._v(" "), _vm._l((_vm.toDraw.newAtoms), function(atom) {
-    return _c('lewis-atom', {
-      key: atom.stats.index,
-      attrs: {
-        "stats": atom.stats
-      }
-    })
-  })], 2)
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-cc85718c", module.exports)
-  }
-}
-
-/***/ }),
-/* 138 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
 
 /* harmony default export */ __webpack_exports__["a"] = ({
@@ -49400,7 +50577,7 @@ if (false) {
       return [start, end];
     };
     Vue.newAtomPositioner = function (textRect, direction) {
-      var bondLength = 30;
+      var bondLength = 35;
       var end = [0, 0];
       var start = [20, 20];
       var height = textRect.height;
@@ -49607,7 +50784,7 @@ if (false) {
         start = [textRect.left - 4, textRect.centery + height / 3];
         first = [start[0] + 1, start[1] + 4];
         second = [start[0] - 1, start[1] - 4];
-        end1 = [first[0] - bondLength * 0.866, second[1] + bondLength / 2];
+        end1 = [first[0] - bondLength * 0.866, first[1] + bondLength / 2];
         end2 = [second[0] - bondLength * 0.866, second[1] + bondLength / 2];
       }
       if (direction === 5) {
@@ -49709,7 +50886,7 @@ if (false) {
         end = [start[0] - bondLength * 0.866, start[1] + bondLength / 2];
         first = [start[0] + 1, start[1] + 4];
         second = [start[0] - 1, start[1] - 4];
-        end1 = [first[0] - bondLength * 0.866, second[1] + bondLength / 2];
+        end1 = [first[0] - bondLength * 0.866, first[1] + bondLength / 2];
         end2 = [second[0] - bondLength * 0.866, second[1] + bondLength / 2];
       }
       if (direction === 5) {
@@ -49766,22 +50943,23 @@ if (false) {
 });
 
 /***/ }),
-/* 139 */
+/* 140 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
 
 //import store from '../vuex/store';
 /* harmony default export */ __webpack_exports__["a"] = ({
   install: function install(Vue) {
 
-    Vue.parseFormulaForStructure = function (formula) {
+    Vue.parseFormulaForStructure = function (formula, elements) {
       var atomFinder = /([A-Z][a-z]*)(\d*)/g;
       var chargeFinder = /([+|-]\d*)$/;
       var tempArray = [];
       var structure = [];
+      var numE = 0;
       while ((tempArray = atomFinder.exec(formula)) !== null) {
         if (tempArray[2] === '') tempArray[2] = 1;
         for (var i = 0; i < Number(tempArray[2]); i++) {
@@ -49791,10 +50969,16 @@ if (false) {
           //3: connections
           //4: is loop
           //5: numUnpairedE
-          var atom = [0, 0, tempArray[1], [], 0, 0];
+          //6: num bonds
+          //7: formal charge
+          //8: satisfied
+          var atom = [0, 0, tempArray[1], [], 0, 0, 0, 0, 0];
           structure.push(atom);
+          //console.log(elements[tempArray[1]][1])
+          numE += elements[tempArray[1]][1];
         }
       }
+      console.log('in parse structure is ', structure);
       var chargeArray = chargeFinder.exec(formula);
       //console.log(chargeArray)
       var charge = 0;
@@ -49802,28 +50986,185 @@ if (false) {
         //console.log(Number(chargeArray[0]))
         charge = Number(chargeArray[0]);
       }
-      return { structure: structure, charge: charge };
+      numE -= charge;
+      return { structure: structure, charge: charge, numE: numE };
     };
     //expects central atom first, and all other atoms same element. diatomics ok, no charges
-    Vue.simpleCentralStructure = function (formula, elements) {
+    Vue.generalLewisStructure = function (formula, elements) {
       //console.log('in simpleCentralStructure')
-      var strucObj = Vue.parseFormulaForStructure(formula);
+      var strucObj = Vue.parseFormulaForStructure(formula, elements);
       var struc = strucObj.structure;
       var charge = strucObj.charge;
+      var numE = strucObj.numE;
+      //console.log(numE)
+      //if (charge !== 0) console.log("not setup for charges yet")
+      //console.log("struc, from parse, is ", struc)
+      var numAtoms = struc.length;
+      //let element = elements[struc[0][2]]
+      //console.log('element is: ', element)
+      //struc[0][0] = 0
+
+      // set up connections; this part needs work to make connectivity general
+      //each outside atom has one bond to central only
+      var unusedE = numE;
+      var EwantedForLP = 0;
+      var eToAdd = 0;
+      var atomsWantingBonds = [];
+      var atomsWantingOctet = [];
+      var tryNewConnectivity = 0;
+      var j = 0;
+      var i = 1;
+      var element = [];
+      //let atomsWithBigFC = []
+      for (i = 1; i < numAtoms; i++) {
+        element = elements[struc[i][2]];
+        struc[i][0] = i;
+        struc[i][6] = 1;
+        if (1 < element[4]) atomsWantingBonds.push(i);
+        struc[i][3].push([0, 1]);
+        struc[0][3].push([i, 1]);
+        struc[0][6] += 1;
+        unusedE -= 2;
+        if (element[2] % 2 !== 0 && numE % 2 === 0) EwantedForLP += element[2] - struc[i][6] * 2 + 1;else EwantedForLP += element[2] - struc[i][6] * 2;
+        console.log(element, element[2] - struc[i][6] * 2);
+      }
+      //check central element
+      element = elements[struc[0][2]];
+      if (struc[0][6] < element[6]) {
+        console.log('central atom needs bonds');
+        //atomsWantingBonds.push(0)
+      }
+      if (struc[0][6] > element[5]) {
+        console.log('central atom has too many bonds already, need different structure');
+        tryNewConnectivity = 1;
+      }
+      EwantedForLP += element[2] - struc[0][6] * 2;
+      console.log('EwantedForLP:', EwantedForLP);
+      console.log('unusedE: ', unusedE);
+      // add multiple bonds
+      if (EwantedForLP > unusedE) {
+        console.log('adding more bonds');
+        //first check if central atom can have more bonds
+        var maxNewBondsToCentral = element[5] - struc[0][6];
+        var newBondsNeeded = (EwantedForLP - unusedE) / 2;
+        if (newBondsNeeded > maxNewBondsToCentral) {
+          console.log('need too many new bonds to central atom');
+          tryNewConnectivity = 1;
+        } else {
+          console.log("maxNewBondsToCentral", maxNewBondsToCentral);
+          console.log('atomsWantingBonds', atomsWantingBonds);
+
+          while (newBondsNeeded > 0) {
+            i = atomsWantingBonds.shift();
+            element = elements[struc[i][2]];
+            struc[i][6] += 1;
+            if (struc[i][6] < element[4]) atomsWantingBonds.push(i);else if (struc[i][6] < element[5] && newBondsNeeded > atomsWantingBonds.length) atomsWantingBonds.push(i);
+            struc[i][3][0][1] += 1;
+            console.log('struc[0][3]', struc[0][3]);
+            j = struc[0][3].findIndex(function (element) {
+              return element[0] === i;
+            });
+            console.log('i, j, struc[0][3]', i, j, struc[0][3]);
+            struc[0][3][j][1] += 1;
+            struc[0][6] += 1;
+            unusedE -= 2;
+            EwantedForLP -= 4;
+            newBondsNeeded -= 1;
+          }
+        }
+      }
+      //update central atom
+      var happyAtoms = 0;
+      element = elements[struc[0][2]];
+      struc[0][7] = element[1] - struc[0][1] - struc[0][6];
+      if (struc[0][6] < element[6]) {
+        console.log('central atom needs bonds');
+        //atomsWantingBonds.push(0)
+      }
+      if (struc[0][6] > element[5]) {
+        console.log('central atom has too many bonds already, need different structure');
+        tryNewConnectivity = 1;
+      } else if (element[2] <= struc[0][1] + struc[0][6] * 2 && element[3] >= struc[0][1] + struc[0][6] * 2) {
+        struc[0][8] = 1;
+        console.log('set central happy');
+        happyAtoms++;
+      }
+      console.log('element[2] <= struc[0][1] + struc[0][6] && element[3] >= struc[0][1] + struc[0][6]', element[2], struc[0][1], struc[0][6], element[3]);
+      //fill out octets, outer atoms first, until you run out of electrons
+      if (unusedE < 0) console.log("unusedE: ", unusedE);
+
+      j = 1;
+
+      //clean this up, combine 2 ifs
+      while (unusedE > 0) {
+        console.log('about to add LP');
+        if (!struc[j][8]) {
+          console.log('about to add LP to index: ', j);
+          element = elements[struc[j][2]];
+          if (element[2] % 2 !== 0 && numE % 2 === 0) eToAdd = element[2] - struc[j][1] - struc[j][6] * 2 + 1;else eToAdd = element[2] - struc[j][1] - struc[j][6] * 2;
+          if (eToAdd > unusedE) eToAdd = unusedE;else happyAtoms++;
+          struc[j][1] += eToAdd;
+          if (struc[j][1] % 2 !== 0) struc[j][5] = 1;
+          struc[j][7] = element[1] - struc[j][1] - struc[j][6];
+          struc[j][8] = 1;
+          if (struc[j][6] > element[5] || struc[j][6] < element[6]) console.log('bad number of bonds for index: ', j);
+          unusedE -= eToAdd;
+          j++;
+          j = j % numAtoms;
+        }
+        if (happyAtoms === numAtoms && unusedE > 0) {
+          element = elements[struc[j][2]];
+          if (struc[j][1] + struc[j][6] * 2 < element[3]) {
+            eToAdd = element[3] - (struc[j][1] + struc[j][6] * 2);
+            if (eToAdd > unusedE) eToAdd = unusedE;
+            struc[j][1] += eToAdd;
+            if (struc[j][1] % 2 !== 0) struc[j][5] = 1;
+            struc[j][7] = element[1] - struc[j][1] - struc[j][6];
+            struc[j][8] = 1;
+            if (struc[j][6] > element[5] || struc[j][6] < element[6]) console.log('bad number of bonds for index: ', j);
+            unusedE -= eToAdd;
+            j++;
+            j = j % numAtoms;
+          }
+        }
+      }
+
+      if (happyAtoms === numAtoms) return { structure: struc, answer: 'y' };else {
+        console.log('bad structure, out of ideas');
+        return { structure: struc, answer: 'n' };
+      }
+    };
+
+    Vue.simpleCentralStructure = function (formula, elements) {
+      //console.log('in simpleCentralStructure')
+      var strucObj = Vue.parseFormulaForStructure(formula, elements);
+      var struc = strucObj.structure;
+      var charge = strucObj.charge;
+      var numE = strucObj.numE;
       if (charge !== 0) console.log("not setup for charges yet");
+      //console.log("struc, from parse, is ", struc)
       var numAtoms = struc.length;
       var element = elements[struc[0][2]];
+      console.log('element is: ', element);
       struc[0][0] = 0;
-      var bonds = element[4];
+      var bonds = element[4]; //normal num of bonds for element
       var outerBonds = 0;
+      var elementTemp = 0;
       for (var i = 1; i < numAtoms; i++) {
-        element = elements[struc[i][2]];
-        outerBonds += element[4];
+        elementTemp = elements[struc[i][2]];
+        outerBonds += elementTemp[4];
       }
       console.log('outerBonds: ', outerBonds);
+      console.log('bonds: ', bonds);
       if (bonds < numAtoms - 1) bonds = element[5]; //use ox max valence instead of normal
+      if (bonds < outerBonds) {
+        console.log('bonds less than outerBonds', bonds, outerBonds);
+        if (outerBonds < element[5] + 1) bonds = outerBonds;
+      }
       if (bonds > outerBonds) bonds = outerBonds;
       if (bonds % outerBonds !== 0) console.log("bonds don't divide evenly over atoms");
+      console.log('element[1] and bonds:', element[1], bonds);
+      console.log('element is: ', element);
       struc[0][1] = element[1] - bonds;
       var bondsPerConnection = bonds / (numAtoms - 1);
       for (var _i = 1; _i < numAtoms; _i++) {
@@ -49842,294 +51183,11 @@ if (false) {
 });
 
 /***/ }),
-/* 140 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(141)
-}
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(143),
-  /* template */
-  __webpack_require__(144),
-  /* styles */
-  injectStyle,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/NomenclatureSession.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] NomenclatureSession.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-1039c240", Component.options)
-  } else {
-    hotAPI.reload("data-v-1039c240", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
 /* 141 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(142);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(4)("23a28045", content, false);
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-1039c240\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./NomenclatureSession.vue", function() {
-     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-1039c240\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./NomenclatureSession.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 142 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(3)(undefined);
-// imports
-
-
-// module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 143 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {
-      mode: 'Easy Mode',
-      notMode: 'Hard Mode',
-      modeBool: true
-    };
-  },
-  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
-    factsStatus: 'checkFactsReady',
-    statesStatus: 'checkStatesReady',
-    currentQuestionState: 'getCurrent',
-    setupReady: 'checkSetup',
-    finished: 'getFinished',
-    frustrated: 'isFrustrated',
-    bug: 'isBug',
-    suggestion: 'hasSuggestion',
-    message: 'getMessage'
-  }), {
-    ready: function ready() {
-      if (this.setupReady === true && typeof this.currentQuestionState !== 'undefined') {
-        return true;
-      } else return false;
-    }
-  }),
-  created: function created() {
-    var _this = this;
-
-    Promise.all([this.$store.dispatch('setupFacts')]).then(function (results) {
-      _this.$store.dispatch('setupStates', 9);
-    }).then(function (results) {
-      _this.$store.dispatch('setupIons');
-    }).then(function (results) {
-
-      console.log(results);
-      console.log('promise resolved, in then');
-      _this.$store.dispatch('setReady');
-      var curr = _this.currentQuestionState;
-      console.log(curr);
-      _this.$store.dispatch('setQuestionStart');
-    });
-  },
-
-  methods: {
-    setMode: function setMode() {
-      console.log('called setMode');
-      if (this.modeBool) {
-        this.mode = 'Hard Mode';
-        this.notMode = 'Easy Mode';
-      } else {
-        this.notMode = 'Hard Mode';
-        this.mode = 'Easy Mode';
-      }
-      this.modeBool = !this.modeBool;
-    }
-  }
-});
-
-/***/ }),
-/* 144 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('div', [_vm._v("Easy mode talks you through the decisions you need to make. Hard mode just asks for the answer.\n    Currently set to " + _vm._s(_vm.mode))]), _vm._v(" "), _c('button', {
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": function($event) {
-        _vm.setMode()
-      }
-    }
-  }, [_vm._v("Set " + _vm._s(_vm.notMode))]), _vm._v(" "), _c('div', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (_vm.finished),
-      expression: "finished"
-    }],
-    staticClass: "alert alert-success"
-  }, [_c('strong', [_vm._v("Congrats, you've finished studying everything you set for this session!")]), _vm._v("\n    Add more material by returning to your dashboard and setting a new session, or\n    check back in later to see if you have material to review. Or just keep studying, if you want.")]), _vm._v(" "), _c('div', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (_vm.message),
-      expression: "message"
-    }],
-    staticClass: "alert alert-info"
-  }, [_vm._v("\n      " + _vm._s(_vm.message))]), _vm._v(" "), (_vm.ready === false) ? _c('div', [_vm._v("Please wait, loading")]) : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[0] === -1) ? _c('div', {
-    staticClass: "alert alert-danger"
-  }, [_vm._v("\n    You haven't set up nomenclature! Please return to your dashboard and use Setup New Session\n    to add the topic nomenclature.")]) : _vm._e(), _vm._v(" "), (_vm.ready === true && _vm.currentQuestionState[2] === 'skill') ? _c('general-nomenclature-question', {
-    attrs: {
-      "easymode": _vm.modeBool
-    }
-  }) : _vm._e(), _vm._v(" "), _c('div', [_c('button', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (!_vm.bug),
-      expression: "!bug"
-    }],
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": function($event) {
-        _vm.$store.dispatch('toggleBug')
-      }
-    }
-  }, [_vm._v("Report Bug")]), _vm._v(" "), _c('button', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (!_vm.frustrated),
-      expression: "!frustrated"
-    }],
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": function($event) {
-        _vm.$store.dispatch('toggleFrustrated')
-      }
-    }
-  }, [_vm._v("I'm frustrated")]), _vm._v(" "), _c('button', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (!_vm.suggestion),
-      expression: "!suggestion"
-    }],
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": function($event) {
-        _vm.$store.dispatch('toggleSuggestion')
-      }
-    }
-  }, [_vm._v("Make a suggestion")])]), _vm._v(" "), (_vm.bug) ? _c('bug-report') : _vm._e(), (_vm.frustrated) ? _c('frustration-report') : _vm._e(), _vm._v(" "), (_vm.suggestion) ? _c('suggestion-box') : _vm._e(), _vm._v(" "), _c('hr')], 1)
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-1039c240", module.exports)
-  }
-}
-
-/***/ }),
-/* 145 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
 
 //import store from '../vuex/store';
@@ -50220,19 +51278,33 @@ if (false) {
 });
 
 /***/ }),
-/* 146 */
+/* 142 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 143 */,
+/* 144 */,
+/* 145 */,
+/* 146 */,
+/* 147 */,
+/* 148 */,
+/* 149 */,
+/* 150 */,
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(147)
+  __webpack_require__(152)
 }
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(149),
+  __webpack_require__(154),
   /* template */
-  __webpack_require__(150),
+  __webpack_require__(155),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -50240,9 +51312,9 @@ var Component = __webpack_require__(1)(
   /* moduleIdentifier (server only) */
   null
 )
-Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/GeneralNomenclatureQuestion.vue"
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/LewisTester.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] GeneralNomenclatureQuestion.vue: functional components are not supported with templates, they should use render functions.")}
+if (Component.options.functional) {console.error("[vue-loader] LewisTester.vue: functional components are not supported with templates, they should use render functions.")}
 
 /* hot reload */
 if (false) {(function () {
@@ -50251,9 +51323,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-7e502546", Component.options)
+    hotAPI.createRecord("data-v-004bcb68", Component.options)
   } else {
-    hotAPI.reload("data-v-7e502546", Component.options)
+    hotAPI.reload("data-v-004bcb68", Component.options)
   }
   module.hot.dispose(function (data) {
     disposed = true
@@ -50264,23 +51336,23 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 147 */
+/* 152 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(148);
+var content = __webpack_require__(153);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("177a8e1d", content, false);
+var update = __webpack_require__(3)("356a06c8", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
  if(!content.locals) {
-   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7e502546\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./GeneralNomenclatureQuestion.vue", function() {
-     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7e502546\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./GeneralNomenclatureQuestion.vue");
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-004bcb68\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./LewisTester.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-004bcb68\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./LewisTester.vue");
      if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
      update(newContent);
    });
@@ -50290,99 +51362,30 @@ if(false) {
 }
 
 /***/ }),
-/* 148 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 149 */
+/* 154 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //
@@ -50418,399 +51421,57 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
   data: function data() {
     return {
       entry: '',
-      tries: 0,
-      acc: 0,
-      rts: [],
-      startTime: 0,
+      index: 0
       //determines whether name or formula is given
-      requestFormula: true,
-      type: 0,
-      typeEntry: 0,
-      romanNums: ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'],
-      types: ['ion', 'ionic compound', 'covalent compound', 'acid'],
-      question: { name: '', formula: '' },
-      stage: 0,
-      successes: [],
-      stage1response: '',
-      stage2response: '',
-      stage3response: '',
-      //stage2explanations[type][typeEntry] for name given
-      stage2explanationsName: [[],
-      //ionic
-      ['', '', 'You can recognize an ionic compound because the first part of the name is a metal or ammonium. ', "This can't be an acid because the name doesn't include 'acid'. "],
-      //covalent
-      ['', 'You can recognize a covalent compound because the name will usually include a prefix, and\n          also the first element named will be a non-metal. ', '', "This is not named as an acid (because it doens't include 'acid') and unless it contains hydrogen, it isn't an acid at all. "],
-      //acid
-      ['', 'This is an acid, since it has "acid" in the name. ', 'Acids are covalent, but since it has acid in the name, pick "acid". ', '']],
-      stage2explanationsFormula: [[],
-      //ionic
-      ['', '', 'You can tell it\'s ionic because it begins with either NH4 or a metal', 'You can tell it\'s not an acid because it doesn\'t start with H. '],
-      //covalent
-      ['', 'You can tell it\'s not ionic because it starts with a non-metal (but not the NH4 group). ', '', 'If it doesn\'t start with H, it can\'t be an acid. '],
-      //acid
-      ['', 'Acids are sort of similar to ionic compounds, but since it starts with H, you should call it an acid. ', 'Acids are a type of covalent compound, but in this case we can\'t name it as covalent. ']],
-      num1: '',
-      num2: ''
     };
   },
-  props: ['easymode'],
+  //props: ['questionTypeID'],
   computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
-    currentQuestion: 'getCurrent',
-    questionSetTime: 'getQuestionSetTime',
-    stageData: 'getStageData',
-    facts: 'getFacts',
-    ions: 'getIons',
-    covalentCompounds: 'getCovalentCompounds',
-    feedback: 'getFeedback',
-    feedbackType: 'getFeedbackType'
+    lewisHomo: 'getLewisHomoDiatomics',
+    lewisHetero: 'getLewisHeteroDiatomics',
+    lewisMulti: 'getLewisSimpleCentral',
+    lewisTriCentral: 'getLewisTriatomicCentral',
+    elements: 'getLSE'
   }), {
-    cations: function cations() {
-      var cations = this.ions.cat;
-      cations.concat(this.ions.polycat);
-      return cations;
+    formulasArray: function formulasArray() {
+      var temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti);
+      //let temp = this.lewisTriCentral
+      return temp;
     },
-    anions: function anions() {
-      var anions = this.ions.an;
-      anions.concat(this.ions.polyan);
-      return anions;
+    formula: function formula() {
+      //return this.formulasArray[this.index]
+      return 'ClO';
     },
-    acids: function acids() {
-      var acids = this.facts.filter(function (entry) {
-        return entry.group_name === 'acids';
-      });
-      return acids;
+    question: function question() {
+      return Vue.generalLewisStructure(this.formula, this.elements);
+    },
+    stats: function stats() {
+      var directions = Array(12);
+      directions.fill(0);
+      var drawnAtoms = Array(this.question.structure.length);
+      drawnAtoms.fill(0);
+      return {
+        center: [100, 100],
+        directions: directions,
+        atomsArray: this.question.structure,
+        drawnAtoms: drawnAtoms,
+        index: 0
+      };
     }
   }),
-  created: function created() {
-    this.requestFormula = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random() >= 0.5;
-    this.type = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, 3);
-    if (this.type === 0) this.setIonQuestion();else if (this.type === 1) this.setIonicQuestion();else if (this.type === 2) this.setCovalentQuestion();else if (this.type === 3) this.setAcidQuestion();
-  },
 
   methods: {
-    setIonQuestion: function setIonQuestion() {
-      var catOrAn = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random() >= 0.5;
-      var ion = 0;
-      if (catOrAn) {
-        ion = this.cations[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.cations.length - 1)];
-      } else ion = this.anions[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.anions.length - 1)];
-      var question = Vue.ionNameFormula(ion);
-      this.question = question;
-    },
-    setIonicQuestion: function setIonicQuestion() {
-      var setTime = this.questionSetTime;
-      var anions = this.ions.an;
-      var cations = this.ions.cat;
-      if (this.currentQuestion[6] === 'complex ionic formulas') {
-        anions.concat(this.ions.polyan);
-        cations.concat(this.ions.polycat);
-      }
-      var anion = anions[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, anions.length - 1)];
-      var cation = cations[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, cations.length - 1)];
-      var question = Vue.ionicNameFormula(cation, anion);
-      question.setTime = setTime;
-      this.question = question;
-    },
-    setCovalentQuestion: function setCovalentQuestion() {
-      var compounds = this.covalentCompounds;
-      var compound = compounds[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, compounds.length - 1)];
-      var regex = /[A-Z][a-z]*(\d*)[A-Z][a-z]*(\d*)/g;
-      var arr = regex.exec(compound[0]);
-      for (var i = 1; i < 3; i++) {
-        if (arr[i] === '') arr[i] = '1';
-      }
-      console.log(arr);
-      this.question = { name: compound[1], formula: compound[0], num1: arr[1], num2: arr[2] };
-    },
-    setAcidQuestion: function setAcidQuestion() {
-      var acid = this.acids[__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.acids.length - 1)];
-      var regex = /^H(\d*)/;
-      var arr = regex.exec(acid.key);
-      if (arr[1] === '') arr[1] = '1';
-      console.log(arr);
-      this.question = { name: acid.prop, formula: acid.key, charge: -Number(arr[1]) };
-    },
-    neutralOrNot: function neutralOrNot(choice) {
-      //is ion
-      if (this.type === 0) {
-        //picked ion correctly
-        if (!choice) {
-          this.successes[0] = 1;
-          this.stage1response = "You picked ion. ";
-        } else {
-          this.successes[0] = 0;
-          this.stage1response = 'You picked compound, but this is an ion. ';
-        }
-      } else {
-        if (choice) {
-          this.successes[0] = 1;
-          this.stage1response = "You picked compound. ";
-        } else {
-          this.successes[0] = 0;
-          this.stage1response = "You picked ion, but this is a compound. ";
-        }
-      }
-      if (this.type !== 0) this.stage = 1;else this.stage = 4;
-    },
-    typeCheck: function typeCheck(typeEntry) {
-      this.typeEntry = typeEntry;
-      if (/^H/.test(this.question.formula) && !/O/.test(this.question.formula) && !this.requestFormula) {
-        if (typeEntry > 1) {
-          this.successes[1] = 1;
-          if (typeEntry === this.type) this.stage2response = 'You picked ' + this.types[this.type] + '. ';else {
-            this.stage2response = 'You picked ' + this.types[typeEntry] + ', which is reasonable, but let\'s use the rules for ' + this.types[this.type] + 's. ';
-          }
-        } else {
-          this.successes[1] = 0;
-          this.stage2response = 'You picked ' + this.types[typeEntry] + ', but this is a ' + this.types[this.type] + '. ';
-        }
-      } else if (typeEntry === this.type) {
-        this.successes[1] = 1;
-        this.stage2response = 'You picked ' + this.types[this.type] + '. ';
-      } else {
-        this.successes[1] = 0;
-        this.stage2response = 'You picked ' + this.types[typeEntry] + ', but this is a ' + this.types[this.type] + '. ';
-      }
-      this.stage = 2;
-    },
-    submitNum: function submitNum(event) {
-      if (this.type === 1) {
-        this.num1 = Number(this.num1.replace(/(\d+)([+])/g, '$2$1'));
-        this.num2 = Number(this.num2.replace(/(\d+)([-])/g, '$2$1'));
-        if (this.num1 === Number(this.question.catCharge) && this.num2 === -Number(this.question.anCharge)) {
-          this.successes[2] = 1;
-        } else this.successes[2] = 0;
-      } else if (this.type === 2) {
-        if (this.num1 === this.question.num1 && this.num2 === this.question.num2) {
-          this.successes[2] = 1;
-        } else this.successes[2] = 0;
-      } else if (this.type === 3) {
-        this.num1 = Number(this.num1.replace(/(\d+)([-])/g, '$2$1'));
-        if (this.num1 === this.question.charge) this.successes[2] = 1;else this.successes[2] = 0;
-      }
-      if (this.successes[2]) this.stage = 4;else this.stage = 3;
-    },
-    lastCheck: function lastCheck(choice) {
-      if (this.type === 1) {
-        if (Boolean(choice) === this.question.romNum) {
-          this.successes[2] = 1;
-        } else this.successes[2] = 0;
-      } else if (this.type === 2) {
-        if (choice === 1) {
-          this.successes[2] = 1;
-        } else this.successes[2] = 0;
-      } else if (this.type === 3) {
-        /^hydro/.test(this.question.name);
-        if (/^hydro/.test(this.question.name) === Boolean(choice)) this.successes[2] = 1;else this.successes[2] = 0;
-      }
-      if (this.successes[2]) this.stage = 4;else this.stage = 3;
-    },
+
     submitEntry: function submitEntry(event) {
-      this.tries += 1;
-      var answerDetail = this.checkEntry();
-      if (this.startTime === 0) {
-        this.startTime = this.questionSetTime;
-      }
-      answerDetail.timeStamp = Date.now();
 
-      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
-      //console.log('rts is set to ', this.rts)
-      this.startTime = Date.now();
-
-      var correct = answerDetail.correct;
-      var moveOn = false;
-      var gotIt = false;
-
-      if (correct === 'correct') {
-        answerDetail.messageSent += ' Correct!';
-        moveOn = true;
-        gotIt = true;
-        this.acc = this.tries - 1;
-        this.$store.dispatch('setFeedbackType', { "alert-success": true });
-
-        //console.log('acc is set to ', this.acc)
-      } else if (correct === 'dontKnow') {
-        moveOn = true;
-      } else {
-        if (this.tries < 3) {
-          answerDetail.messageSent += " Try again!";
-        } else moveOn = true;
-      }
-      if (moveOn === true && gotIt === false) {
-        if (this.requestFormula) {
-          answerDetail.messageSent = 'The formula of "' + this.question.name + '" is\n          "' + this.question.formula + '". We\'ll come back to it.';
-          this.acc = 4;
-        } else {
-          answerDetail.messageSent = 'The name of "' + this.question.formula + '" is\n          "' + this.question.name + '". We\'ll come back to it.';
-          this.acc = 4;
-        }
-      }
-      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
-        this.$store.dispatch('setFeedbackType', { "alert-warning": true });
-      } else if (gotIt === false) this.$store.dispatch('setFeedbackType', { "alert-danger": true });
-      this.$store.dispatch('setFeedback', answerDetail.messageSent);
-      var action = {};
-      action.state_id = this.currentQuestion[4];
-      action.type = 'answer given-' + correct;
-      action.detail = answerDetail;
-      action.time = answerDetail.timeStamp;
-
-      //this code gives a 500 error now, should check laravel side
-      //console.log("action is ", action);
-      axios.post('../api/student/actions', action).catch(function (error) {
-        console.log(error);
-      });
-
-      if (moveOn) {
-        //update states
-
-        var updatedState = { rts: this.rts, accs: this.acc };
-        console.log("updatedState is", updatedState);
-        this.$store.dispatch('updateRtsAccs', updatedState);
-        updatedState = Vue.skillPriorityHelper(this.stageData);
-        this.$store.dispatch('updateStage', updatedState);
-
-        //set new question
-        //console.log('about to set new question');
-        //this.$store.dispatch('setQuestion');
-        this.$store.dispatch('setNomenclatureSession');
-
-        //update props
-        this.entry = '';
-        this.typeEntry = 0;
-        this.tries = 0;
-        this.acc = 0;
-        this.rts = [];
-        this.requestFormula = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random() >= 0.5;
-        //this.type = _.random(0,3);
-        this.type = 3;
-        if (this.type === 0) this.setIonQuestion();else if (this.type === 1) this.setIonicQuestion();else if (this.type === 2) this.setCovalentQuestion();else if (this.type === 3) this.setAcidQuestion();
-        this.stage = 0;
-        this.successes = [];
-        this.stage1response = '';
-        this.stage2response = '';
-        this.stage3response = '';
-        this.num1 = '';
-        this.num2 = '';
-      }
-    },
-
-    //checks the entry, returns answerDetail
-    checkEntry: function checkEntry() {
-      var answerDetailToReturn = { answer: this.entry, messageSent: '', correct: '' };
-      console.log('this.entry: ', this.entry);
-      //console.log('this.answer: ', this.answers);
-      if (this.entry === '') {
-        answerDetailToReturn.correct = 'noAnswer';
-        answerDetailToReturn.messageSent += 'If you don\'t know the answer, enter zero. ';
-      } else if (Number(this.entry) === 0) {
-        answerDetailToReturn.correct = 'dontKnow';
-      }
-      //if answer is formula:
-      if (this.requestFormula) {
-        if (this.entry === this.question.formula) {
-          answerDetailToReturn.correct = 'correct';
-        } else if (this.entry.toLowerCase() === this.question.formula.toLowerCase()) {
-          answerDetailToReturn.correct = 'close';
-          answerDetailToReturn.messageSent = 'Check your capitalization!';
-        }
-        //later, try to parse answer and give specific feedback
-        //break into cation and anion
-        //check quantity of ions and correct identity
-        //check parentheses
-        else if (this.type > 0) {
-            var reCatParen = /\(([A-Z][a-z]*)\)(\d?)([A-Z][a-z]*)(\d?)/;
-            var reAnParen = /([A-Z][a-z]*)(\d?)\(([A-Z][a-z]*)\)(\d?)/;
-            var reBothParen = /\(([A-Z][a-z]*)\)(\d?)\(([A-Z][a-z]*)\)(\d?)/;
-            var reNoParen = /([A-Z][a-z]*)(\d?)([A-Z][a-z]*)(\d?)/;
-            var parensE = 0;
-            var reArrayE = reCatParen.exec(this.entry);
-            if (!reArrayE) {
-              reArrayE = reAnParen.exec(this.entry);
-              parensE = 1;
-            }
-            if (!reArrayE) {
-              reArrayE = reBothParen.exec(this.entry);
-              parensE = 2;
-            }
-            if (!reArrayE) {
-              reArrayE = reNoParen.exec(this.entry);
-              parensE = 3;
-            }
-            if (!reArrayE) {
-              answerDetailToReturn.correct = 'unknownWrong';
-              answerDetailToReturn.messageSent = 'Make sure your answer is formatted correctly.';
-            } else {
-              var parensA = 0;
-              var reArrayA = reCatParen.exec(this.question.formula);
-              if (!reArrayA) {
-                reArrayA = reAnParen.exec(this.question.formula);
-                parensA = 1;
-              }
-              if (!reArrayA) {
-                reArrayA = reBothParen.exec(this.question.formula);
-                parensA = 2;
-              }
-              if (!reArrayA) {
-                reArrayA = reNoParen.exec(this.question.formula);
-                parensA = 3;
-              }
-              if (!reArrayA) {
-                answerDetailToReturn.correct = 'unknownWrong';
-                answerDetailToReturn.messageSent = 'check your formula';
-              } else if (parensA !== parensE) {
-                answerDetailToReturn.correct = 'knownWrong';
-                answerDetailToReturn.messageSent += 'Check your parentheses. ';
-              } else if (reArrayA[1] !== reArrayE[1]) {
-                answerDetailToReturn.correct = 'knownWrong';
-                answerDetailToReturn.messageSent += 'Check your cation or first element. ';
-              } else if (reArrayA[3] !== reArrayE[3]) {
-                answerDetailToReturn.correct = 'knownWrong';
-                answerDetailToReturn.messageSent += 'Check your anion or second element. ';
-              } else if (reArrayA[2] !== reArrayE[2] || reArrayA[4] !== reArrayE[4]) {
-                answerDetailToReturn.correct = 'knownWrong';
-                answerDetailToReturn.messageSent += 'Check the number of ions or atoms. ';
-              }
-            }
-          }
-      }
-
-      //if answer is name:
-      else {
-          //console.log(this.entry === this.question.name)
-          if (this.entry === this.question.name) {
-            answerDetailToReturn.correct = 'correct';
-          } else if (this.type === 0 && this.entry === this.question.name + ' ion') {
-            answerDetailToReturn.correct = 'correct';
-          } else if (this.entry.toLowerCase() === this.question.name.toLowerCase()) {
-            answerDetailToReturn.correct = 'close';
-            answerDetailToReturn.messageSent = 'Check your capitalization!';
-          } else {
-            var reName = /(\w+)(\([IVX]+\))?\s(\w+)/;
-            var reArrayNA = reName.exec(this.question.name);
-            var reArrayNE = reName.exec(this.entry);
-            if (!reArrayNE) {
-              answerDetailToReturn.correct = 'unknownWrong';
-              answerDetailToReturn.messageSent = 'Check the format of your answer. Include "ion" in cation names. ';
-            } else {
-              if (reArrayNE[1] !== reArrayNA[1] || reArrayNE[2] !== reArrayNA[2]) {
-                answerDetailToReturn.correct = 'knownWrong';
-                answerDetailToReturn.messageSent += 'Check your cation, first element or acid name. ';
-              }
-              if (reArrayNE[3] !== reArrayNA[3]) {
-                answerDetailToReturn.correct = 'knownWrong';
-                answerDetailToReturn.messageSent += 'Check your anion, second element or spelling of "acid". ';
-              }
-            }
-          }
-        }
-      return answerDetailToReturn;
+      this.index++;
+      //this.index = 20
     }
   }
 });
 
 /***/ }),
-/* 150 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -50818,180 +51479,15 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "panel panel-default"
   }, [_c('div', {
     staticClass: "panel-heading"
-  }, [_vm._v("General Nomenclature Practice!")]), _vm._v(" "), _c('div', {
+  }, [_vm._v("Lewis Tester")]), _vm._v(" "), _c('div', {
     staticClass: "panel-body"
-  }, [_c('div', [_vm._v("\n          Instructions: If you are asked for a formula,\n          use the following format: write 'VO2+1' for "), _c('span', {
+  }, [_c('div', [_c('br'), _c('br'), _vm._v("\n            Is this a good Lewis structure for "), _c('span', {
     domProps: {
-      "innerHTML": _vm._s(this.$options.filters.formatFormula('VO2+1'))
+      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.formula))
     }
-  }), _vm._v(". Recall that compounds are always charge balanced."), _c('br'), _vm._v("\n        Note that ionic compounds in this practice are generated randomly, and may not all actually exist. To the best of my\n        knowledge, the covalent example compounds do exist but may be quite unstable.\n        ")]), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.requestFormula) ? _c('h3', [_vm._v("\n          We need to convert " + _vm._s(_vm.question.name) + " to a formula.")]) : _vm._e(), _vm._v(" "), (!(_vm.requestFormula)) ? _c('h3', [_vm._v("\n          We need to convert "), _c('span', {
-    domProps: {
-      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.question.formula))
-    }
-  }), _vm._v(" to a name.")]) : _vm._e(), _vm._v(" "), (_vm.easymode) ? _c('div', [_c('h4', [_vm._v("First, you need to decide if this is a compound or an ion.")]), _vm._v(" "), _c('button', {
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": function($event) {
-        _vm.neutralOrNot(0)
-      }
-    }
-  }, [_vm._v("Ion")]), _vm._v(" "), _c('button', {
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": function($event) {
-        _vm.neutralOrNot(1)
-      }
-    }
-  }, [_vm._v("Compound")])]) : _vm._e(), _vm._v(" "), (_vm.easymode && _vm.stage > 0) ? _c('div', [(_vm.successes[0]) ? _c('h4', [_vm._v(_vm._s(_vm.stage1response) + " Correct!")]) : _vm._e(), _vm._v(" "), (!_vm.successes[0]) ? _c('div', [_c('h4', [_vm._v(_vm._s(_vm.stage1response))]), _c('br'), _vm._v("\n            If given a formula, if a charge is not given, it is a neutral compound.\n            If given a name, an ion name will be one word or will be \"_____ ion\", while an ionic or binary covalent\n            compound name will have two words neither of which is \"ion\". (There are compounds with one word names, but\n            we haven't learned about them yet. Organic compounds like methane and ethanol are examples; they won't end in\n            '-ide', '-ate' or '-ite'.)")]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), (_vm.type > 0) ? _c('div', [_c('h4', [_vm._v("Next, we need to decide which type of nomenclature to use. If it could be acid or covalent, pick acid.")]), _vm._v(" "), _c('button', {
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": function($event) {
-        _vm.typeCheck(1)
-      }
-    }
-  }, [_vm._v("Ionic")]), _vm._v(" "), _c('button', {
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": function($event) {
-        _vm.typeCheck(2)
-      }
-    }
-  }, [_vm._v("Covalent")]), _vm._v(" "), _c('button', {
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": function($event) {
-        _vm.typeCheck(3)
-      }
-    }
-  }, [_vm._v("Acid")])]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.easymode && _vm.stage > 1 && _vm.type > 0) ? _c('div', [(_vm.successes[1]) ? _c('h4', [_vm._v(_vm._s(_vm.stage2response) + " Correct!")]) : _vm._e(), _vm._v(" "), (!_vm.successes[1]) ? _c('div', [_c('h4', [_vm._v(_vm._s(_vm.stage2response))]), _vm._v(" "), (_vm.requestFormula) ? _c('div', [_vm._v(_vm._s(_vm.stage2explanationsName[_vm.type][_vm.typeEntry]))]) : _vm._e(), _vm._v(" "), (!_vm.requestFormula) ? _c('div', [_vm._v(_vm._s(_vm.stage2explanationsFormula[_vm.type][_vm.typeEntry]))]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.requestFormula) ? _c('div', [(_vm.type === 1) ? _c('h4', [_vm._v("What charges do the ions have? Enter cation and anion charge:")]) : _vm._e(), _vm._v(" "), (_vm.type === 2) ? _c('h4', [_vm._v("How many of each element do we need? Enter number of first and second:")]) : _vm._e(), _vm._v(" "), (_vm.type === 3) ? _c('h4', [_vm._v("What's the charge on the anion?")]) : _vm._e(), _vm._v(" "), _c('input', {
-    directives: [{
-      name: "focus",
-      rawName: "v-focus"
-    }, {
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.num1),
-      expression: "num1"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      "type": "text",
-      "autocapitalize": "off",
-      "autocorrect": "off"
-    },
-    domProps: {
-      "value": (_vm.num1)
-    },
-    on: {
-      "keyup": function($event) {
-        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
-        _vm.submitNum($event)
-      },
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.num1 = $event.target.value
-      }
-    }
-  }), _vm._v(" "), (_vm.type < 3) ? _c('input', {
-    directives: [{
-      name: "focus",
-      rawName: "v-focus"
-    }, {
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.num2),
-      expression: "num2"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      "type": "text",
-      "autocapitalize": "off",
-      "autocorrect": "off"
-    },
-    domProps: {
-      "value": (_vm.num2)
-    },
-    on: {
-      "keyup": function($event) {
-        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
-        _vm.submitNum($event)
-      },
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.num2 = $event.target.value
-      }
-    }
-  }) : _vm._e()]) : _vm._e(), _vm._v(" "), (!_vm.requestFormula) ? _c('div', [(_vm.type === 1) ? _c('h4', [_vm._v("Should we use Roman numerals?")]) : _vm._e(), _vm._v(" "), (_vm.type === 2) ? _c('h4', [_vm._v("Does this system use prefixes?")]) : _vm._e(), _vm._v(" "), (_vm.type === 3) ? _c('h4', [_vm._v("Should the name start with 'hydro-'?")]) : _vm._e(), _vm._v(" "), _c('button', {
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": function($event) {
-        _vm.lastCheck(1)
-      }
-    }
-  }, [_vm._v("Yes")]), _vm._v(" "), _c('button', {
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": function($event) {
-        _vm.lastCheck(0)
-      }
-    }
-  }, [_vm._v("No")])]) : _vm._e()]) : _vm._e(), _vm._v(" "), (_vm.easymode && _vm.stage > 2 && _vm.type > 0) ? _c('div', [(_vm.successes[2]) ? _c('h4', [_vm._v("Correct! Enter the answer!")]) : _vm._e(), _vm._v(" "), (!_vm.successes[2]) ? _c('h4', [_vm._v("Oops! Try again.")]) : _vm._e(), _vm._v(" "), (!_vm.successes[2] && !_vm.requestFormula && _vm.type === 1) ? _c('div', [_vm._v("Use Roman numerals unless the cation is an alkali\n            metal, an alkaline earth metal, aluminum or zinc.")]) : _vm._e(), _vm._v(" "), (!_vm.successes[2] && !_vm.requestFormula && _vm.type === 2) ? _c('div', [_vm._v("The covalent system uses prefixes, though in the specific case\n              of acids named as covalent compounds, prefixes are omitted.")]) : _vm._e(), _vm._v(" "), (!_vm.successes[2] && !_vm.requestFormula && _vm.type === 3) ? _c('div', [_vm._v("Use hydro if there is no oxygen in the anion.")]) : _vm._e()]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), (!_vm.easymode || _vm.stage > 3) ? _c('div', [(_vm.requestFormula) ? _c('div', [_vm._v("Your formatted answer is: "), _c('span', {
-    domProps: {
-      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.entry))
-    }
-  })]) : _vm._e(), _vm._v(" "), _c('div', {
+  }), _vm._v("?")]), _vm._v(" "), _c('div', {
     staticClass: "input-group"
-  }, [_vm._v("\n            Your answer here:\n            "), _c('input', {
-    directives: [{
-      name: "focus",
-      rawName: "v-focus"
-    }, {
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.entry),
-      expression: "entry"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      "type": "text",
-      "autocapitalize": "off",
-      "autocorrect": "off"
-    },
-    domProps: {
-      "value": (_vm.entry)
-    },
-    on: {
-      "keyup": function($event) {
-        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
-        _vm.submitEntry($event)
-      },
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.entry = $event.target.value
-      }
-    }
-  }), _vm._v(" "), _c('span', {
+  }, [_c('span', {
     staticClass: "input-group-btn"
   }, [_c('button', {
     staticClass: "btn btn-default",
@@ -51001,22 +51497,22 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "click": _vm.submitEntry
     }
-  }, [_vm._v("Submit answer!")])])])]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (_vm.feedback),
-      expression: "feedback"
-    }],
-    staticClass: "alert",
-    class: _vm.feedbackType
-  }, [_c('p', [_vm._v(_vm._s(_vm.feedback))])])])])
+  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), _c('svg', {
+    attrs: {
+      "width": "200",
+      "height": "200"
+    }
+  }, [_c('lewis-atom', {
+    attrs: {
+      "stats": _vm.stats
+    }
+  })], 1), _vm._v(" "), _c('br')])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-7e502546", module.exports)
+     require("vue-hot-reload-api").rerender("data-v-004bcb68", module.exports)
   }
 }
 

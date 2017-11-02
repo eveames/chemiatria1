@@ -78,14 +78,6 @@ class HomeController extends Controller
     public function update_plan(Request $request, SessionPlanHelper $formatter)
     {
       $user = auth()->user();
-      //create new states
-      if(is_array($request->new))
-      {
-        //dd($request->new);
-        $topicIDsToAdd = array_map('intval', array_keys($request->new));
-        $user = auth()->user();
-        $formatter->addStatesByTopic($topicIDsToAdd, $user);
-      }
 
       //update current on old states
       $input = json_decode($request->input, true);
@@ -177,6 +169,7 @@ class HomeController extends Controller
       $statesToSet0 = array_filter($statesToSet0, function($item) {
         return(is_numeric($item));
       });
+
       //dd($statesToSet1, $statesToSet0);
       if($statesToSet1 != [])
       {
@@ -188,6 +181,15 @@ class HomeController extends Controller
         State::whereIn('id', $statesToSet0)->update(['current' => 0]);
         //dd($states);
         //$states;
+      }
+
+      //create new states
+      if(is_array($request->new))
+      {
+        //dd($request->new);
+        $topicIDsToAdd = array_map('intval', array_keys($request->new));
+        $user = auth()->user();
+        $formatter->addStatesByTopic($topicIDsToAdd, $user);
       }
       //dd($user->states()->get());
       return view('home')->with('user', $user);

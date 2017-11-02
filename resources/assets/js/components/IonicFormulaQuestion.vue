@@ -65,8 +65,8 @@ export default {
       let anions = this.ions.an;
       let cations = this.ions.cat;
       if (this.currentQuestion[6] === 'complex ionic formulas') {
-        anions.concat(this.ions.polyan);
-        cations.concat(this.ions.polycat);
+        anions = anions.concat(this.ions.polyan);
+        cations = cations.concat(this.ions.polycat);
       }
       let anion = anions[_.random(0, anions.length-1)];
       let cation = cations[_.random(0, cations.length-1)];
@@ -114,7 +114,7 @@ export default {
       if (moveOn === true && gotIt === false) {
         if (this.requestFormula) {
           answerDetail.messageSent = `The formula of "${this.question.name}" is
-          "${this.question.answer}". We\'ll come back to it.`;
+          "${this.question.formula}". We\'ll come back to it.`;
           this.acc = 4;
         }
         else {
@@ -203,7 +203,7 @@ export default {
               }
               if (!reArrayE) {
                 reArrayE = reBothParen.exec(this.entry);
-                parentheses = 2;
+                parensE = 2;
               }
               if (!reArrayE) {
                 reArrayE = reNoParen.exec(this.entry);

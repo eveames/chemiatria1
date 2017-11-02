@@ -47,7 +47,7 @@ const actions = {
   setupStates ({commit}, topic) {
     let url = '../api/student/states/active'
     if (topic) url = '../api/student/states/'+topic
-    console.log(url)
+    //console.log(url)
     return new Promise((resolve, reject) => {
       axios.get(url)
       .then((response) => {
@@ -67,7 +67,12 @@ const actions = {
         }
         states.push(thisState);
       }
-      console.log('states is ', states);
+      //console.log('states is ', states);
+      if (!topic) {
+        states = states.filter(function(entry) {
+          return entry.subtype != 'nomenclature'
+        })
+      }
       commit(types.INITIALIZE_STATES, states);
       if (!topic) commit(types.SET_QUESTION);
       else if (topic === 9) commit(types.SET_NOMENCLATURE_SESSION, -1)
@@ -116,7 +121,7 @@ const actions = {
       console.log(error);
     })
     commit(types.SET_QUESTION);
-    console.log('after SET_QUESTION, prev is ', prev)
+    //console.log('after SET_QUESTION, prev is ', prev)
   },
   setNomenclatureSession ({commit}) {
     let prev = state.currentIndex;
@@ -130,7 +135,7 @@ const actions = {
     })
     let index = prev
     if (!(state.currentSkill === 'general nomenclature')) index = -1
-    console.log('before SET index is ', index)
+    //console.log('before SET index is ', index)
     commit(types.SET_NOMENCLATURE_SESSION, index);
   }
 }
@@ -138,7 +143,7 @@ const actions = {
 // mutations
 const mutations = {
   [types.INITIALIZE_STATES] (state, states) {
-    console.log('in INITIALIZE_STATES')
+    //console.log('in INITIALIZE_STATES')
     state.states = states;
     state.statesReady = true;
   },
@@ -147,7 +152,7 @@ const mutations = {
     state.skillsReady = true;
   },
   [types.SET_NOMENCLATURE_SESSION] (state, index) {
-    console.log('in SET_NOMENCLATURE_SESSION')
+    //console.log('in SET_NOMENCLATURE_SESSION')
     if (index === -1) {
       index = state.states.findIndex(function(entry) {
         return entry.name === 'general nomenclature'
@@ -155,7 +160,7 @@ const mutations = {
     }
     //console.log(state.states[0])
     state.currentIndex = index;
-    console.log('index is ', index, state.currentIndex)
+    //console.log('index is ', index, state.currentIndex)
     state.currentTypeID = state.states[state.currentIndex].type_id;
     state.currentType = state.states[state.currentIndex].type;
     state.currentStage = state.states[state.currentIndex].stage;
@@ -167,7 +172,7 @@ const mutations = {
   [types.SET_QUESTION] (state) {
     //console.log('before getNext index is ', state.currentIndex)
     state.currentIndex = getNext();
-    console.log('after getNext index is ', state.currentIndex)
+    //console.log('after getNext index is ', state.currentIndex)
     if (state.currentIndex === -1) {
       state.currentTypeID = false;
       state.currentType = false;
@@ -216,7 +221,7 @@ const getNext = () => {
       let unseen = [];
 
     	for (let i = 0; i < state.states.length; i++) {
-        console.log('state.states[i] is: ', state.states[i]);
+        //console.log('state.states[i] is: ', state.states[i]);
         //console.log('state.states[i -1] is: ', state.states[i-1]);
         if (state.states[i].priority < 100) {
           unseen.push(i);
@@ -238,14 +243,14 @@ const getNext = () => {
     			else {readiestUnready = i;}
     		}
     	}
-    	console.log(readiest);
+    	//console.log(readiest);
       if (unseen.length > 0) {
         let r = _.random(0, unseen.length -1);
         return unseen[r];
       }
     	else if (readiest !== -1) { return readiest;}
     	else {
-            console.log("in final else")
+            //console.log("in final else")
             if (readiestUnready !== -1) {
               if (state.states[readiestUnready].priority > currentTime + 1800000) {state.finished = true;}
             }
