@@ -29248,7 +29248,7 @@ module.exports = Vue$3;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(16);
-module.exports = __webpack_require__(142);
+module.exports = __webpack_require__(147);
 
 
 /***/ }),
@@ -29257,13 +29257,13 @@ module.exports = __webpack_require__(142);
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__vuex_store__ = __webpack_require__(127);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__plugins_RandomGeneratorPlugin_js__ = __webpack_require__(136);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__plugins_FactPriorityPlugin_js__ = __webpack_require__(137);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__plugins_SkillPriorityPlugin_js__ = __webpack_require__(138);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__plugins_LewisPositionerPlugin_js__ = __webpack_require__(139);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__plugins_LewisStructurePlugin_js__ = __webpack_require__(140);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__plugins_NameFormulaPlugin_js__ = __webpack_require__(141);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__vuex_store__ = __webpack_require__(132);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__plugins_RandomGeneratorPlugin_js__ = __webpack_require__(141);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__plugins_FactPriorityPlugin_js__ = __webpack_require__(142);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__plugins_SkillPriorityPlugin_js__ = __webpack_require__(143);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__plugins_LewisPositionerPlugin_js__ = __webpack_require__(144);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__plugins_LewisStructurePlugin_js__ = __webpack_require__(145);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__plugins_NameFormulaPlugin_js__ = __webpack_require__(146);
 
 /**
  * First we will load all of this project's JavaScript dependencies which
@@ -29298,10 +29298,10 @@ Vue.component('ionic-formula-question', __webpack_require__(100));
 Vue.component('lewis-structure-question', __webpack_require__(105));
 Vue.component('general-nomenclature-question', __webpack_require__(110));
 Vue.component('lewis-atom', __webpack_require__(115));
-Vue.component('lewis-tester', __webpack_require__(151));
-Vue.component('bug-report', __webpack_require__(118));
-Vue.component('frustration-report', __webpack_require__(121));
-Vue.component('suggestion-box', __webpack_require__(124));
+Vue.component('lewis-tester', __webpack_require__(118));
+Vue.component('bug-report', __webpack_require__(123));
+Vue.component('frustration-report', __webpack_require__(126));
+Vue.component('suggestion-box', __webpack_require__(129));
 
 
 
@@ -48811,7 +48811,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       return this.numConnections + __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.ceil(this.numUnbondedE / 2);
     },
     formalCharge: function formalCharge() {
-      return this.element[1] - (this.numUnbondedE + this.numBonds);
+      return this.atom[7];
     },
     directions: function directions() {
       return this.stats.directions.slice(0);
@@ -48860,7 +48860,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       var newAtomsArray = [];
       var dotsArray = [];
       var formalChargeToDraw = false;
-      if (this.formalCharge !== 0) domains += 1;
+      //if (this.formalCharge !== 0 && domains > 4) domains += 1
       if (domains === 7) posToAdd = [(x + 6) % 12, (x + 2) % 12, (x + 4) % 12, (x + 8) % 12, (x + 10) % 12, (x + 5) % 12, x];else if (domains === 6) posToAdd = [(x + 6) % 12, (x + 2) % 12, (x + 4) % 12, (x + 8) % 12, (x + 10) % 12, x];else if (domains === 5) posToAdd = [(x + 5) % 12, (x + 2) % 12, (x + 7) % 12, (x + 10) % 12, x];else if (domains === 4) posToAdd = [(x + 6) % 12, (x + 3) % 12, (x + 9) % 12, x];else if (domains === 3) posToAdd = [(x + 4) % 12, (x + 8) % 12, x];else if (domains === 2) posToAdd = [(x + 6) % 12, x];else if (domains === 1) posToAdd = [x];else console.log("bad number of domains");
       //add bond and atoms
       var bondsToDraw = this.numConnections - this.numBondsAlready;
@@ -48930,7 +48930,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       }
       if (this.formalCharge !== 0) {
         console.log("posOccupied", posOccupied);
-        for (var _i2 = 0; _i2 < 12; _i2++) {
+        for (var _i2 = 5; _i2 < 12; _i2++) {
           if (posOccupied.indexOf(_i2) === -1) {
             console.log("setting up fc, i is ", _i2);
             var fcpos = Vue.lpPositioner(this.textRect, _i2, 1);
@@ -48939,7 +48939,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
             var str = String(this.formalCharge);
             if (one) str = '';
             if (plus) str = str + '+';
-            if (one && !plus) str = '-';else str = str.replace(/(-)(\d+)/, '$2$1');
+            if (one && !plus) str = '\u2013';else str = str.replace(/(-)(\d+)/, '$2\u2013');
             formalChargeToDraw = { charge: str, position: fcpos };
             break;
           }
@@ -48991,10 +48991,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     })
   }), _vm._v(" "), (_vm.toDraw.formalCharge) ? _c('text', {
     attrs: {
-      "x": _vm.toDraw.formalCharge.position[0] - 8,
-      "y": _vm.toDraw.formalCharge.position[1],
+      "x": _vm.toDraw.formalCharge.position[0] - 2,
+      "y": _vm.toDraw.formalCharge.position[1] + 4,
       "font-family": "Verdana",
-      "font-size": "14"
+      "font-size": "14",
+      "font-weight": "bold"
     }
   }, [_vm._v(_vm._s(_vm.toDraw.formalCharge.charge))]) : _vm._e(), _vm._v(" "), _vm._l((_vm.toDraw.newAtoms), function(atom) {
     return _c('lewis-atom', {
@@ -49018,11 +49019,238 @@ if (false) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(119)
+}
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(119),
+  __webpack_require__(121),
   /* template */
-  __webpack_require__(120),
+  __webpack_require__(122),
+  /* styles */
+  injectStyle,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/LewisTester.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] LewisTester.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-004bcb68", Component.options)
+  } else {
+    hotAPI.reload("data-v-004bcb68", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 119 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(120);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(3)("356a06c8", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-004bcb68\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./LewisTester.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-004bcb68\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./LewisTester.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 120 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(2)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 121 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      entry: '',
+      index: 4
+      //determines whether name or formula is given
+    };
+  },
+  //props: ['questionTypeID'],
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
+    lewisHomo: 'getLewisHomoDiatomics',
+    lewisHetero: 'getLewisHeteroDiatomics',
+    lewisMulti: 'getLewisSimpleCentral',
+    lewisTriCentral: 'getLewisTriatomicCentral',
+    lewisIons: 'getLewisIons',
+    elements: 'getLSE'
+  }), {
+    formulasArray: function formulasArray() {
+      //let temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti)
+      //let temp = this.lewisTriCentral
+      var temp = this.lewisIons;
+      return temp;
+    },
+    formula: function formula() {
+      return this.formulasArray[this.index];
+      //return 'SCl4'
+    },
+    question: function question() {
+      return Vue.generalLewisStructure(this.formula, this.elements, false);
+    },
+    stats: function stats() {
+      var directions = Array(12);
+      directions.fill(0);
+      var drawnAtoms = Array(this.question.structure.length);
+      drawnAtoms.fill(0);
+      return {
+        center: [100, 100],
+        directions: directions,
+        atomsArray: this.question.structure,
+        drawnAtoms: drawnAtoms,
+        index: 0
+      };
+    }
+  }),
+
+  methods: {
+
+    submitEntry: function submitEntry(event) {
+
+      this.index++;
+      //this.index = 20
+    }
+  }
+});
+
+/***/ }),
+/* 122 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "panel panel-default"
+  }, [_c('div', {
+    staticClass: "panel-heading"
+  }, [_vm._v("Lewis Tester")]), _vm._v(" "), _c('div', {
+    staticClass: "panel-body"
+  }, [_c('div', [_c('br'), _c('br'), _vm._v("\n            Is this a good Lewis structure for "), _c('span', {
+    domProps: {
+      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.formula))
+    }
+  }), _vm._v("?")]), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_c('span', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), _c('svg', {
+    attrs: {
+      "width": "200",
+      "height": "200"
+    }
+  }, [_c('lewis-atom', {
+    attrs: {
+      "stats": _vm.stats
+    }
+  })], 1), _vm._v(" "), _c('br')])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-004bcb68", module.exports)
+  }
+}
+
+/***/ }),
+/* 123 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(124),
+  /* template */
+  __webpack_require__(125),
   /* styles */
   null,
   /* scopeId */
@@ -49054,7 +49282,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 119 */
+/* 124 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -49123,7 +49351,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 120 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -49191,15 +49419,15 @@ if (false) {
 }
 
 /***/ }),
-/* 121 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(122),
+  __webpack_require__(127),
   /* template */
-  __webpack_require__(123),
+  __webpack_require__(128),
   /* styles */
   null,
   /* scopeId */
@@ -49231,7 +49459,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 122 */
+/* 127 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -49300,7 +49528,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 123 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -49362,15 +49590,15 @@ if (false) {
 }
 
 /***/ }),
-/* 124 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(125),
+  __webpack_require__(130),
   /* template */
-  __webpack_require__(126),
+  __webpack_require__(131),
   /* styles */
   null,
   /* scopeId */
@@ -49402,7 +49630,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 125 */
+/* 130 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -49471,7 +49699,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 126 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -49537,24 +49765,24 @@ if (false) {
 }
 
 /***/ }),
-/* 127 */
+/* 132 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vuex__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__getters__ = __webpack_require__(128);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__getters__ = __webpack_require__(133);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__getters___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__getters__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__actions__ = __webpack_require__(129);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__actions__ = __webpack_require__(134);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__actions___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__actions__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__mutations__ = __webpack_require__(130);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__mutations__ = __webpack_require__(135);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__mutations___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__mutations__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__modules_facts__ = __webpack_require__(131);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__modules_states__ = __webpack_require__(132);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__modules_words__ = __webpack_require__(133);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__modules_session__ = __webpack_require__(134);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__modules_elements__ = __webpack_require__(135);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__modules_facts__ = __webpack_require__(136);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__modules_states__ = __webpack_require__(137);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__modules_words__ = __webpack_require__(138);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__modules_session__ = __webpack_require__(139);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__modules_elements__ = __webpack_require__(140);
 
 
 
@@ -49582,25 +49810,25 @@ __WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_1_vuex
 }));
 
 /***/ }),
-/* 128 */
+/* 133 */
 /***/ (function(module, exports) {
 
 
 
 /***/ }),
-/* 129 */
+/* 134 */
 /***/ (function(module, exports) {
 
 
 
 /***/ }),
-/* 130 */
+/* 135 */
 /***/ (function(module, exports) {
 
 
 
 /***/ }),
-/* 131 */
+/* 136 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -49721,7 +49949,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
 });
 
 /***/ }),
-/* 132 */
+/* 137 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -49995,7 +50223,7 @@ var getNext = function getNext() {
 });
 
 /***/ }),
-/* 133 */
+/* 138 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -50063,7 +50291,7 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
 });
 
 /***/ }),
-/* 134 */
+/* 139 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -50192,7 +50420,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
 });
 
 /***/ }),
-/* 135 */
+/* 140 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -50234,6 +50462,30 @@ var state = {
     I: ['I', 7, 8, 16, 1, 7, 1],
     Xe: ['Xe', 8, 8, 16, 0, 8, 0]
   },
+  lewisElementsBad: {
+    H: ['H', 1, 2, 4, 1, 2, 1],
+    He: ['He', 2, 2, 2, 0, 0, 0],
+    Li: ['Li', 1, 2, 8, 1, 4, 1],
+    Be: ['Be', 2, 4, 8, 2, 4, 2],
+    B: ['B', 3, 6, 8, 3, 4, 3],
+    C: ['C', 4, 6, 10, 4, 5, 2],
+    N: ['N', 5, 5, 10, 3, 5, 1],
+    O: ['O', 6, 6, 10, 2, 4, 1],
+    F: ['F', 7, 6, 10, 1, 3, 1],
+    Ne: ['Ne', 8, 8, 8, 0, 0, 0],
+    Si: ['Si', 4, 6, 10, 4, 5, 2],
+    P: ['P', 5, 6, 12, 3, 5, 2],
+    S: ['S', 6, 6, 12, 2, 6, 1],
+    Cl: ['Cl', 7, 6, 16, 1, 7, 1],
+    Ge: ['Ge', 4, 6, 10, 4, 4, 3],
+    As: ['As', 5, 6, 12, 3, 6, 2],
+    Se: ['Se', 6, 6, 12, 2, 6, 1],
+    Br: ['Br', 7, 6, 16, 1, 7, 1],
+    Sb: ['Sb', 5, 6, 12, 3, 5, 2],
+    Te: ['Te', 6, 6, 12, 2, 6, 1],
+    I: ['I', 7, 6, 16, 1, 7, 1],
+    Xe: ['Xe', 8, 6, 16, 0, 8, 0]
+  },
 
   bboxesForLewisText: {},
 
@@ -50241,6 +50493,7 @@ var state = {
   LewisHeteroDiatomics: ['HF', 'HCl', 'HBr', 'HI', 'ClF', 'BrF', 'IF', 'BrCl', 'ICl', 'IBr', 'CO', 'NO', 'SO', 'NP', 'HO', 'ClO'],
   LewisSimpleCentralMulti: ['BH3', 'CH4', 'NH3', 'OH2', 'SiH4', 'PH3', 'SH2', 'AsH3', 'SeH2', 'BF3', 'CF4', 'SiF4', 'GeF4', 'PF3', 'PF5', 'AsF3', 'AsF5', 'SbF3', 'SbF5', 'SF2', 'SF4', 'SF6', 'SeF2', 'SeF4', 'SeF6', 'TeF2', 'TeF4', 'TeF6', 'ClF3', 'BrF3', 'BrF5', 'IF3', 'IF5', 'BeCl2', 'BCl3', 'CCl4', 'SiCl4', 'NCl3', 'PCl3', 'PCl5', 'AsCl3', 'AsCl5', 'SbCl3', 'SbCl5', 'SCl2', 'SCl4', 'SeCl2', 'SeCl4', 'TeCl2', 'TeCl4', 'BrCl3', 'ICl3', 'CBr4', 'CI4', 'CO2', 'CS2', 'SiO2', 'NO2', 'SO2', 'SO3', 'SeO2', 'SeO3', 'TeO2', 'TeO3', 'XeO2', 'XeO4', 'XeF2', 'XeF4', 'XeF6', 'O3'],
   LewisTriatomicCentral: ['COCl2', 'COF2', 'COH2', 'CHF3', 'CH2F2', 'CH3F', 'CHCl3', 'CH2Cl2', 'CH3Cl', 'CHBr3', 'CH2Br2', 'CH3Br', 'CHI3', 'CH2I2', 'CH3I', 'CSO', 'POCl3', 'POF3', 'XeOF2', 'XeOF4', 'CHN'],
+  LewisIons: ['BF4-1', 'PF6-1', 'AsF6-1', 'SbF6-1', 'CO3-2', 'NO2-1', 'NO3-1', 'PO4-3', 'AsO4-3', 'SbO4-3', 'SO3-2', 'SO4-2', 'SeO4-2', 'TeO4-2', 'ClO-1', 'ClO2-1', 'ClO3-1', 'ClO4-1', 'BrO-1', 'BrO2-1', 'BrO3-1', 'BrO4-1', 'IO-1', 'IO2-1', 'IO3-1', 'IO4-1', 'CN-1', 'NH4+1', 'CNS-1', 'CNO-1', 'S2O3-2', 'NO2+1', 'OH3+1'],
   covalentCompounds: [['CO', 'carbon monoxide'], ['BF3', 'boron trifluoride'], ['CF4', 'carbon tetrafluoride'], ['SiF4', 'silicon tetrafluoride'], ['PF3', 'phosphorus trifluoride'], ['PF5', 'phosphorus pentafluoride'], ['AsF3', 'arsenic trifluoride'], ['AsF5', 'arsenic pentafluoride'], ['SF2', 'sulfur difluoride'], ['SF4', 'sulfur tetrafluoride'], ['SF6', 'sulfur hexafluoride'], ['SeF2', 'selenium difluoride'], ['SeF4', 'selenium tetrafluoride'], ['SeF6', 'selenium hexafluoride'], ['TeF2', 'tellurium difluoride'], ['TeF4', 'tellurium tetrafluoride'], ['TeF6', 'tellurium hexafluoride'], ['ClF3', 'chlorine trifluoride'], ['BrF3', 'bromine trifluoride'], ['BrF5', 'bromine pentafluoride'], ['IF3', 'iodine trifluoride'], ['IF5', 'iodine pentafluoride'], ['BCl3', 'boron trichloride'], ['CCl4', 'carbon tetrachloride'], ['SiCl4', 'silicon tetrachloride'], ['NCl3', 'nitrogen trichloride'], ['PCl3', 'phosphorus trichloride'], ['PCl5', 'phosphorus pentachloride'], ['AsCl3', 'arsenic trichloride'], ['AsCl5', 'arsenic pentachloride'], ['SCl2', 'sulfur dichloride'], ['SCl4', 'sulfur tetrachloride'], ['SeCl2', 'selenium dichloride'], ['SeCl4', 'selenium tetrachloride'], ['TeCl2', 'tellurium dichloride'], ['TeCl4', 'tellurium tetrachloride'], ['BrCl3', 'bromine trichloride'], ['ICl3', 'iodine trichloride'], ['CBr4', 'carbon tetrabromide'], ['CI4', 'carbon tetriodide'], ['CO2', 'carbon dioxide'], ['CS2', 'carbon disulfide'], ['SiO2', 'silicon dioxide'], ['NO2', 'nitrogen dioxide'], ['SO2', 'sulfur dioxide'], ['SO3', 'sulfur trioxide'], ['SeO2', 'selenium dioxide'], ['SeO3', 'selenium trioxide'], ['TeO2', 'tellurium dioxide'], ['TeO3', 'tellurium trioxide'], ['XeO2', 'xenon dioxide'], ['XeO3', 'xenon trioxide'], ['XeO4', 'xenon tetroxide'], ['XeF2', 'xenon difluoride'], ['XeF4', 'xenon tetrafluoride'], ['XeF6', 'xenon hexafluoride'], ['N2O4', 'dinitrogen tetroxide'], ['N2O5', 'dinitrogen pentoxide'], ['P2O5', 'diphosphorus pentoxide'], ['B2F4', 'diboron tetrafluoride'], ['B2Cl4', 'diboron tetrachloride'], ['B2Br4', 'diboron tetrabromide'], ['B3F5', 'triboron pentafluoride'], ['B4Cl4', 'tetraboron tetrachloride'], ['B2O3', 'diboron trioxide'], ['N2F4', 'dinitrogen tetrafluoride'], ['N2F2', 'dinitrogen difluoride'], ['N3F', 'trinitrogen fluoride'], ['NO3', 'nitrogen trioxide'], ['N2O3', 'dinitrogen trioxide'], ['N2O2', 'dinitrogen dioxide'], ['P2F4', 'diphosphorus tetrafluoride'], ['P2Cl4', 'diphosphorus tetrachloride'], ['P2I4', 'diphosphorus tetraiodide'], ['P2S3', 'diphosphorus trisulfide'], ['P4O6', 'tetraphosphorus hexoxide'], ['P4S2', 'tetraphosphorus disulfide'], ['P4S3', 'tetraphosphorus trisulfide'], ['P4S4', 'tetraphosphorus tetrasulfide'], ['P4S5', 'tetraphosphorus pentasulfide'], ['S2F2', 'disulfur difluoride'], ['S2F4', 'disulfur tetrafluoride'], ['S2Cl2', 'disulfur dichloride'], ['S6O2', 'hexasulfur dioxide'], ['S4N4', 'tetrasulfur tetranitride'], ['S2N2', 'disulfur dinitride'], ['S4N2', 'tetrasulfur dinitride'], ['S5Cl2', 'pentasulfur dichloride'], ['S5N6', 'pentasulfur hexanitride'], ['I2O5', 'diodine pentoxide'], ['Cl2O', 'dichlorine monoxide'], ['ClO2', 'chlorine dioxide'], ['Cl2O4', 'dichlorine tetroxide'], ['Cl2O6', 'dichlorine hexoxide'], ['ClO3', 'chlorine trioxide'], ['BrO2', 'bromine dioxide'], ['HF', 'hydrogen fluoride'], ['HCl', 'hydrogen chloride'], ['HBr', 'hydrogen bromide'], ['HI', 'hydrogen iodide'], ['H2S', 'hydrogen sulfide']]
 
   // getters
@@ -50263,6 +50516,9 @@ var state = {
   getLSE: function getLSE(state) {
     return state.lewisElements;
   },
+  getLSEBad: function getLSEBad(state) {
+    return state.lewisElementsBad;
+  },
   getLewisHomoDiatomics: function getLewisHomoDiatomics(state) {
     return state.LewisHomoDiatomics;
   },
@@ -50274,6 +50530,9 @@ var state = {
   },
   getLewisTriatomicCentral: function getLewisTriatomicCentral(state) {
     return state.LewisTriatomicCentral;
+  },
+  getLewisIons: function getLewisIons(state) {
+    return state.LewisIons;
   },
   getCovalentCompounds: function getCovalentCompounds(state) {
     return state.covalentCompounds;
@@ -50304,7 +50563,7 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
 });
 
 /***/ }),
-/* 136 */
+/* 141 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -50340,7 +50599,7 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
 });
 
 /***/ }),
-/* 137 */
+/* 142 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -50393,7 +50652,7 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
 });
 
 /***/ }),
-/* 138 */
+/* 143 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -50507,7 +50766,7 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
 });
 
 /***/ }),
-/* 139 */
+/* 144 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -50943,7 +51202,7 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
 });
 
 /***/ }),
-/* 140 */
+/* 145 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -50960,6 +51219,8 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
       var tempArray = [];
       var structure = [];
       var numE = 0;
+      var octetTotalMax = 0;
+      var octetTotalMin = 0;
       while ((tempArray = atomFinder.exec(formula)) !== null) {
         if (tempArray[2] === '') tempArray[2] = 1;
         for (var i = 0; i < Number(tempArray[2]); i++) {
@@ -50976,6 +51237,8 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
           structure.push(atom);
           //console.log(elements[tempArray[1]][1])
           numE += elements[tempArray[1]][1];
+          octetTotalMin += elements[tempArray[1]][2];
+          octetTotalMax += elements[tempArray[1]][3];
         }
       }
       console.log('in parse structure is ', structure);
@@ -50987,19 +51250,22 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
         charge = Number(chargeArray[0]);
       }
       numE -= charge;
-      return { structure: structure, charge: charge, numE: numE };
+      return { structure: structure, charge: charge, numE: numE, octetTotalMax: octetTotalMax, octetTotalMin: octetTotalMin };
     };
     //expects central atom first, and all other atoms same element. diatomics ok, no charges
-    Vue.generalLewisStructure = function (formula, elements) {
+    Vue.generalLewisStructure = function (formula, elements, maxBonds) {
       //console.log('in simpleCentralStructure')
       var strucObj = Vue.parseFormulaForStructure(formula, elements);
       var struc = strucObj.structure;
       var charge = strucObj.charge;
       var numE = strucObj.numE;
+      var maxBondsForOctet = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.floor((strucObj.octetTotalMax - numE) / 2);
+      var minBondsForOctet = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.ceil((strucObj.octetTotalMin - numE) / 2);
       //console.log(numE)
       //if (charge !== 0) console.log("not setup for charges yet")
       //console.log("struc, from parse, is ", struc)
       var numAtoms = struc.length;
+      var numBonds = 0;
       //let element = elements[struc[0][2]]
       //console.log('element is: ', element)
       //struc[0][0] = 0
@@ -51025,6 +51291,7 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
         struc[0][3].push([i, 1]);
         struc[0][6] += 1;
         unusedE -= 2;
+        numBonds++;
         if (element[2] % 2 !== 0 && numE % 2 === 0) EwantedForLP += element[2] - struc[i][6] * 2 + 1;else EwantedForLP += element[2] - struc[i][6] * 2;
         console.log(element, element[2] - struc[i][6] * 2);
       }
@@ -51042,7 +51309,7 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
       console.log('EwantedForLP:', EwantedForLP);
       console.log('unusedE: ', unusedE);
       // add multiple bonds
-      if (EwantedForLP > unusedE) {
+      if (EwantedForLP > unusedE || maxBonds) {
         console.log('adding more bonds');
         //first check if central atom can have more bonds
         var maxNewBondsToCentral = element[5] - struc[0][6];
@@ -51051,14 +51318,22 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
           console.log('need too many new bonds to central atom');
           tryNewConnectivity = 1;
         } else {
+          if (maxBonds) {
+
+            if (newBondsNeeded < atomsWantingBonds.length) newBondsNeeded = atomsWantingBonds.length;
+            if (newBondsNeeded > maxNewBondsToCentral) newBondsNeeded = maxNewBondsToCentral;
+          }
+
           console.log("maxNewBondsToCentral", maxNewBondsToCentral);
           console.log('atomsWantingBonds', atomsWantingBonds);
-
           while (newBondsNeeded > 0) {
             i = atomsWantingBonds.shift();
+            //console.log('newBondsNeeded, outerAtomsWithMaxNormalBonds, i, atomsToGiveBonds', newBondsNeeded, outerAtomsWithMaxNormalBonds, i, atomsToGiveBonds)
             element = elements[struc[i][2]];
             struc[i][6] += 1;
-            if (struc[i][6] < element[4]) atomsWantingBonds.push(i);else if (struc[i][6] < element[5] && newBondsNeeded > atomsWantingBonds.length) atomsWantingBonds.push(i);
+            if (struc[i][6] < element[4]) atomsWantingBonds.push(i);else if (struc[i][6] < element[5] && newBondsNeeded > atomsWantingBonds.length) {
+              atomsWantingBonds.push(i);
+            }
             struc[i][3][0][1] += 1;
             console.log('struc[0][3]', struc[0][3]);
             j = struc[0][3].findIndex(function (element) {
@@ -51087,7 +51362,7 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
       } else if (element[2] <= struc[0][1] + struc[0][6] * 2 && element[3] >= struc[0][1] + struc[0][6] * 2) {
         struc[0][8] = 1;
         console.log('set central happy');
-        happyAtoms++;
+        //happyAtoms++
       }
       console.log('element[2] <= struc[0][1] + struc[0][6] && element[3] >= struc[0][1] + struc[0][6]', element[2], struc[0][1], struc[0][6], element[3]);
       //fill out octets, outer atoms first, until you run out of electrons
@@ -51096,37 +51371,31 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
       j = 1;
 
       //clean this up, combine 2 ifs
-      while (unusedE > 0) {
-        console.log('about to add LP');
-        if (!struc[j][8]) {
-          console.log('about to add LP to index: ', j);
-          element = elements[struc[j][2]];
-          if (element[2] % 2 !== 0 && numE % 2 === 0) eToAdd = element[2] - struc[j][1] - struc[j][6] * 2 + 1;else eToAdd = element[2] - struc[j][1] - struc[j][6] * 2;
-          if (eToAdd > unusedE) eToAdd = unusedE;else happyAtoms++;
-          struc[j][1] += eToAdd;
-          if (struc[j][1] % 2 !== 0) struc[j][5] = 1;
-          struc[j][7] = element[1] - struc[j][1] - struc[j][6];
-          struc[j][8] = 1;
-          if (struc[j][6] > element[5] || struc[j][6] < element[6]) console.log('bad number of bonds for index: ', j);
-          unusedE -= eToAdd;
-          j++;
-          j = j % numAtoms;
-        }
-        if (happyAtoms === numAtoms && unusedE > 0) {
-          element = elements[struc[j][2]];
-          if (struc[j][1] + struc[j][6] * 2 < element[3]) {
+      var k = 0;
+      while (unusedE > 0 && k < 6) {
+        //console.log('about to add LP')
+        console.log('about to add LP to index: ', j);
+        console.log('happyAtoms: ', happyAtoms);
+        console.log(struc[j]);
+        element = elements[struc[j][2]];
+        if (element[2] % 2 !== 0 && numE % 2 === 0) eToAdd = element[2] - struc[j][1] - struc[j][6] * 2 + 1;
+        //console.log()
+        else if (happyAtoms >= numAtoms - 1 && unusedE > 0) {
             eToAdd = element[3] - (struc[j][1] + struc[j][6] * 2);
-            if (eToAdd > unusedE) eToAdd = unusedE;
-            struc[j][1] += eToAdd;
-            if (struc[j][1] % 2 !== 0) struc[j][5] = 1;
-            struc[j][7] = element[1] - struc[j][1] - struc[j][6];
-            struc[j][8] = 1;
-            if (struc[j][6] > element[5] || struc[j][6] < element[6]) console.log('bad number of bonds for index: ', j);
-            unusedE -= eToAdd;
-            j++;
-            j = j % numAtoms;
-          }
-        }
+          } else eToAdd = element[2] - struc[j][1] - struc[j][6] * 2;
+        console.log('eToAdd, unusedE: ', eToAdd, unusedE);
+        if (eToAdd > unusedE || eToAdd < 0) eToAdd = unusedE;else happyAtoms++;
+        struc[j][1] += eToAdd;
+        if (struc[j][1] % 2 !== 0) struc[j][5] = 1;
+        struc[j][7] = element[1] - struc[j][1] - struc[j][6];
+        struc[j][8] = 1;
+        if (struc[j][6] > element[5] || struc[j][6] < element[6]) console.log('bad number of bonds for index: ', j);
+        console.log('eToAdd: ', eToAdd);
+        unusedE -= eToAdd;
+        j++;
+        j = j % numAtoms;
+        console.log('unusedE: ', unusedE);
+        k++;
       }
 
       if (happyAtoms === numAtoms) return { structure: struc, answer: 'y' };else {
@@ -51134,56 +51403,11 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
         return { structure: struc, answer: 'n' };
       }
     };
-
-    Vue.simpleCentralStructure = function (formula, elements) {
-      //console.log('in simpleCentralStructure')
-      var strucObj = Vue.parseFormulaForStructure(formula, elements);
-      var struc = strucObj.structure;
-      var charge = strucObj.charge;
-      var numE = strucObj.numE;
-      if (charge !== 0) console.log("not setup for charges yet");
-      //console.log("struc, from parse, is ", struc)
-      var numAtoms = struc.length;
-      var element = elements[struc[0][2]];
-      console.log('element is: ', element);
-      struc[0][0] = 0;
-      var bonds = element[4]; //normal num of bonds for element
-      var outerBonds = 0;
-      var elementTemp = 0;
-      for (var i = 1; i < numAtoms; i++) {
-        elementTemp = elements[struc[i][2]];
-        outerBonds += elementTemp[4];
-      }
-      console.log('outerBonds: ', outerBonds);
-      console.log('bonds: ', bonds);
-      if (bonds < numAtoms - 1) bonds = element[5]; //use ox max valence instead of normal
-      if (bonds < outerBonds) {
-        console.log('bonds less than outerBonds', bonds, outerBonds);
-        if (outerBonds < element[5] + 1) bonds = outerBonds;
-      }
-      if (bonds > outerBonds) bonds = outerBonds;
-      if (bonds % outerBonds !== 0) console.log("bonds don't divide evenly over atoms");
-      console.log('element[1] and bonds:', element[1], bonds);
-      console.log('element is: ', element);
-      struc[0][1] = element[1] - bonds;
-      var bondsPerConnection = bonds / (numAtoms - 1);
-      for (var _i = 1; _i < numAtoms; _i++) {
-        element = elements[struc[_i][2]];
-        struc[_i][0] = _i;
-        struc[_i][1] = element[1] - bondsPerConnection;
-        if (!(bondsPerConnection >= element[4] && bondsPerConnection <= element[5])) console.log('bad structure! outer atoms not happy');
-        console.log(bondsPerConnection, element[4], bondsPerConnection, element[5]);
-        struc[_i][3].push([0, bondsPerConnection]);
-        struc[0][3].push([_i, bondsPerConnection]);
-      }
-
-      return { structure: struc, answer: 'y' };
-    };
   }
 });
 
 /***/ }),
-/* 141 */
+/* 146 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -51278,243 +51502,10 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
 });
 
 /***/ }),
-/* 142 */
+/* 147 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 143 */,
-/* 144 */,
-/* 145 */,
-/* 146 */,
-/* 147 */,
-/* 148 */,
-/* 149 */,
-/* 150 */,
-/* 151 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(152)
-}
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(154),
-  /* template */
-  __webpack_require__(155),
-  /* styles */
-  injectStyle,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "/Users/Emily/Game/chemiatria/resources/assets/js/components/LewisTester.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] LewisTester.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-004bcb68", Component.options)
-  } else {
-    hotAPI.reload("data-v-004bcb68", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 152 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(153);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(3)("356a06c8", content, false);
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-004bcb68\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./LewisTester.vue", function() {
-     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-004bcb68\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./LewisTester.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 153 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(2)(undefined);
-// imports
-
-
-// module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 154 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lodash__);
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {
-      entry: '',
-      index: 0
-      //determines whether name or formula is given
-    };
-  },
-  //props: ['questionTypeID'],
-  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapGetters"])({
-    lewisHomo: 'getLewisHomoDiatomics',
-    lewisHetero: 'getLewisHeteroDiatomics',
-    lewisMulti: 'getLewisSimpleCentral',
-    lewisTriCentral: 'getLewisTriatomicCentral',
-    elements: 'getLSE'
-  }), {
-    formulasArray: function formulasArray() {
-      var temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti);
-      //let temp = this.lewisTriCentral
-      return temp;
-    },
-    formula: function formula() {
-      //return this.formulasArray[this.index]
-      return 'ClO';
-    },
-    question: function question() {
-      return Vue.generalLewisStructure(this.formula, this.elements);
-    },
-    stats: function stats() {
-      var directions = Array(12);
-      directions.fill(0);
-      var drawnAtoms = Array(this.question.structure.length);
-      drawnAtoms.fill(0);
-      return {
-        center: [100, 100],
-        directions: directions,
-        atomsArray: this.question.structure,
-        drawnAtoms: drawnAtoms,
-        index: 0
-      };
-    }
-  }),
-
-  methods: {
-
-    submitEntry: function submitEntry(event) {
-
-      this.index++;
-      //this.index = 20
-    }
-  }
-});
-
-/***/ }),
-/* 155 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "panel panel-default"
-  }, [_c('div', {
-    staticClass: "panel-heading"
-  }, [_vm._v("Lewis Tester")]), _vm._v(" "), _c('div', {
-    staticClass: "panel-body"
-  }, [_c('div', [_c('br'), _c('br'), _vm._v("\n            Is this a good Lewis structure for "), _c('span', {
-    domProps: {
-      "innerHTML": _vm._s(this.$options.filters.formatFormula(_vm.formula))
-    }
-  }), _vm._v("?")]), _vm._v(" "), _c('div', {
-    staticClass: "input-group"
-  }, [_c('span', {
-    staticClass: "input-group-btn"
-  }, [_c('button', {
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": _vm.submitEntry
-    }
-  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), _c('svg', {
-    attrs: {
-      "width": "200",
-      "height": "200"
-    }
-  }, [_c('lewis-atom', {
-    attrs: {
-      "stats": _vm.stats
-    }
-  })], 1), _vm._v(" "), _c('br')])])
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-004bcb68", module.exports)
-  }
-}
 
 /***/ })
 /******/ ]);

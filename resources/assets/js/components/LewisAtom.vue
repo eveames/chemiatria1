@@ -5,8 +5,8 @@
     <line v-for="bond in toDraw.bonds" :x1='bond.start[0]' :y1='bond.start[1]' :x2='bond.end[0]'
       :y2='bond.end[1]' stroke-width="2" stroke="black"/>
     <circle v-for="dot in toDraw.dots" :cx='dot.position[0]' :cy='dot.position[1]' r="2"/>
-    <text v-if="toDraw.formalCharge" :x='toDraw.formalCharge.position[0] - 8' :y='toDraw.formalCharge.position[1]'
-      font-family="Verdana" font-size="14">{{toDraw.formalCharge.charge}}</text>
+    <text v-if="toDraw.formalCharge" :x='toDraw.formalCharge.position[0] - 2' :y='toDraw.formalCharge.position[1] +4'
+      font-family="Verdana" font-size="14" font-weight="bold">{{toDraw.formalCharge.charge}}</text>
     <lewis-atom v-for="atom in toDraw.newAtoms" :stats="atom.stats" :key="atom.stats.index"></lewis-atom>
   </g>
 </template>
@@ -68,7 +68,7 @@ export default {
       return this.numConnections + _.ceil(this.numUnbondedE/2)
     },
     formalCharge: function() {
-      return this.element[1] - (this.numUnbondedE + this.numBonds) ;
+      return this.atom[7];
     },
     directions: function() {
       return this.stats.directions.slice(0);
@@ -115,7 +115,7 @@ export default {
       let newAtomsArray = []
       let dotsArray = []
       let formalChargeToDraw = false;
-      if (this.formalCharge !== 0) domains += 1
+      //if (this.formalCharge !== 0 && domains > 4) domains += 1
       if (domains === 7) posToAdd = [(x+6)%12, (x+2)%12, (x+4)%12, (x+8)%12, (x+10)%12, (x+5)%12, x]
       else if (domains === 6) posToAdd = [(x+6)%12, (x+2)%12, (x+4)%12, (x+8)%12, (x+10)%12,x]
       else if (domains === 5) posToAdd = [(x+5)%12,(x+2)%12, (x+7)%12, (x+10)%12, x]
@@ -195,7 +195,7 @@ export default {
       }
       if (this.formalCharge !== 0) {
         console.log("posOccupied", posOccupied)
-        for (let i = 0; i < 12; i++) {
+        for (let i = 5; i < 12; i++) {
           if (posOccupied.indexOf(i) === -1) {
             console.log("setting up fc, i is ", i)
             let fcpos = Vue.lpPositioner(this.textRect, i, 1)
@@ -204,8 +204,8 @@ export default {
             let str = String(this.formalCharge);
             if (one) str = ''
             if (plus) str = str + '+';
-            if (one && !plus) str = '-'
-            else str = str.replace(/(-)(\d+)/, '$2$1')
+            if (one && !plus) str = '\u2013'
+            else str = str.replace(/(-)(\d+)/, '$2\u2013')
             formalChargeToDraw = {charge: str, position: fcpos}
             break;
           }

@@ -33,7 +33,7 @@ export default {
   data: function() {
     return {
       entry: '',
-      index: 0,
+      index: 4,
       //determines whether name or formula is given
     }
   },
@@ -44,19 +44,21 @@ export default {
       lewisHetero: 'getLewisHeteroDiatomics',
       lewisMulti: 'getLewisSimpleCentral',
       lewisTriCentral: 'getLewisTriatomicCentral',
+      lewisIons: 'getLewisIons',
       elements: 'getLSE'
     }),
     formulasArray: function() {
-      let temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti)
+      //let temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti)
       //let temp = this.lewisTriCentral
+      let temp = this.lewisIons
       return temp
     },
     formula: function() {
-      //return this.formulasArray[this.index]
-      return 'ClO'
+      return this.formulasArray[this.index]
+      //return 'SCl4'
     },
     question: function() {
-      return Vue.generalLewisStructure(this.formula, this.elements)
+      return Vue.generalLewisStructure(this.formula, this.elements, false)
     },
     stats: function() {
       let directions = Array(12);
