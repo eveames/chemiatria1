@@ -11,6 +11,7 @@ export default {
       let numE = 0
       let octetTotalMax = 0
       let octetTotalMin = 0
+      let extraEToAdd = 0
       while((tempArray = atomFinder.exec(formula)) !== null) {
         if (tempArray[2] === '') tempArray[2] = 1
         for (let i = 0; i < Number(tempArray[2]); i++) {
@@ -29,6 +30,7 @@ export default {
           numE += elements[tempArray[1]][1]
           octetTotalMin += elements[tempArray[1]][2]
           octetTotalMax += elements[tempArray[1]][3]
+          if (elements[tempArray[1]][2] === 7) extraEToAdd++
         }
       }
       console.log('in parse structure is ', structure)
@@ -40,30 +42,25 @@ export default {
         charge = Number(chargeArray[0])
       }
       numE -= charge
+      if (numE%2 === 0) octetTotalMin += extraEToAdd
       return {structure: structure, charge: charge, numE: numE, octetTotalMax: octetTotalMax, octetTotalMin: octetTotalMin};
     }
     //expects central atom first, and all other atoms same element. diatomics ok, no charges
     Vue.generalLewisStructure = function(formula, elements, maxBonds) {
-      //console.log('in simpleCentralStructure')
       let strucObj = Vue.parseFormulaForStructure(formula, elements)
       let struc = strucObj.structure
       let charge = strucObj.charge
       let numE = strucObj.numE
       let maxBondsForOctet = _.floor((strucObj.octetTotalMax - numE)/2)
       let minBondsForOctet = _.ceil((strucObj.octetTotalMin - numE)/2)
-      //console.log(numE)
-      //if (charge !== 0) console.log("not setup for charges yet")
-      //console.log("struc, from parse, is ", struc)
+      console.log("maxBondsForOctet, minBondsForOctet", maxBondsForOctet, minBondsForOctet)
       let numAtoms = struc.length
       let numBonds = 0
-      //let element = elements[struc[0][2]]
-      //console.log('element is: ', element)
-      //struc[0][0] = 0
+      let maxNewBondsToCentral = 0
 
       // set up connections; this part needs work to make connectivity general
       //each outside atom has one bond to central only
       let unusedE = numE
-      let EwantedForLP = 0
       let eToAdd = 0
       let atomsWantingBonds = []
       let atomsWantingOctet = []
@@ -82,8 +79,8 @@ export default {
         struc[0][6] += 1
         unusedE -= 2
         numBonds++
-        if (element[2]%2 !== 0 && numE%2 === 0) EwantedForLP += element[2] - struc[i][6]*2 + 1
-        else EwantedForLP += element[2] - struc[i][6]*2
+        //if (element[2]%2 !== 0 && numE%2 === 0) EwantedForLP += element[2] - struc[i][6]*2 + 1
+        //else EwantedForLP += element[2] - struc[i][6]*2
         console.log(element, element[2] - struc[i][6]*2)
       }
       //check central element
@@ -96,25 +93,17 @@ export default {
         console.log('central atom has too many bonds already, need different structure')
         tryNewConnectivity = 1
       }
-      EwantedForLP += element[2] - struc[0][6]*2
-      console.log('EwantedForLP:', EwantedForLP)
-      console.log('unusedE: ', unusedE)
+
       // add multiple bonds
-      if (EwantedForLP > unusedE || maxBonds) {
+      if (numBonds < minBondsForOctet) {
         console.log('adding more bonds')
         //first check if central atom can have more bonds
-        let maxNewBondsToCentral = element[5] - struc[0][6]
-        let newBondsNeeded = (EwantedForLP - unusedE)/2
+        maxNewBondsToCentral = element[5] - struc[0][6]
+        let newBondsNeeded = minBondsForOctet - numBonds
         if (newBondsNeeded > maxNewBondsToCentral) {
           console.log('need too many new bonds to central atom')
           tryNewConnectivity = 1
         }
-        else {
-          if (maxBonds) {
-
-            if (newBondsNeeded < atomsWantingBonds.length) newBondsNeeded = atomsWantingBonds.length;
-            if (newBondsNeeded > maxNewBondsToCentral) newBondsNeeded = maxNewBondsToCentral;
-          }
 
           console.log("maxNewBondsToCentral", maxNewBondsToCentral)
           console.log('atomsWantingBonds', atomsWantingBonds)
@@ -128,19 +117,18 @@ export default {
               atomsWantingBonds.push(i)
             }
             struc[i][3][0][1] += 1
-            console.log('struc[0][3]', struc[0][3])
+            //console.log('struc[0][3]', struc[0][3])
             j = struc[0][3].findIndex((element) => {
               return element[0] === i
             })
-            console.log('i, j, struc[0][3]', i, j, struc[0][3])
+            //console.log('i, j, struc[0][3]', i, j, struc[0][3])
             struc[0][3][j][1] += 1
             struc[0][6] += 1
             unusedE -= 2
-            EwantedForLP -= 4
+            //EwantedForLP -= 4
             newBondsNeeded -= 1
           }
         }
-      }
       //update central atom
       let happyAtoms = 0
       element = elements[struc[0][2]]
@@ -193,6 +181,64 @@ export default {
           j = j%numAtoms
           console.log('unusedE: ', unusedE)
           k++
+      }
+
+      //check for formal charges next to each other
+      // 0: central atom FC
+      //1: number of outer atoms with neg fc
+      //2: number of outer atoms with pos fc
+      let formalChargeArray = [0, 0, 0]
+      for (i = 0; i < numAtoms; i++) {
+        if (i === 0) formalChargeArray[0] = struc[i][7]
+        else if (struc[i][7] < 0) formalChargeArray[1]++
+        else if (struc[i][7] > 0) formalChargeArray[2]++
+      }
+      element = elements[struc[0][2]]
+      maxNewBondsToCentral = _.floor(element[3]/2 - struc[0][1]/2 - struc[0][6])
+
+      if (formalChargeArray[0] > 0 && maxBonds) {
+        while (struc[0][7] > 0 && maxNewBondsToCentral > 0) {
+          i = struc.reduce((iMin, x, i, arr) => x[7] < arr[iMin][7] ? i : iMin, 0);
+          console.log('adding bond to element ', i)
+          element = elements[struc[i][2]]
+          struc[i][1] -= 2
+          struc[i][3][0][1]++
+          struc[i][6]++
+          struc[i][7] = element[1] - struc[i][1] - struc[i][6]
+          j = struc[0][3].findIndex((element) => {
+            return element[0] === i
+          })
+          struc[0][3][j][1]++
+          struc[0][6]++
+          element = elements[struc[0][2]]
+          struc[0][7] = element[1] - struc[0][1] - struc[0][6]
+          maxNewBondsToCentral--
+        }
+      }
+      if (formalChargeArray[0] < 0 && formalChargeArray[1] > 0) {
+        //neg charges on both, remove a double bond
+        for (i = 1; i < numAtoms; i++) {
+          if (struc[i][6] > 1 && struc[i][7] >= 0) {
+            console.log('moving bond on element ', i)
+            element = elements[struc[i][2]]
+            struc[i][1] += 2
+            struc[i][3][0][1]--
+            struc[i][6]--
+            struc[i][7] = element[1] - struc[i][1] - struc[i][6]
+            j = struc[0][3].findIndex((element) => {
+              return element[0] === i
+            })
+            struc[0][3][j][1]--
+            struc[0][6]--
+            element = elements[struc[0][2]]
+            struc[0][7] = element[1] - struc[0][1] - struc[0][6]
+            break
+          }
+        }
+      }
+      else if (formalChargeArray[0] > 0 && formalChargeArray[2] > 0) {
+        //pos charges on both, ??
+        console.log('positive charges on both central atom and an outside atom, yikes!')
       }
 
       if (happyAtoms === numAtoms) return {structure: struc, answer: 'y'};

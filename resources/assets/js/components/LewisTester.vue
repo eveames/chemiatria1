@@ -33,7 +33,7 @@ export default {
   data: function() {
     return {
       entry: '',
-      index: 4,
+      index: 0,
       //determines whether name or formula is given
     }
   },
@@ -48,9 +48,9 @@ export default {
       elements: 'getLSE'
     }),
     formulasArray: function() {
-      //let temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti)
+      let temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti, this.lewisTriCentral, this.lewisIons)
       //let temp = this.lewisTriCentral
-      let temp = this.lewisIons
+      //let temp = this.lewisIons
       return temp
     },
     formula: function() {

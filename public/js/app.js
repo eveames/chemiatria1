@@ -49144,7 +49144,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
   data: function data() {
     return {
       entry: '',
-      index: 4
+      index: 0
       //determines whether name or formula is given
     };
   },
@@ -49158,9 +49158,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     elements: 'getLSE'
   }), {
     formulasArray: function formulasArray() {
-      //let temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti)
+      var temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti, this.lewisTriCentral, this.lewisIons);
       //let temp = this.lewisTriCentral
-      var temp = this.lewisIons;
+      //let temp = this.lewisIons
       return temp;
     },
     formula: function formula() {
@@ -50490,8 +50490,8 @@ var state = {
   bboxesForLewisText: {},
 
   LewisHomoDiatomics: ['H2', 'N2', 'O2', 'F2', 'Cl2', 'Br2', 'I2', 'S2', 'P2', 'Se2'],
-  LewisHeteroDiatomics: ['HF', 'HCl', 'HBr', 'HI', 'ClF', 'BrF', 'IF', 'BrCl', 'ICl', 'IBr', 'CO', 'NO', 'SO', 'NP', 'HO', 'ClO'],
-  LewisSimpleCentralMulti: ['BH3', 'CH4', 'NH3', 'OH2', 'SiH4', 'PH3', 'SH2', 'AsH3', 'SeH2', 'BF3', 'CF4', 'SiF4', 'GeF4', 'PF3', 'PF5', 'AsF3', 'AsF5', 'SbF3', 'SbF5', 'SF2', 'SF4', 'SF6', 'SeF2', 'SeF4', 'SeF6', 'TeF2', 'TeF4', 'TeF6', 'ClF3', 'BrF3', 'BrF5', 'IF3', 'IF5', 'BeCl2', 'BCl3', 'CCl4', 'SiCl4', 'NCl3', 'PCl3', 'PCl5', 'AsCl3', 'AsCl5', 'SbCl3', 'SbCl5', 'SCl2', 'SCl4', 'SeCl2', 'SeCl4', 'TeCl2', 'TeCl4', 'BrCl3', 'ICl3', 'CBr4', 'CI4', 'CO2', 'CS2', 'SiO2', 'NO2', 'SO2', 'SO3', 'SeO2', 'SeO3', 'TeO2', 'TeO3', 'XeO2', 'XeO4', 'XeF2', 'XeF4', 'XeF6', 'O3'],
+  LewisHeteroDiatomics: ['HF', 'HCl', 'HBr', 'HI', 'ClF', 'BrF', 'IF', 'BrCl', 'ICl', 'IBr', 'CO', 'NO', 'SO', 'NP', 'ClO'],
+  LewisSimpleCentralMulti: ['BH3', 'CH4', 'NH3', 'OH2', 'SiH4', 'PH3', 'SH2', 'AsH3', 'SeH2', 'BF3', 'CF4', 'SiF4', 'GeF4', 'PF3', 'PF5', 'AsF3', 'AsF5', 'SbF3', 'SbF5', 'SF2', 'SF4', 'SF6', 'SeF2', 'SeF4', 'SeF6', 'TeF2', 'TeF4', 'TeF6', 'ClF3', 'BrF3', 'BrF5', 'IF3', 'IF5', 'BeCl2', 'BCl3', 'CCl4', 'SiCl4', 'NCl3', 'PCl3', 'PCl5', 'AsCl3', 'AsCl5', 'SbCl3', 'SbCl5', 'SCl2', 'SCl4', 'SeCl2', 'SeCl4', 'TeCl2', 'TeCl4', 'BrCl3', 'ICl3', 'CBr4', 'CI4', 'CO2', 'CS2', 'SiO2', 'NO2', 'SO2', 'SO3', 'SeO2', 'SeO3', 'TeO2', 'TeO3', 'XeO2', 'XeO4', 'XeF2', 'XeF4', 'O3'],
   LewisTriatomicCentral: ['COCl2', 'COF2', 'COH2', 'CHF3', 'CH2F2', 'CH3F', 'CHCl3', 'CH2Cl2', 'CH3Cl', 'CHBr3', 'CH2Br2', 'CH3Br', 'CHI3', 'CH2I2', 'CH3I', 'CSO', 'POCl3', 'POF3', 'XeOF2', 'XeOF4', 'CHN'],
   LewisIons: ['BF4-1', 'PF6-1', 'AsF6-1', 'SbF6-1', 'CO3-2', 'NO2-1', 'NO3-1', 'PO4-3', 'AsO4-3', 'SbO4-3', 'SO3-2', 'SO4-2', 'SeO4-2', 'TeO4-2', 'ClO-1', 'ClO2-1', 'ClO3-1', 'ClO4-1', 'BrO-1', 'BrO2-1', 'BrO3-1', 'BrO4-1', 'IO-1', 'IO2-1', 'IO3-1', 'IO4-1', 'CN-1', 'NH4+1', 'CNS-1', 'CNO-1', 'S2O3-2', 'NO2+1', 'OH3+1'],
   covalentCompounds: [['CO', 'carbon monoxide'], ['BF3', 'boron trifluoride'], ['CF4', 'carbon tetrafluoride'], ['SiF4', 'silicon tetrafluoride'], ['PF3', 'phosphorus trifluoride'], ['PF5', 'phosphorus pentafluoride'], ['AsF3', 'arsenic trifluoride'], ['AsF5', 'arsenic pentafluoride'], ['SF2', 'sulfur difluoride'], ['SF4', 'sulfur tetrafluoride'], ['SF6', 'sulfur hexafluoride'], ['SeF2', 'selenium difluoride'], ['SeF4', 'selenium tetrafluoride'], ['SeF6', 'selenium hexafluoride'], ['TeF2', 'tellurium difluoride'], ['TeF4', 'tellurium tetrafluoride'], ['TeF6', 'tellurium hexafluoride'], ['ClF3', 'chlorine trifluoride'], ['BrF3', 'bromine trifluoride'], ['BrF5', 'bromine pentafluoride'], ['IF3', 'iodine trifluoride'], ['IF5', 'iodine pentafluoride'], ['BCl3', 'boron trichloride'], ['CCl4', 'carbon tetrachloride'], ['SiCl4', 'silicon tetrachloride'], ['NCl3', 'nitrogen trichloride'], ['PCl3', 'phosphorus trichloride'], ['PCl5', 'phosphorus pentachloride'], ['AsCl3', 'arsenic trichloride'], ['AsCl5', 'arsenic pentachloride'], ['SCl2', 'sulfur dichloride'], ['SCl4', 'sulfur tetrachloride'], ['SeCl2', 'selenium dichloride'], ['SeCl4', 'selenium tetrachloride'], ['TeCl2', 'tellurium dichloride'], ['TeCl4', 'tellurium tetrachloride'], ['BrCl3', 'bromine trichloride'], ['ICl3', 'iodine trichloride'], ['CBr4', 'carbon tetrabromide'], ['CI4', 'carbon tetriodide'], ['CO2', 'carbon dioxide'], ['CS2', 'carbon disulfide'], ['SiO2', 'silicon dioxide'], ['NO2', 'nitrogen dioxide'], ['SO2', 'sulfur dioxide'], ['SO3', 'sulfur trioxide'], ['SeO2', 'selenium dioxide'], ['SeO3', 'selenium trioxide'], ['TeO2', 'tellurium dioxide'], ['TeO3', 'tellurium trioxide'], ['XeO2', 'xenon dioxide'], ['XeO3', 'xenon trioxide'], ['XeO4', 'xenon tetroxide'], ['XeF2', 'xenon difluoride'], ['XeF4', 'xenon tetrafluoride'], ['XeF6', 'xenon hexafluoride'], ['N2O4', 'dinitrogen tetroxide'], ['N2O5', 'dinitrogen pentoxide'], ['P2O5', 'diphosphorus pentoxide'], ['B2F4', 'diboron tetrafluoride'], ['B2Cl4', 'diboron tetrachloride'], ['B2Br4', 'diboron tetrabromide'], ['B3F5', 'triboron pentafluoride'], ['B4Cl4', 'tetraboron tetrachloride'], ['B2O3', 'diboron trioxide'], ['N2F4', 'dinitrogen tetrafluoride'], ['N2F2', 'dinitrogen difluoride'], ['N3F', 'trinitrogen fluoride'], ['NO3', 'nitrogen trioxide'], ['N2O3', 'dinitrogen trioxide'], ['N2O2', 'dinitrogen dioxide'], ['P2F4', 'diphosphorus tetrafluoride'], ['P2Cl4', 'diphosphorus tetrachloride'], ['P2I4', 'diphosphorus tetraiodide'], ['P2S3', 'diphosphorus trisulfide'], ['P4O6', 'tetraphosphorus hexoxide'], ['P4S2', 'tetraphosphorus disulfide'], ['P4S3', 'tetraphosphorus trisulfide'], ['P4S4', 'tetraphosphorus tetrasulfide'], ['P4S5', 'tetraphosphorus pentasulfide'], ['S2F2', 'disulfur difluoride'], ['S2F4', 'disulfur tetrafluoride'], ['S2Cl2', 'disulfur dichloride'], ['S6O2', 'hexasulfur dioxide'], ['S4N4', 'tetrasulfur tetranitride'], ['S2N2', 'disulfur dinitride'], ['S4N2', 'tetrasulfur dinitride'], ['S5Cl2', 'pentasulfur dichloride'], ['S5N6', 'pentasulfur hexanitride'], ['I2O5', 'diodine pentoxide'], ['Cl2O', 'dichlorine monoxide'], ['ClO2', 'chlorine dioxide'], ['Cl2O4', 'dichlorine tetroxide'], ['Cl2O6', 'dichlorine hexoxide'], ['ClO3', 'chlorine trioxide'], ['BrO2', 'bromine dioxide'], ['HF', 'hydrogen fluoride'], ['HCl', 'hydrogen chloride'], ['HBr', 'hydrogen bromide'], ['HI', 'hydrogen iodide'], ['H2S', 'hydrogen sulfide']]
@@ -51221,6 +51221,7 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
       var numE = 0;
       var octetTotalMax = 0;
       var octetTotalMin = 0;
+      var extraEToAdd = 0;
       while ((tempArray = atomFinder.exec(formula)) !== null) {
         if (tempArray[2] === '') tempArray[2] = 1;
         for (var i = 0; i < Number(tempArray[2]); i++) {
@@ -51239,6 +51240,7 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
           numE += elements[tempArray[1]][1];
           octetTotalMin += elements[tempArray[1]][2];
           octetTotalMax += elements[tempArray[1]][3];
+          if (elements[tempArray[1]][2] === 7) extraEToAdd++;
         }
       }
       console.log('in parse structure is ', structure);
@@ -51250,30 +51252,25 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
         charge = Number(chargeArray[0]);
       }
       numE -= charge;
+      if (numE % 2 === 0) octetTotalMin += extraEToAdd;
       return { structure: structure, charge: charge, numE: numE, octetTotalMax: octetTotalMax, octetTotalMin: octetTotalMin };
     };
     //expects central atom first, and all other atoms same element. diatomics ok, no charges
     Vue.generalLewisStructure = function (formula, elements, maxBonds) {
-      //console.log('in simpleCentralStructure')
       var strucObj = Vue.parseFormulaForStructure(formula, elements);
       var struc = strucObj.structure;
       var charge = strucObj.charge;
       var numE = strucObj.numE;
       var maxBondsForOctet = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.floor((strucObj.octetTotalMax - numE) / 2);
       var minBondsForOctet = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.ceil((strucObj.octetTotalMin - numE) / 2);
-      //console.log(numE)
-      //if (charge !== 0) console.log("not setup for charges yet")
-      //console.log("struc, from parse, is ", struc)
+      console.log("maxBondsForOctet, minBondsForOctet", maxBondsForOctet, minBondsForOctet);
       var numAtoms = struc.length;
       var numBonds = 0;
-      //let element = elements[struc[0][2]]
-      //console.log('element is: ', element)
-      //struc[0][0] = 0
+      var maxNewBondsToCentral = 0;
 
       // set up connections; this part needs work to make connectivity general
       //each outside atom has one bond to central only
       var unusedE = numE;
-      var EwantedForLP = 0;
       var eToAdd = 0;
       var atomsWantingBonds = [];
       var atomsWantingOctet = [];
@@ -51292,7 +51289,8 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
         struc[0][6] += 1;
         unusedE -= 2;
         numBonds++;
-        if (element[2] % 2 !== 0 && numE % 2 === 0) EwantedForLP += element[2] - struc[i][6] * 2 + 1;else EwantedForLP += element[2] - struc[i][6] * 2;
+        //if (element[2]%2 !== 0 && numE%2 === 0) EwantedForLP += element[2] - struc[i][6]*2 + 1
+        //else EwantedForLP += element[2] - struc[i][6]*2
         console.log(element, element[2] - struc[i][6] * 2);
       }
       //check central element
@@ -51305,47 +51303,39 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
         console.log('central atom has too many bonds already, need different structure');
         tryNewConnectivity = 1;
       }
-      EwantedForLP += element[2] - struc[0][6] * 2;
-      console.log('EwantedForLP:', EwantedForLP);
-      console.log('unusedE: ', unusedE);
+
       // add multiple bonds
-      if (EwantedForLP > unusedE || maxBonds) {
+      if (numBonds < minBondsForOctet) {
         console.log('adding more bonds');
         //first check if central atom can have more bonds
-        var maxNewBondsToCentral = element[5] - struc[0][6];
-        var newBondsNeeded = (EwantedForLP - unusedE) / 2;
+        maxNewBondsToCentral = element[5] - struc[0][6];
+        var newBondsNeeded = minBondsForOctet - numBonds;
         if (newBondsNeeded > maxNewBondsToCentral) {
           console.log('need too many new bonds to central atom');
           tryNewConnectivity = 1;
-        } else {
-          if (maxBonds) {
+        }
 
-            if (newBondsNeeded < atomsWantingBonds.length) newBondsNeeded = atomsWantingBonds.length;
-            if (newBondsNeeded > maxNewBondsToCentral) newBondsNeeded = maxNewBondsToCentral;
+        console.log("maxNewBondsToCentral", maxNewBondsToCentral);
+        console.log('atomsWantingBonds', atomsWantingBonds);
+        while (newBondsNeeded > 0) {
+          i = atomsWantingBonds.shift();
+          //console.log('newBondsNeeded, outerAtomsWithMaxNormalBonds, i, atomsToGiveBonds', newBondsNeeded, outerAtomsWithMaxNormalBonds, i, atomsToGiveBonds)
+          element = elements[struc[i][2]];
+          struc[i][6] += 1;
+          if (struc[i][6] < element[4]) atomsWantingBonds.push(i);else if (struc[i][6] < element[5] && newBondsNeeded > atomsWantingBonds.length) {
+            atomsWantingBonds.push(i);
           }
-
-          console.log("maxNewBondsToCentral", maxNewBondsToCentral);
-          console.log('atomsWantingBonds', atomsWantingBonds);
-          while (newBondsNeeded > 0) {
-            i = atomsWantingBonds.shift();
-            //console.log('newBondsNeeded, outerAtomsWithMaxNormalBonds, i, atomsToGiveBonds', newBondsNeeded, outerAtomsWithMaxNormalBonds, i, atomsToGiveBonds)
-            element = elements[struc[i][2]];
-            struc[i][6] += 1;
-            if (struc[i][6] < element[4]) atomsWantingBonds.push(i);else if (struc[i][6] < element[5] && newBondsNeeded > atomsWantingBonds.length) {
-              atomsWantingBonds.push(i);
-            }
-            struc[i][3][0][1] += 1;
-            console.log('struc[0][3]', struc[0][3]);
-            j = struc[0][3].findIndex(function (element) {
-              return element[0] === i;
-            });
-            console.log('i, j, struc[0][3]', i, j, struc[0][3]);
-            struc[0][3][j][1] += 1;
-            struc[0][6] += 1;
-            unusedE -= 2;
-            EwantedForLP -= 4;
-            newBondsNeeded -= 1;
-          }
+          struc[i][3][0][1] += 1;
+          //console.log('struc[0][3]', struc[0][3])
+          j = struc[0][3].findIndex(function (element) {
+            return element[0] === i;
+          });
+          //console.log('i, j, struc[0][3]', i, j, struc[0][3])
+          struc[0][3][j][1] += 1;
+          struc[0][6] += 1;
+          unusedE -= 2;
+          //EwantedForLP -= 4
+          newBondsNeeded -= 1;
         }
       }
       //update central atom
@@ -51396,6 +51386,63 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
         j = j % numAtoms;
         console.log('unusedE: ', unusedE);
         k++;
+      }
+
+      //check for formal charges next to each other
+      // 0: central atom FC
+      //1: number of outer atoms with neg fc
+      //2: number of outer atoms with pos fc
+      var formalChargeArray = [0, 0, 0];
+      for (i = 0; i < numAtoms; i++) {
+        if (i === 0) formalChargeArray[0] = struc[i][7];else if (struc[i][7] < 0) formalChargeArray[1]++;else if (struc[i][7] > 0) formalChargeArray[2]++;
+      }
+      element = elements[struc[0][2]];
+      maxNewBondsToCentral = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.floor(element[3] / 2 - struc[0][1] / 2 - struc[0][6]);
+
+      if (formalChargeArray[0] > 0 && maxBonds) {
+        while (struc[0][7] > 0 && maxNewBondsToCentral > 0) {
+          i = struc.reduce(function (iMin, x, i, arr) {
+            return x[7] < arr[iMin][7] ? i : iMin;
+          }, 0);
+          console.log('adding bond to element ', i);
+          element = elements[struc[i][2]];
+          struc[i][1] -= 2;
+          struc[i][3][0][1]++;
+          struc[i][6]++;
+          struc[i][7] = element[1] - struc[i][1] - struc[i][6];
+          j = struc[0][3].findIndex(function (element) {
+            return element[0] === i;
+          });
+          struc[0][3][j][1]++;
+          struc[0][6]++;
+          element = elements[struc[0][2]];
+          struc[0][7] = element[1] - struc[0][1] - struc[0][6];
+          maxNewBondsToCentral--;
+        }
+      }
+      if (formalChargeArray[0] < 0 && formalChargeArray[1] > 0) {
+        //neg charges on both, remove a double bond
+        for (i = 1; i < numAtoms; i++) {
+          if (struc[i][6] > 1 && struc[i][7] >= 0) {
+            console.log('moving bond on element ', i);
+            element = elements[struc[i][2]];
+            struc[i][1] += 2;
+            struc[i][3][0][1]--;
+            struc[i][6]--;
+            struc[i][7] = element[1] - struc[i][1] - struc[i][6];
+            j = struc[0][3].findIndex(function (element) {
+              return element[0] === i;
+            });
+            struc[0][3][j][1]--;
+            struc[0][6]--;
+            element = elements[struc[0][2]];
+            struc[0][7] = element[1] - struc[0][1] - struc[0][6];
+            break;
+          }
+        }
+      } else if (formalChargeArray[0] > 0 && formalChargeArray[2] > 0) {
+        //pos charges on both, ??
+        console.log('positive charges on both central atom and an outside atom, yikes!');
       }
 
       if (happyAtoms === numAtoms) return { structure: struc, answer: 'y' };else {
