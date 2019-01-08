@@ -18706,10 +18706,10 @@ const SET_USER = 'SET_USER'
 /* unused harmony export SET_USER */
 
 const UPDATE_STAGE = 'UPDATE_STAGE'
-/* harmony export (immutable) */ __webpack_exports__["s"] = UPDATE_STAGE;
+/* harmony export (immutable) */ __webpack_exports__["t"] = UPDATE_STAGE;
 
 const UPDATE_RTS_ACCS = 'UPDATE_RTS_ACCS'
-/* harmony export (immutable) */ __webpack_exports__["r"] = UPDATE_RTS_ACCS;
+/* harmony export (immutable) */ __webpack_exports__["s"] = UPDATE_RTS_ACCS;
 
 const INCREMENT_FRUSTRATION = 'INCREMENT_FRUSTRATION'
 /* unused harmony export INCREMENT_FRUSTRATION */
@@ -18719,16 +18719,16 @@ const INCREMENT_HINTS = 'INCREMENT_HINTS'
 
 //export const NEW_QUESTION = 'NEW_QUESTION'
 const SET_READY = 'SET_READY'
-/* harmony export (immutable) */ __webpack_exports__["n"] = SET_READY;
+/* harmony export (immutable) */ __webpack_exports__["o"] = SET_READY;
 
 const SET_QUESTION = 'SET_QUESTION'
-/* harmony export (immutable) */ __webpack_exports__["l"] = SET_QUESTION;
+/* harmony export (immutable) */ __webpack_exports__["m"] = SET_QUESTION;
 
 const SET_QUESTION_START = 'SET_QUESTION_START'
-/* harmony export (immutable) */ __webpack_exports__["m"] = SET_QUESTION_START;
+/* harmony export (immutable) */ __webpack_exports__["n"] = SET_QUESTION_START;
 
 const SET_MESSAGE = 'SET_MESSAGE'
-/* harmony export (immutable) */ __webpack_exports__["j"] = SET_MESSAGE;
+/* harmony export (immutable) */ __webpack_exports__["k"] = SET_MESSAGE;
 
 const SET_FEEDBACK = 'SET_FEEDBACK'
 /* harmony export (immutable) */ __webpack_exports__["h"] = SET_FEEDBACK;
@@ -18737,19 +18737,22 @@ const SET_FEEDBACK_TYPE = 'SET_FEEDBACK_TYPE'
 /* harmony export (immutable) */ __webpack_exports__["i"] = SET_FEEDBACK_TYPE;
 
 const TOGGLE_BUG = 'TOGGLE_BUG'
-/* harmony export (immutable) */ __webpack_exports__["o"] = TOGGLE_BUG;
+/* harmony export (immutable) */ __webpack_exports__["p"] = TOGGLE_BUG;
 
 const TOGGLE_FRUSTRATED = 'TOGGLE_FRUSTRATED'
-/* harmony export (immutable) */ __webpack_exports__["p"] = TOGGLE_FRUSTRATED;
+/* harmony export (immutable) */ __webpack_exports__["q"] = TOGGLE_FRUSTRATED;
 
 const TOGGLE_SUGGESTION = 'TOGGLE_SUGGESTION'
-/* harmony export (immutable) */ __webpack_exports__["q"] = TOGGLE_SUGGESTION;
+/* harmony export (immutable) */ __webpack_exports__["r"] = TOGGLE_SUGGESTION;
 
 const SET_NOMENCLATURE_SESSION = 'SET_NOMENCLATURE_SESSION'
-/* harmony export (immutable) */ __webpack_exports__["k"] = SET_NOMENCLATURE_SESSION;
+/* harmony export (immutable) */ __webpack_exports__["l"] = SET_NOMENCLATURE_SESSION;
 
 const SET_BBOXES = 'SET_BBOXES'
 /* harmony export (immutable) */ __webpack_exports__["g"] = SET_BBOXES;
+
+const SET_LEWIS_DATA = 'SET_LEWIS_DATA'
+/* harmony export (immutable) */ __webpack_exports__["j"] = SET_LEWIS_DATA;
 
 
 
@@ -47587,7 +47590,7 @@ exports = module.exports = __webpack_require__(2)(undefined);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -47633,6 +47636,29 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -47642,11 +47668,15 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     return {
       entry: '',
       tries: 0,
+      attempts: 0, //number of structures seen
+      successes: 0,
       acc: 0,
       rts: [],
       startTime: 0,
-      index: 0
-      //determines whether name or formula is given
+      index: 0,
+      followup: false,
+      problems: ["missing lone pairs on the central atom", "missing lone pairs on peripheral atoms", "multiple bond to hydrogen", "second period atom with more than octet", "unnecessary radicals", "missing formal charges", "wrong formal charges", "atoms without octet (that should have octet)", "wrong number of electrons in structure", "bond split into radicals", "like formal charges on neighbors", "positive formal charge on fluorine"],
+      problemsEntry: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     };
   },
   //props: ['questionTypeID'],
@@ -47660,18 +47690,23 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     lewisHetero: 'getLewisHeteroDiatomics',
     lewisMulti: 'getLewisSimpleCentral',
     lewisTriCentral: 'getLewisTriatomicCentral',
-    elements: 'getLSE'
+    lewisIons: 'getLewisIons',
+    elements: 'getLSE',
+    lewisSessionData: 'getLewisSessionData'
   }), {
     formulasArray: function formulasArray() {
       //let temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti)
-      var temp = this.lewisTriCentral;
+      var temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti, this.lewisTriCentral, this.lewisIons);
       return temp;
     },
     formula: function formula() {
       return this.formulasArray[this.index];
     },
     question: function question() {
-      return Vue.generalLewisStructure(this.formula, this.elements);
+      var maxErrors = 1;
+      if (this.attempts > 15 && this.successes / this.attempts > 0.85) maxErrors = 3;else if (this.attempts > 10 && this.successes / this.attempts > 0.75) maxErrors = 3;else if (this.attempts > 5 && this.successes > 3) maxErrors = 2;
+      var maxBonds = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random() > 0;
+      return Vue.generalLewisStructure(this.formula, this.elements, maxBonds, this.lewisSessionData, maxErrors);
     },
     stats: function stats() {
       var directions = Array(12);
@@ -47688,7 +47723,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     }
   }),
   created: function created() {
-    this.index = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.formulasArray.length - 1);
+    //this.index = _.random(0, this.formulasArray.length -1)
   },
   mounted: function mounted() {},
 
@@ -47703,6 +47738,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       answerDetail.timeStamp = Date.now();
 
       this.rts.push(answerDetail.timeStamp - this.questionSetTime);
+
       //console.log('rts is set to ', this.rts)
       this.startTime = Date.now();
 
@@ -47711,24 +47747,29 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       var gotIt = false;
 
       if (correct === 'correct') {
-        answerDetail.messageSent += ' Correct!';
-        moveOn = true;
-        gotIt = true;
+
+        if (this.question.answer === 'y' || this.followup) {
+          moveOn = true;
+        } else this.followup = true;
+        if (this.tries === 1) {
+          gotIt = true;
+          this.successes++;
+        }
         this.acc = this.tries - 1;
         this.$store.dispatch('setFeedbackType', { "alert-success": true });
 
         //console.log('acc is set to ', this.acc)
-      } else if (correct === 'dontKnow') {
-        moveOn = true;
       } else {
-        if (this.tries === 1) {
+        if (answerDetail.correct === 'formatError' || answerDetail.correct === 'noAnswer') {
           answerDetail.messageSent += " Try again!";
-        } else if (answerDetail.correct === 'formatError' || answerDetail.correct === 'noAnswer') {
-          answerDetail.messageSent += " Try again!";
-        } else moveOn = true;
+        } else if (this.question.answer === 'y' && answerDetail.correct === 'knownWrong') {
+          answerDetail.messageSent += " Take another look, convince yourself it's good, and enter the correct answer. ";
+        } else if (this.question.answer === 'n' && answerDetail.correct === 'knownWrong' && !this.followup) {
+          this.followup = true;
+        } else answerDetail.messageSent += " Take another look, and hit enter when you're satisfied.";
       }
-      if (moveOn === true && gotIt === false) this.acc = 4;
-      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close' || answerDetail.correct === 'dontKnow') {
+      if (this.acc === 1) this.acc = 4;
+      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'dontKnow' || moveOn === true && gotIt === false) {
         this.$store.dispatch('setFeedbackType', { "alert-warning": true });
       } else if (gotIt === false) this.$store.dispatch('setFeedbackType', { "alert-danger": true });
       this.$store.dispatch('setFeedback', answerDetail.messageSent);
@@ -47763,6 +47804,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
         this.tries = 0;
         this.acc = 0;
         this.rts = [];
+        this.attempts++;
         this.index = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.random(0, this.formulasArray.length - 1);
         //this.index = 20
       }
@@ -47771,32 +47813,61 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     //checks the entry, returns answerDetail
     checkEntry: function checkEntry() {
       var answerDetailToReturn = { answer: this.entry, messageSent: '', correct: '' };
-      var entryTemp = this.entry.toLowerCase();
-      //console.log('this.entry: ', this.entry);
-      //console.log('this.answer: ', this.answers);
-      if (entryTemp === '') {
-        answerDetailToReturn.correct = 'noAnswer';
-        answerDetailToReturn.messageSent += 'Please enter an answer. ';
-      } else {
-        var yArray = ['y', 'yes', 't', 'true'];
-        var nArray = ['n', 'no', 'f', 'false'];
-        if (yArray.indexOf(entryTemp) > -1) {
-          entryTemp = 'y';
-        } else if (nArray.indexOf(entryTemp) > -1) {
-          entryTemp = 'n';
-        } else {
-          answerDetailToReturn.correct = 'formatError';
-          answerDetailToReturn.messageSent = 'Please check the format of your answer. ';
+      if (this.followup) {
+        answerDetailToReturn.answer = this.problemsEntry;
+        var missingProblems = [];
+        var extraProblems = [];
+        var numCorrect = 0;
+        for (var _i = 0; _i < 12; _i++) {
+          if (this.question.errors[_i] !== this.problemsEntry[_i]) {
+            if (this.problemsEntry[_i] === 1) extraProblems.push(_i);else missingProblems.push(_i);
+          } else numCorrect++;
         }
-        if (entryTemp === this.question.answer) {
-          answerDetailToReturn.correct = 'correct';
-        } else answerDetailToReturn.correct = 'knownWrong';
+        if (missingProblems.length > 0) {
+          answerDetailToReturn.messageSent += "The structure had these issues that you didn't select: ";
+          for (var _i2 = 0; _i2 < missingProblems.length; _i2++) {
+            answerDetailToReturn.messageSent += this.problems[missingProblems[_i2]] + ", ";
+          }
+        }
+        if (extraProblems.length > 0) {
+          answerDetailToReturn.messageSent += "You selected the following as issues, but the algorithm though they weren't: ";
+          for (i = 0; i < extraProblems.length; i++) {
+            answerDetailToReturn.messageSent += this.problems[extraProblems[i]] + ", ";
+          }
+        }
+        if (extraProblems.length === 0 && missingProblems.length === 0) answerDetailToReturn.correct = 'correct';else if (numCorrect > 0) answerDetailToReturn.correct = 'close';else answerDetailToReturn.correct = 'knownWrong';
+      } else {
+        var entryTemp = this.entry.toLowerCase();
+        //console.log('this.entry: ', this.entry);
+        //console.log('this.answer: ', this.answers);
+        if (entryTemp === '') {
+          answerDetailToReturn.correct = 'noAnswer';
+          answerDetailToReturn.messageSent += 'Please enter an answer. ';
+        } else {
+          var yArray = ['y', 'yes', 't', 'true'];
+          var nArray = ['n', 'no', 'f', 'false'];
+          if (yArray.indexOf(entryTemp) > -1) {
+            entryTemp = 'y';
+          } else if (nArray.indexOf(entryTemp) > -1) {
+            entryTemp = 'n';
+          } else {
+            answerDetailToReturn.correct = 'formatError';
+            answerDetailToReturn.messageSent = 'Please check the format of your answer. ';
+          }
+          if (entryTemp === this.question.answer) {
+            answerDetailToReturn.correct = 'correct';
+            answerDetailToReturn.messageSent += 'Correct!';
+          } else {
+            answerDetailToReturn.correct = 'knownWrong';
+            answerDetailToReturn.messageSent += ' Incorrect.';
+            if (this.question.answer === 'y') answerDetailToReturn.messageSent = " This is a good structure.";else answerDetailToReturn.messageSent = " This structure isn't good.";
+          }
+        }
       }
 
       //console.log(entryTemp, answerDetailToReturn)
       return answerDetailToReturn;
     }
-
   }
 });
 
@@ -47855,7 +47926,65 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "click": _vm.submitEntry
     }
-  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), _c('svg', {
+  }, [_vm._v("Submit answer!")])])]), _vm._v(" "), (_vm.followup) ? _c('div', [_c('div', [_vm._v("Instructions: Click on each thing that's wrong with the structure, then hit enter.")]), _vm._v(" "), _c('br'), _vm._v(" "), _c('h4', [_vm._v("What's wrong with it?")]), _vm._v(" "), _c('br'), _vm._v(" "), _c('div', {
+    on: {
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.submitEntry($event)
+      }
+    }
+  }, [_c('ul', _vm._l((_vm.problems), function(problem, index) {
+    return _c('li', {
+      staticClass: "input-group",
+      staticStyle: {
+        "padding": "5px 10px"
+      }
+    }, [_vm._v("\n                  " + _vm._s(problem) + "\n                  "), _c('input', {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: (_vm.problemsEntry[index]),
+        expression: "problemsEntry[index]"
+      }],
+      staticClass: "form-check",
+      attrs: {
+        "type": "checkbox"
+      },
+      domProps: {
+        "checked": Array.isArray(_vm.problemsEntry[index]) ? _vm._i(_vm.problemsEntry[index], null) > -1 : (_vm.problemsEntry[index])
+      },
+      on: {
+        "__c": function($event) {
+          var $$a = _vm.problemsEntry[index],
+            $$el = $event.target,
+            $$c = $$el.checked ? (true) : (false);
+          if (Array.isArray($$a)) {
+            var $$v = null,
+              $$i = _vm._i($$a, $$v);
+            if ($$el.checked) {
+              $$i < 0 && (_vm.problemsEntry[index] = $$a.concat($$v))
+            } else {
+              $$i > -1 && (_vm.problemsEntry[index] = $$a.slice(0, $$i).concat($$a.slice($$i + 1)))
+            }
+          } else {
+            _vm.$set(_vm.problemsEntry, index, $$c)
+          }
+        }
+      }
+    })])
+  }))]), _vm._v(" "), _c('div', {
+    staticClass: "input-group"
+  }, [_c('span', {
+    staticClass: "input-group-btn"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": _vm.submitEntry
+    }
+  }, [_vm._v("Check answer!")])])])]) : _vm._e(), _vm._v(" "), _c('br'), _vm._v(" "), _c('svg', {
     attrs: {
       "width": "200",
       "height": "200"
@@ -49144,8 +49273,23 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
   data: function data() {
     return {
       entry: '',
-      index: 0
-      //determines whether name or formula is given
+      index: 0,
+      randomTester: 0,
+      //0: missing lp on central
+      //1: missing lp outside
+      // 2: multiple bond to H
+      // 3: second period atom above octet
+      // 4: extra radicals
+      //5: no (missing) formal charges
+      //6: wrong formal charges
+      //7: below octet
+      //8: wrong electron counts
+      //9: multiple bond split into radicals
+      //10: negative formal charge together
+      //11: double bond to F
+      lewisSessionData: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      tries: 0,
+      successes: 0
     };
   },
   //props: ['questionTypeID'],
@@ -49156,6 +49300,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     lewisTriCentral: 'getLewisTriatomicCentral',
     lewisIons: 'getLewisIons',
     elements: 'getLSE'
+
   }), {
     formulasArray: function formulasArray() {
       var temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti, this.lewisTriCentral, this.lewisIons);
@@ -49168,7 +49313,10 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
       //return 'SCl4'
     },
     question: function question() {
-      return Vue.generalLewisStructure(this.formula, this.elements, false);
+      var maxErrors = 1;
+      if (this.tries > 15 && this.successes / this.tries > 0.85) maxErrors = 3;else if (this.tries > 10 && this.successes / this.tries > 0.75) maxErrors = 3;else if (this.tries > 5 && this.successes > 3) maxErrors = 2;
+      //[-2,-2,-1,-2,-2,-2,-2,-2,-2,-2,-2,-2]
+      return Vue.generalLewisStructure(this.formula, this.elements, false, [-2, -2, -2, -1, -2, -2, -2, -2, -2, -2, -2, -2], 3);
     },
     stats: function stats() {
       var directions = Array(12);
@@ -49190,7 +49338,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
     submitEntry: function submitEntry(event) {
 
       this.index++;
-      //this.index = 20
     }
   }
 });
@@ -50033,7 +50180,7 @@ var state = {
           });
         }
         commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["e" /* INITIALIZE_STATES */], states);
-        if (!topic) commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* SET_QUESTION */]);else if (topic === 9) commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_NOMENCLATURE_SESSION */], -1);
+        if (!topic) commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* SET_QUESTION */]);else if (topic === 9) commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* SET_NOMENCLATURE_SESSION */], -1);
         resolve();
       }).catch(function (error) {
         console.log(error);
@@ -50064,12 +50211,12 @@ var state = {
   updateRtsAccs: function updateRtsAccs(_ref3, newState) {
     var commit = _ref3.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["r" /* UPDATE_RTS_ACCS */], newState);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["s" /* UPDATE_RTS_ACCS */], newState);
   },
   updateStage: function updateStage(_ref4, newState) {
     var commit = _ref4.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["s" /* UPDATE_STAGE */], newState);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["t" /* UPDATE_STAGE */], newState);
   },
   setQuestion: function setQuestion(_ref5) {
     var commit = _ref5.commit;
@@ -50083,7 +50230,7 @@ var state = {
     axios.post(url, state.states[prev]).catch(function (error) {
       console.log(error);
     });
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* SET_QUESTION */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* SET_QUESTION */]);
     //console.log('after SET_QUESTION, prev is ', prev)
   },
   setNomenclatureSession: function setNomenclatureSession(_ref6) {
@@ -50100,7 +50247,7 @@ var state = {
     var index = prev;
     if (!(state.currentSkill === 'general nomenclature')) index = -1;
     //console.log('before SET index is ', index)
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_NOMENCLATURE_SESSION */], index);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* SET_NOMENCLATURE_SESSION */], index);
   }
 };
 
@@ -50112,7 +50259,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
 }), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["d" /* INITIALIZE_SKILLS */], function (state, skills) {
   state.skills = skills;
   state.skillsReady = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_NOMENCLATURE_SESSION */], function (state, index) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* SET_NOMENCLATURE_SESSION */], function (state, index) {
   //console.log('in SET_NOMENCLATURE_SESSION')
   if (index === -1) {
     index = state.states.findIndex(function (entry) {
@@ -50129,7 +50276,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
   state.states[state.currentIndex].lastStudied = Date.now();
   state.currentSubtype = 'nomenclature';
   state.currentSkill = 'general nomenclature';
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["l" /* SET_QUESTION */], function (state) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* SET_QUESTION */], function (state) {
   //console.log('before getNext index is ', state.currentIndex)
   state.currentIndex = getNext();
   //console.log('after getNext index is ', state.currentIndex)
@@ -50154,12 +50301,12 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED
       state.currentSkill = false;
     }
   }
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["r" /* UPDATE_RTS_ACCS */], function (state, newState) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["s" /* UPDATE_RTS_ACCS */], function (state, newState) {
   //console.log("newState is ", newState);
   state.states[state.currentIndex].accs.push(newState.accs);
   state.states[state.currentIndex].rts.push(newState.rts);
   //console.log("state is now ", state.states[state.currentIndex])
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["s" /* UPDATE_STAGE */], function (state, newState) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["t" /* UPDATE_STAGE */], function (state, newState) {
   //console.log("newState is ", newState)
   state.states[state.currentIndex].priority = newState.priority;
   state.states[state.currentIndex].stage = newState.stage;
@@ -50318,7 +50465,20 @@ var state = {
   message: '',
   frustrated: false,
   bug: false,
-  suggestion: false
+  suggestion: false,
+  //0: missing lp on central
+  //1: missing 1 lp outside
+  // 2: missing symmetrical lp outside
+  // 3: second period atom above octet
+  // 4: extra radicals
+  //5: no (missing) formal charges
+  //6: wrong formal charges
+  //7: below octet
+  //8: wrong electron count
+  //9: bond split into radicals
+  //10: negative formal charge together
+  //11: wrong connectivity
+  lewisSessionData: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
   // getters
 };var getters = {
@@ -50345,6 +50505,9 @@ var state = {
   },
   getMessage: function getMessage(state) {
     return state.message;
+  },
+  getLewisSessionData: function getLewisSessionData(state) {
+    return state.lewisSessionData;
   }
 
   // actions
@@ -50353,18 +50516,18 @@ var state = {
     var commit = _ref.commit;
 
     //console.log('setReady');
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["n" /* SET_READY */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["o" /* SET_READY */]);
   },
   setQuestionStart: function setQuestionStart(_ref2) {
     var commit = _ref2.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* SET_QUESTION_START */], Date.now());
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_MESSAGE */], '');
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["n" /* SET_QUESTION_START */], Date.now());
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_MESSAGE */], '');
   },
   setMessage: function setMessage(_ref3, message) {
     var commit = _ref3.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_MESSAGE */], message);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_MESSAGE */], message);
   },
   setFeedback: function setFeedback(_ref4, feedback) {
     var commit = _ref4.commit;
@@ -50379,37 +50542,44 @@ var state = {
   toggleBug: function toggleBug(_ref6) {
     var commit = _ref6.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["o" /* TOGGLE_BUG */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["p" /* TOGGLE_BUG */]);
   },
   toggleFrustrated: function toggleFrustrated(_ref7) {
     var commit = _ref7.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["p" /* TOGGLE_FRUSTRATED */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["q" /* TOGGLE_FRUSTRATED */]);
   },
   toggleSuggestion: function toggleSuggestion(_ref8) {
     var commit = _ref8.commit;
 
-    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["q" /* TOGGLE_SUGGESTION */]);
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["r" /* TOGGLE_SUGGESTION */]);
+  },
+  setLewisSessionData: function setLewisSessionData(_ref9, data) {
+    var commit = _ref9.commit;
+
+    commit(__WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_LEWIS_DATA */], data);
   }
 };
 
 // mutations
-var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["n" /* SET_READY */], function (state) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["o" /* SET_READY */], function (state) {
   state.setupComplete = true;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["m" /* SET_QUESTION_START */], function (state, time) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["n" /* SET_QUESTION_START */], function (state, time) {
   state.questionSetTime = time;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_MESSAGE */], function (state, message) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["k" /* SET_MESSAGE */], function (state, message) {
   state.message = message;
 }), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["h" /* SET_FEEDBACK */], function (state, feedback) {
   state.feedback = feedback;
 }), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["i" /* SET_FEEDBACK_TYPE */], function (state, feedbackType) {
   state.feedbackType = feedbackType;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["o" /* TOGGLE_BUG */], function (state) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["p" /* TOGGLE_BUG */], function (state) {
   state.bug = !state.bug;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["p" /* TOGGLE_FRUSTRATED */], function (state) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["q" /* TOGGLE_FRUSTRATED */], function (state) {
   state.frustrated = !state.frustrated;
-}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["q" /* TOGGLE_SUGGESTION */], function (state) {
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["r" /* TOGGLE_SUGGESTION */], function (state) {
   state.suggestion = !state.suggestion;
+}), _defineProperty(_mutations, __WEBPACK_IMPORTED_MODULE_0__mutation_types__["j" /* SET_LEWIS_DATA */], function (state, data) {
+  state.lewisSessionData = data;
 }), _mutations);
 
 /* harmony default export */ __webpack_exports__["a"] = ({
@@ -51256,11 +51426,103 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
       return { structure: structure, charge: charge, numE: numE, octetTotalMax: octetTotalMax, octetTotalMin: octetTotalMin };
     };
     //expects central atom first, and all other atoms same element. diatomics ok, no charges
-    Vue.generalLewisStructure = function (formula, elements, maxBonds) {
+    Vue.generalLewisStructure = function (formula, elements, maxBonds, alterationInstructions, maxErrors) {
+      function checkConnection(struc, a, b) {
+        var j = struc[b][3].findIndex(function (element) {
+          return element[0] === a;
+        });
+        var k = struc[a][3].findIndex(function (element) {
+          return element[0] === b;
+        });
+        if (j < 0 || k < 0) return false;else return [j, k];
+      }
+      // returns false if ok, returns array with info about which checks failed if bad
+      function checkAtom(struc, a, elements, numE) {
+        // check octet and sensible number of bonds
+        var trouble = [0, 0, 0, 0];
+        var totalE = struc[a][1] + 2 * struc[a][6];
+        var bonds = struc[a][6];
+        var element = elements[struc[a][2]];
+        var minE = element[2];
+        if (minE === 7 && numE % 2 === 0) minE = 8;
+        if (totalE > element[3]) trouble[0] = 1;
+        if (totalE < minE) trouble[1] = 1;
+        if (bonds < element[6]) trouble[2] = 1;
+        if (bonds > element[5]) trouble[3] = 1;
+        if (trouble = [0, 0, 0, 0]) return false;else return trouble;
+      }
+      //add bond between indexes a, b
+      function addBond(struc, a, b, elements, moveE) {
+        console.log('in addBond, a, b: ', a, b);
+        var jk = checkConnection(struc, a, b);
+        if (!jk) return false;
+        //check number of bonds:
+        if (struc[a][3][jk[1]][1] === 3 && struc[b][3][jk[0]][1] === 3) {
+          console.log("tried to add bond between ", a, b, "but already triple");
+          return false;
+        }
+        if (moveE) struc[a][1] -= 2;
+        struc[a][3][jk[1]][1]++;
+        struc[a][6]++;
+        struc[a][7] = elements[struc[a][2]][1] - struc[a][1] - struc[a][6];
+        struc[b][3][jk[0]][1]++;
+        struc[b][6]++;
+        struc[b][7] = elements[struc[b][2]][1] - struc[b][1] - struc[b][6];
+        return true;
+      }
+
+      function removeMultipleBond(struc, a, b, elements) {
+        // check at least double bond now
+        var jk = checkConnection(struc, a, b);
+        if (!jk) return false;
+        if (struc[a][3][jk[1]][1] === 1 && struc[b][3][jk[0]][1] === 1) {
+          console.log("tried to remove bond between ", a, b, "but already single");
+          return false;
+        }
+        struc[a][1] += 2;
+        struc[a][3][jk[1]][1]--;
+        struc[a][6]--;
+        struc[a][7] = elements[struc[a][2]][1] - struc[a][1] - struc[a][6];
+        struc[b][3][jk[0]][1]--;
+        struc[b][6]--;
+        struc[b][7] = elements[struc[b][2]][1] - struc[b][1] - struc[b][6];
+        return true;
+      }
+
+      function connectAtoms(struc, a, b, atomsWantingBonds, elements) {
+        var jk = checkConnection(struc, a, b);
+        if (jk) return 1;
+        struc[a][0] = i;
+        struc[a][6] = 1;
+        if (1 < elements[struc[a][2]][4]) atomsWantingBonds.push(a);
+        struc[a][3].push([b, 1]);
+        struc[b][3].push([a, 1]);
+        struc[b][6] += 1;
+        struc[a][7] = elements[struc[a][2]][1] - struc[a][1] - struc[a][6];
+        struc[b][7] = elements[struc[b][2]][1] - struc[b][1] - struc[b][6];
+      }
+
       var strucObj = Vue.parseFormulaForStructure(formula, elements);
       var struc = strucObj.structure;
       var charge = strucObj.charge;
       var numE = strucObj.numE;
+      var altIns = alterationInstructions;
+
+      var errors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+      //check and if needed alter numE
+      if (altIns && altIns[8] !== -2 && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(errors, function (sum, n) {
+        return sum + n;
+      }, 0) < maxErrors) {
+        if (altIns[8] === -1 || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 1, true) < 0.05 + maxErrors / 100 + altIns[8] / 100) {
+          //alter numE to be wrong
+          if (charge) numE += charge;else if (numE % 2 !== 0) {
+            if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random() > 0.5) numE += 1;else numE -= 1;
+          } else if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random() > 0.5) numE += 2;else numE -= 2;
+          errors[8] = 1;
+        }
+      }
+
       var maxBondsForOctet = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.floor((strucObj.octetTotalMax - numE) / 2);
       var minBondsForOctet = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.ceil((strucObj.octetTotalMin - numE) / 2);
       console.log("maxBondsForOctet, minBondsForOctet", maxBondsForOctet, minBondsForOctet);
@@ -51278,23 +51540,15 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
       var j = 0;
       var i = 1;
       var element = [];
-      //let atomsWithBigFC = []
       for (i = 1; i < numAtoms; i++) {
-        element = elements[struc[i][2]];
-        struc[i][0] = i;
-        struc[i][6] = 1;
-        if (1 < element[4]) atomsWantingBonds.push(i);
-        struc[i][3].push([0, 1]);
-        struc[0][3].push([i, 1]);
-        struc[0][6] += 1;
+        connectAtoms(struc, i, 0, atomsWantingBonds, elements);
         unusedE -= 2;
         numBonds++;
-        //if (element[2]%2 !== 0 && numE%2 === 0) EwantedForLP += element[2] - struc[i][6]*2 + 1
-        //else EwantedForLP += element[2] - struc[i][6]*2
-        console.log(element, element[2] - struc[i][6] * 2);
       }
+      console.log("unusedE: ", unusedE);
       //check central element
       element = elements[struc[0][2]];
+      maxNewBondsToCentral = element[5] - struc[0][6];
       if (struc[0][6] < element[6]) {
         console.log('central atom needs bonds');
         //atomsWantingBonds.push(0)
@@ -51304,77 +51558,72 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
         tryNewConnectivity = 1;
       }
 
+      if (altIns) {
+        // multiple bond to H
+        if (/H/.test(formula) && unusedE >= 2 && (maxNewBondsToCentral > 0 || struc[0][2] === 'H') && altIns[2] !== -2 && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(errors, function (sum, n) {
+          return sum + n;
+        }, 0) < maxErrors) {
+          if (altIns[2] === -1 || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 1, true) < 0.05 + maxErrors / 100 + altIns[2] / 100) {
+            for (i = 0; i < numAtoms; i++) {
+              if (numBonds < minBondsForOctet) {
+                if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(errors, function (sum, n) {
+                  return sum + n;
+                }, 0) + 1 >= maxErrors) break;else errors[7] = 1;
+              }
+              if (struc[i][2] === 'H') {
+                if (i === 0) addBond(struc, i, 1, elements, false);else addBond(struc, struc[i][3][0][0], i, elements, false);
+                errors[2] = 1;
+                unusedE -= 2;
+                maxNewBondsToCentral--;
+                if (maxNewBondsToCentral === 0) break;
+                if (unusedE < 2) break;
+                if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random() > 0.5) break;
+              }
+            }
+          }
+        }
+      }
+
       // add multiple bonds
+      var multBonds = [];
       if (numBonds < minBondsForOctet) {
         console.log('adding more bonds');
         //first check if central atom can have more bonds
-        maxNewBondsToCentral = element[5] - struc[0][6];
         var newBondsNeeded = minBondsForOctet - numBonds;
         if (newBondsNeeded > maxNewBondsToCentral) {
           console.log('need too many new bonds to central atom');
           tryNewConnectivity = 1;
         }
-
-        console.log("maxNewBondsToCentral", maxNewBondsToCentral);
-        console.log('atomsWantingBonds', atomsWantingBonds);
         while (newBondsNeeded > 0) {
+          console.log("before adding bond unusedE: ", unusedE);
           i = atomsWantingBonds.shift();
-          //console.log('newBondsNeeded, outerAtomsWithMaxNormalBonds, i, atomsToGiveBonds', newBondsNeeded, outerAtomsWithMaxNormalBonds, i, atomsToGiveBonds)
+          addBond(struc, i, 0, elements, false);
+          multBonds.push([0, i]);
           element = elements[struc[i][2]];
-          struc[i][6] += 1;
           if (struc[i][6] < element[4]) atomsWantingBonds.push(i);else if (struc[i][6] < element[5] && newBondsNeeded > atomsWantingBonds.length) {
             atomsWantingBonds.push(i);
           }
-          struc[i][3][0][1] += 1;
-          //console.log('struc[0][3]', struc[0][3])
-          j = struc[0][3].findIndex(function (element) {
-            return element[0] === i;
-          });
-          //console.log('i, j, struc[0][3]', i, j, struc[0][3])
-          struc[0][3][j][1] += 1;
-          struc[0][6] += 1;
           unusedE -= 2;
-          //EwantedForLP -= 4
+          console.log("after adding bond unusedE: ", unusedE);
+          console.log("bonds to central: ", struc[0][6]);
           newBondsNeeded -= 1;
         }
       }
-      //update central atom
+      console.log("unusedE: ", unusedE);
       var happyAtoms = 0;
-      element = elements[struc[0][2]];
-      struc[0][7] = element[1] - struc[0][1] - struc[0][6];
-      if (struc[0][6] < element[6]) {
-        console.log('central atom needs bonds');
-        //atomsWantingBonds.push(0)
-      }
-      if (struc[0][6] > element[5]) {
-        console.log('central atom has too many bonds already, need different structure');
-        tryNewConnectivity = 1;
-      } else if (element[2] <= struc[0][1] + struc[0][6] * 2 && element[3] >= struc[0][1] + struc[0][6] * 2) {
-        struc[0][8] = 1;
-        console.log('set central happy');
-        //happyAtoms++
-      }
-      console.log('element[2] <= struc[0][1] + struc[0][6] && element[3] >= struc[0][1] + struc[0][6]', element[2], struc[0][1], struc[0][6], element[3]);
-      //fill out octets, outer atoms first, until you run out of electrons
-      if (unusedE < 0) console.log("unusedE: ", unusedE);
 
       j = 1;
-
-      //clean this up, combine 2 ifs
-      var k = 0;
-      while (unusedE > 0 && k < 6) {
-        //console.log('about to add LP')
+      while (unusedE > 0) {
         console.log('about to add LP to index: ', j);
         console.log('happyAtoms: ', happyAtoms);
-        console.log(struc[j]);
+        console.log('unusedE: ', unusedE);
+        console.log(struc[j][1], struc[j][6]);
         element = elements[struc[j][2]];
-        if (element[2] % 2 !== 0 && numE % 2 === 0) eToAdd = element[2] - struc[j][1] - struc[j][6] * 2 + 1;
-        //console.log()
-        else if (happyAtoms >= numAtoms - 1 && unusedE > 0) {
-            eToAdd = element[3] - (struc[j][1] + struc[j][6] * 2);
-          } else eToAdd = element[2] - struc[j][1] - struc[j][6] * 2;
-        console.log('eToAdd, unusedE: ', eToAdd, unusedE);
-        if (eToAdd > unusedE || eToAdd < 0) eToAdd = unusedE;else happyAtoms++;
+        if (element[2] % 2 !== 0 && numE % 2 === 0) eToAdd = element[2] - struc[j][1] - struc[j][6] * 2 + 1;else if (happyAtoms >= numAtoms - 1 && unusedE > 0) {
+          eToAdd = element[3] - (struc[j][1] + struc[j][6] * 2);
+        } else eToAdd = element[2] - struc[j][1] - struc[j][6] * 2;
+        if (eToAdd > unusedE) eToAdd = unusedE;
+        if (eToAdd < 0) eToAdd = 0;else happyAtoms++;
         struc[j][1] += eToAdd;
         if (struc[j][1] % 2 !== 0) struc[j][5] = 1;
         struc[j][7] = element[1] - struc[j][1] - struc[j][6];
@@ -51385,7 +51634,6 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
         j++;
         j = j % numAtoms;
         console.log('unusedE: ', unusedE);
-        k++;
       }
 
       //check for formal charges next to each other
@@ -51393,51 +51641,39 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
       //1: number of outer atoms with neg fc
       //2: number of outer atoms with pos fc
       var formalChargeArray = [0, 0, 0];
+      var periLP = [];
+      var extraRadicals = [];
       for (i = 0; i < numAtoms; i++) {
         if (i === 0) formalChargeArray[0] = struc[i][7];else if (struc[i][7] < 0) formalChargeArray[1]++;else if (struc[i][7] > 0) formalChargeArray[2]++;
+        if (i !== 0 && struc[i][1] > 1) periLP.push([i, struc[i][1]]);
+        if (struc[i][6] + struc[i][1] / 2 < 4 && struc[i][1] >= 2) extraRadicals.push(i);
       }
       element = elements[struc[0][2]];
       maxNewBondsToCentral = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.floor(element[3] / 2 - struc[0][1] / 2 - struc[0][6]);
-
+      // if + charge on central and maxBonds, add bonds until central is neutral if possible
       if (formalChargeArray[0] > 0 && maxBonds) {
         while (struc[0][7] > 0 && maxNewBondsToCentral > 0) {
           i = struc.reduce(function (iMin, x, i, arr) {
             return x[7] < arr[iMin][7] ? i : iMin;
           }, 0);
           console.log('adding bond to element ', i);
-          element = elements[struc[i][2]];
-          struc[i][1] -= 2;
-          struc[i][3][0][1]++;
-          struc[i][6]++;
-          struc[i][7] = element[1] - struc[i][1] - struc[i][6];
-          j = struc[0][3].findIndex(function (element) {
-            return element[0] === i;
-          });
-          struc[0][3][j][1]++;
-          struc[0][6]++;
-          element = elements[struc[0][2]];
-          struc[0][7] = element[1] - struc[0][1] - struc[0][6];
+          addBond(struc, i, 0, elements, true);
+          multBonds.push([0, i]);
           maxNewBondsToCentral--;
         }
       }
       if (formalChargeArray[0] < 0 && formalChargeArray[1] > 0) {
-        //neg charges on both, remove a double bond
-        for (i = 1; i < numAtoms; i++) {
-          if (struc[i][6] > 1 && struc[i][7] >= 0) {
-            console.log('moving bond on element ', i);
-            element = elements[struc[i][2]];
-            struc[i][1] += 2;
-            struc[i][3][0][1]--;
-            struc[i][6]--;
-            struc[i][7] = element[1] - struc[i][1] - struc[i][6];
-            j = struc[0][3].findIndex(function (element) {
-              return element[0] === i;
-            });
-            struc[0][3][j][1]--;
-            struc[0][6]--;
-            element = elements[struc[0][2]];
-            struc[0][7] = element[1] - struc[0][1] - struc[0][6];
-            break;
+        //neg charges on both, remove a double bond, unless we want this errors
+        if (altIns && altIns[10] !== -2 && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(errors, function (sum, n) {
+          return sum + n;
+        }, 0) < maxErrors && (altIns[10] === -1 || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 1, true) < 0.05 + maxErrors / 100 + altIns[10] / 100)) {} else {
+          for (i = 1; i < numAtoms; i++) {
+            if (struc[i][6] > 1 && struc[i][7] >= 0) {
+              console.log('moving bond on element ', i);
+              removeMultipleBond(struc, i, 0, elements, true);
+              maxNewBondsToCentral++;
+              break;
+            }
           }
         }
       } else if (formalChargeArray[0] > 0 && formalChargeArray[2] > 0) {
@@ -51445,10 +51681,186 @@ var mutations = _defineProperty({}, __WEBPACK_IMPORTED_MODULE_0__mutation_types_
         console.log('positive charges on both central atom and an outside atom, yikes!');
       }
 
-      if (happyAtoms === numAtoms) return { structure: struc, answer: 'y' };else {
-        console.log('bad structure, out of ideas');
-        return { structure: struc, answer: 'n' };
+      if (altIns) {
+        //remove lp on central
+        if (struc[0][1] > 0 && altIns[0] !== -2 && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(errors, function (sum, n) {
+          return sum + n;
+        }, 0) < maxErrors) {
+          if (altIns[0] === -1 || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 1, true) < 0.05 + maxErrors / 100 + altIns[0] / 100) {
+            var numToRemove = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(1, __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.ceil(struc[0][1] / 2)) * 2;
+            if (struc[0][1] % 2 !== 0) numToRemove -= 1 + __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random();
+            struc[0][1] -= numToRemove;
+            errors[0] = 1;
+            errors[8] = 1;
+          }
+        }
+        //remove peripheral lp
+        if (periLP.length > 0 && altIns[1] !== -2 && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(errors, function (sum, n) {
+          return sum + n;
+        }, 0) < maxErrors) {
+          if (altIns[1] === -1 || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 1, true) < 0.05 + maxErrors / 100 + altIns[1] / 100) {
+            for (i = 0; i < periLP.length; i++) {
+              struc[periLP[i][0]][1] -= 2;
+              if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 1 + i) < 1) break;
+            }
+            errors[1] = 1;
+            errors[8] = 1;
+          }
+        }
+
+        // second period atom above octet
+        if (/[BCNOF](?![a-z])/.test(formula) && altIns[3] !== -2 && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(errors, function (sum, n) {
+          return sum + n;
+        }, 0) < maxErrors) {
+          if (altIns[3] === -1 || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 1, true) < 0.05 + maxErrors / 100 + altIns[3] / 100) {
+            // look for lp on atom bonded to second period with octet, when found add bond w/ moveE
+            //look for second period central
+            if (/[BCNOF](?![a-z])/.test(struc[0][2]) && struc[0][1] + struc[0][6] * 2 >= 7) {
+              console.log('in BCNOF if 1');
+              var k = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, periLP.length - 1);
+              var _i = 0;
+              while (_i < periLP.length) {
+                if (struc[periLP[k][0]][1] >= 2) {
+                  console.log('in BCNOF if 1, while if');
+                  addBond(struc, periLP[k][0], 0, elements, true);
+                  errors[3] = 1;
+                  break;
+                } else {
+                  k++;
+                  k = k % periLP.length;
+                  _i++;
+                }
+              }
+            }
+            // find second period peripheral atom
+            else if (struc[0][1] >= 2) {
+                console.log('in BCNOF else if 2');
+                for (i = 1; i < numAtoms; i++) {
+                  console.log('in BCNOF for 2');
+                  if (/[BCNOF](?![a-z])/.test(struc[i][2])) {
+                    console.log('in BCNOF if 2');
+                  }
+                  if (struc[i][1] + struc[i][6] * 2 >= 7) {
+                    console.log('in BCNOF if 2 octet');
+                    addBond(struc, 0, i, elements, true);
+                    errors[3] = 1;
+                    break;
+                  }
+                }
+              }
+          }
+        }
+
+        //extra radicals
+        if (extraRadicals.length > 0 && altIns[4] !== -2 && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(errors, function (sum, n) {
+          return sum + n;
+        }, 0) < maxErrors) {
+          if (altIns[4] === -1 || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 1, true) < 0.05 + maxErrors / 100 + altIns[4] / 100) {
+            var _k = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, extraRadicals.length - 1);
+            struc[_k][5] = +2;
+            errors[4] = 1;
+          }
+        }
+
+        // no formal charges
+        if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(formalChargeArray, function (sum, n) {
+          return sum + n;
+        }, 0) > 0 && altIns[5] !== -2 && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(errors, function (sum, n) {
+          return sum + n;
+        }, 0) < maxErrors) {
+          if (altIns[5] === -1 || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 1, true) < 0.05 + maxErrors / 100 + altIns[5] / 100) {
+            for (i = 0; i < numAtoms; i++) {
+              struc[0][7] = 0;
+            }
+            errors[5] = 1;
+          }
+        }
+
+        // wrong formal charges
+        if (altIns[6] !== -2 && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(errors, function (sum, n) {
+          return sum + n;
+        }, 0) < maxErrors) {
+          if (altIns[6] === -1 || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 1, true) < 0.05 + maxErrors / 100 + altIns[6] / 100) {
+            var change = 0;
+            for (i = 0; i < numAtoms; i++) {
+              change = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(-2, 2);
+              struc[0][7] += change;
+              if (change !== 0) {
+                errors[6] = 1;
+                if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random() > 0.5) break;
+              }
+            }
+          }
+        }
+
+        // atom without octet
+        if (!maxBonds && multBonds.length > 0 && altIns[7] !== -2 && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(errors, function (sum, n) {
+          return sum + n;
+        }, 0) < maxErrors) {
+          if (altIns[7] === -1 || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 1, true) < 0.05 + maxErrors / 100 + altIns[7] / 100) {
+            var _k2 = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, multBonds.length - 1);
+            if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random() > 0.5) removeMultipleBond(struc, 0, multBonds[_k2][1], elements);else removeMultipleBond(struc, multBonds[_k2][1], 0, elements);
+            errors[7] = 1;
+          }
+        }
+
+        // multiple bond split into radicals
+        if (multBonds.length > 0 && altIns[9] !== -2 && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(errors, function (sum, n) {
+          return sum + n;
+        }, 0) < maxErrors) {
+          if (altIns[9] === -1 || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 1, true) < 0.05 + maxErrors / 100 + altIns[9] / 100) {
+            for (i = 0; i < multBonds.length; i++) {
+              var _k3 = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, multBonds.length - 1);
+              var success = removeMultipleBond(struc, 0, multBonds[_k3][1], elements);
+              if (success) {
+                struc[0][1] -= 1;
+                struc[0][5] += 1;
+                struc[multBonds[_k3][1]][1] += 1;
+                struc[multBonds[_k3][1]][5] += 1;
+                errors[9] = 1;
+                var checkk = checkAtom(struc, _k3, elements, numE);
+                var check0 = checkAtom(struc, 0, elements, numE);
+                if (checkk) {
+                  if (checkk[1] === 1) errors[7] = 1;
+                }
+                if (check0) {
+                  if (check0[1] === 1) errors[7] = 1;
+                }
+                break;
+              } else {
+                _k3++;
+                _k3 = _k3 % multBonds.length;
+                i++;
+              }
+            }
+          }
+        }
+
+        // double bond to F
+        if (/[^H]F/.test(formula) && maxNewBondsToCentral > 0 && altIns[11] !== -2 && __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(errors, function (sum, n) {
+          return sum + n;
+        }, 0) < maxErrors) {
+          if (altIns[11] === -1 || __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random(0, 1, true) < 0.05 + maxErrors / 100 + altIns[11] / 100) {
+            // find F
+            for (i = 1; i < numAtoms.length; i++) {
+              if (/[F]/.test(struc[i][2])) {
+                addBond(struc, i, 0, elements, true);
+                errors[11] = 1;
+                var _check = checkAtom(struc, 0, elements, numE);
+                if (_check) {
+                  if (_check[1] === 1) errors[7] = 1;
+                }
+                if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.random() > 0.5) break;
+              }
+            }
+          }
+        }
       }
+      if (__WEBPACK_IMPORTED_MODULE_0_lodash___default.a.reduce(errors, function (sum, n) {
+        return sum + n;
+      }, 0) > 0) {
+        return { structure: struc, answer: 'n', errors: errors };
+      } else return { structure: struc, answer: 'y', errors: false };
     };
   }
 });

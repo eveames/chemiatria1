@@ -15,6 +15,29 @@
                   type="button">Submit answer!</button>
               </span>
             </div>
+            <div v-if="followup">
+              <div>Instructions: Click on each thing that's wrong with the structure, then hit enter.</div>
+                <br>
+                <h4>What's wrong with it?</h4>
+                <br>
+                <div @keyup.enter="submitEntry">
+                <ul>
+                  <li class="input-group" v-for="(problem, index) in problems" style="padding:5px 10px;">
+                  {{problem}}
+                  <input type="checkbox" class="form-check" v-model="problemsEntry[index]">
+                  </li>
+                </ul>
+              </div>
+              <div class="input-group">
+                <span class="input-group-btn">
+                  <button @click="submitEntry" class="btn btn-default"
+                    type="button">Check answer!</button>
+                </span>
+              </div>
+            </div>
+
+              <br>
+
             <svg width="200" height="200">
               <lewis-atom :stats='stats'></lewis-atom>
             </svg>
@@ -37,11 +60,19 @@ export default {
     return {
       entry: '',
       tries: 0,
+      attempts: 0, //number of structures seen
+      successes: 0,
       acc: 0,
       rts: [],
       startTime: 0,
       index: 0,
-      //determines whether name or formula is given
+      followup: false,
+      problems: ["missing lone pairs on the central atom", "missing lone pairs on peripheral atoms",
+          "multiple bond to hydrogen", "second period atom with more than octet",
+        "unnecessary radicals", "missing formal charges", "wrong formal charges",
+        "atoms without octet (that should have octet)", "wrong number of electrons in structure",
+        "bond split into radicals", "like formal charges on neighbors", "positive formal charge on fluorine"],
+      problemsEntry: [0,0,0,0,0,0,0,0,0,0,0,0]
     }
   },
   //props: ['questionTypeID'],
@@ -56,18 +87,25 @@ export default {
       lewisHetero: 'getLewisHeteroDiatomics',
       lewisMulti: 'getLewisSimpleCentral',
       lewisTriCentral: 'getLewisTriatomicCentral',
-      elements: 'getLSE'
+      lewisIons: 'getLewisIons',
+      elements: 'getLSE',
+      lewisSessionData: 'getLewisSessionData'
     }),
     formulasArray: function() {
       //let temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti)
-      let temp = this.lewisTriCentral
+      let temp = this.lewisHomo.concat(this.lewisHetero, this.lewisMulti, this.lewisTriCentral, this.lewisIons)
       return temp
     },
     formula: function() {
       return this.formulasArray[this.index]
     },
     question: function() {
-      return Vue.generalLewisStructure(this.formula, this.elements)
+      let maxErrors = 1
+      if (this.attempts > 15 && this.successes/this.attempts > 0.85) maxErrors = 3
+      else if (this.attempts > 10 && this.successes/this.attempts > 0.75) maxErrors = 3
+      else if (this.attempts > 5 && this.successes > 3) maxErrors = 2
+      let maxBonds = _.random() > 0
+      return Vue.generalLewisStructure(this.formula, this.elements, maxBonds, this.lewisSessionData, maxErrors)
     },
     stats: function() {
       let directions = Array(12);
@@ -84,7 +122,7 @@ export default {
     }
   },
   created () {
-    this.index = _.random(0, this.formulasArray.length -1)
+    //this.index = _.random(0, this.formulasArray.length -1)
   },
   mounted () {
 
@@ -92,12 +130,13 @@ export default {
   methods: {
 
     submitEntry: function(event) {
-      this.tries += 1;
-      let answerDetail = this.checkEntry();
-      if (this.startTime === 0) {this.startTime = this.questionSetTime}
-    	answerDetail.timeStamp = Date.now();
+        this.tries += 1;
+        let answerDetail = this.checkEntry();
+        if (this.startTime === 0) {this.startTime = this.questionSetTime}
+    	  answerDetail.timeStamp = Date.now();
 
-      this.rts.push(answerDetail.timeStamp - this.questionSetTime);
+        this.rts.push(answerDetail.timeStamp - this.questionSetTime);
+
       //console.log('rts is set to ', this.rts)
       this.startTime = Date.now();
 
@@ -106,27 +145,34 @@ export default {
       let gotIt = false;
 
     	if (correct === 'correct') {
-    		answerDetail.messageSent += ' Correct!';
-    		moveOn = true;
-        gotIt = true;
+
+    		if (this.question.answer === 'y' || this.followup) {
+          moveOn = true;
+        }
+        else this.followup = true
+        if (this.tries === 1) {
+          gotIt = true;
+          this.successes++
+        }
         this.acc = this.tries-1;
         this.$store.dispatch('setFeedbackType', {"alert-success": true});
 
         //console.log('acc is set to ', this.acc)
     	}
-    	else if (correct === 'dontKnow') {
-    		moveOn = true;
-    	}
 
     	else {
-        if (this.tries === 1) {answerDetail.messageSent += " Try again!"}
-        else if (answerDetail.correct === 'formatError' || answerDetail.correct === 'noAnswer') {
+        if (answerDetail.correct === 'formatError' || answerDetail.correct === 'noAnswer') {
           answerDetail.messageSent += " Try again!"}
-        else moveOn = true;
+        else if (this.question.answer === 'y' && answerDetail.correct === 'knownWrong') {
+          answerDetail.messageSent += " Take another look, convince yourself it's good, and enter the correct answer. "
+        }
+        else if (this.question.answer === 'n' && answerDetail.correct === 'knownWrong' && !(this.followup)) {
+          this.followup = true
+        }
+        else answerDetail.messageSent += " Take another look, and hit enter when you're satisfied."
     	}
-      if (moveOn === true && gotIt === false) this.acc = 4;
-      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'close'
-        || answerDetail.correct === 'dontKnow') {
+      if (this.acc === 1) this.acc = 4;
+      if (answerDetail.correct === 'formatError' || answerDetail.correct === 'dontKnow' || (moveOn === true && gotIt === false)) {
         this.$store.dispatch('setFeedbackType', {"alert-warning": true});
       }
       else if (gotIt === false) this.$store.dispatch('setFeedbackType', {"alert-danger": true});
@@ -163,6 +209,7 @@ export default {
         this.tries = 0
         this.acc = 0
         this.rts = []
+        this.attempts++
         this.index = _.random(0, this.formulasArray.length -1)
         //this.index = 20
 
@@ -172,32 +219,67 @@ export default {
     //checks the entry, returns answerDetail
     checkEntry: function() {
       let answerDetailToReturn = {answer: this.entry, messageSent: '', correct: ''};
-      let entryTemp = this.entry.toLowerCase();
-      //console.log('this.entry: ', this.entry);
-      //console.log('this.answer: ', this.answers);
-      if (entryTemp === '') {
-        answerDetailToReturn.correct = 'noAnswer';
-        answerDetailToReturn.messageSent += 'Please enter an answer. ';
+      if (this.followup) {
+        answerDetailToReturn.answer = this.problemsEntry
+        let missingProblems = []
+        let extraProblems = []
+        let numCorrect = 0
+        for (let i = 0; i < 12; i++) {
+          if (this.question.errors[i] !== this.problemsEntry[i]) {
+            if (this.problemsEntry[i] === 1) extraProblems.push(i)
+            else missingProblems.push(i)
+          }
+          else numCorrect++
+        }
+       if (missingProblems.length > 0) {
+         answerDetailToReturn.messageSent += "The structure had these issues that you didn't select: "
+         for (let i = 0; i < missingProblems.length; i++) {
+           answerDetailToReturn.messageSent += this.problems[missingProblems[i]] + ", "
+         }
+       }
+       if (extraProblems.length > 0) {
+         answerDetailToReturn.messageSent += "You selected the following as issues, but the algorithm though they weren't: "
+         for (i = 0; i < extraProblems.length; i++) {
+           answerDetailToReturn.messageSent += this.problems[extraProblems[i]] + ", "
+         }
+       }
+       if (extraProblems.length === 0 && missingProblems.length === 0) answerDetailToReturn.correct = 'correct'
+       else if (numCorrect > 0) answerDetailToReturn.correct = 'close'
+       else answerDetailToReturn.correct = 'knownWrong'
       }
       else {
-        const yArray = ['y', 'yes', 't', 'true'];
-        const nArray = ['n', 'no', 'f', 'false'];
-        if (yArray.indexOf(entryTemp) > -1) {entryTemp = 'y';}
-        else if (nArray.indexOf(entryTemp) > -1) {entryTemp = 'n';}
+        let entryTemp = this.entry.toLowerCase();
+        //console.log('this.entry: ', this.entry);
+        //console.log('this.answer: ', this.answers);
+        if (entryTemp === '') {
+          answerDetailToReturn.correct = 'noAnswer';
+          answerDetailToReturn.messageSent += 'Please enter an answer. ';
+        }
         else {
-          answerDetailToReturn.correct = 'formatError';
-          answerDetailToReturn.messageSent = 'Please check the format of your answer. ';
+          const yArray = ['y', 'yes', 't', 'true'];
+          const nArray = ['n', 'no', 'f', 'false'];
+          if (yArray.indexOf(entryTemp) > -1) {entryTemp = 'y';}
+          else if (nArray.indexOf(entryTemp) > -1) {entryTemp = 'n';}
+          else {
+            answerDetailToReturn.correct = 'formatError';
+            answerDetailToReturn.messageSent = 'Please check the format of your answer. ';
+          }
+          if (entryTemp === this.question.answer) {
+            answerDetailToReturn.correct = 'correct';
+            answerDetailToReturn.messageSent += 'Correct!';
+          }
+          else {
+            answerDetailToReturn.correct = 'knownWrong';
+            answerDetailToReturn.messageSent += ' Incorrect.';
+          if (this.question.answer === 'y') answerDetailToReturn.messageSent = " This is a good structure."
+          else answerDetailToReturn.messageSent = " This structure isn't good."
+          }
         }
-        if (entryTemp === this.question.answer) {
-          answerDetailToReturn.correct = 'correct';
-        }
-        else answerDetailToReturn.correct = 'knownWrong';
       }
 
       //console.log(entryTemp, answerDetailToReturn)
       return answerDetailToReturn;
-    },
-
+    }
   }
 }
 </script>

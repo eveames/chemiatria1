@@ -16,7 +16,20 @@ const state = {
   message: '',
   frustrated: false,
   bug: false,
-  suggestion: false
+  suggestion: false,
+  //0: missing lp on central
+  //1: missing 1 lp outside
+  // 2: missing symmetrical lp outside
+  // 3: second period atom above octet
+  // 4: extra radicals
+  //5: no (missing) formal charges
+  //6: wrong formal charges
+  //7: below octet
+  //8: wrong electron count
+  //9: bond split into radicals
+  //10: negative formal charge together
+  //11: wrong connectivity
+  lewisSessionData: [0,0,0,0,0,0,0,0,0,0,0,0]
 }
 
 // getters
@@ -28,7 +41,8 @@ const getters = {
   isBug: (state) => state.bug,
   isFrustrated: (state) => state.frustrated,
   hasSuggestion: (state) => state.suggestion,
-  getMessage: (state) => state.message
+  getMessage: (state) => state.message,
+  getLewisSessionData: (state) => state.lewisSessionData
 }
 
 // actions
@@ -59,6 +73,9 @@ const actions = {
   toggleSuggestion ({commit}) {
     commit(types.TOGGLE_SUGGESTION)
   },
+  setLewisSessionData ({commit}, data) {
+    commit(types.SET_LEWIS_DATA, data)
+  }
 }
 
 // mutations
@@ -87,6 +104,9 @@ const mutations = {
   [types.TOGGLE_SUGGESTION] (state) {
     state.suggestion = !state.suggestion;
   },
+  [types.SET_LEWIS_DATA] (state, data) {
+    state.lewisSessionData = data
+  }
 }
 
 export default {

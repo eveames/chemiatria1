@@ -82,11 +82,16 @@
                     you can use spaced repetition to learn facts quickly, and you can learn to recognize patterns
                     effortlessly (for example, to see if Lewis structures are correct at a glance) by seeing many
                     examples quickly.</p>
+                <p>I ask you to sign up before you use the site so it can track your progress and help you
+                    efficiently. Chemiatria is completely free, and will always be completely free. There are
+                    no purchases available, or premium subscriptions, or any other way to collect your money.</p>
+                <p>However, <a href="{{ url('/Lewis') }}">this intro</a> to Lewis structures is available without logging in. Check it out!</p>
+                
 
                 <div class="links">
                     <a href="http://www.graylark.com/eve/Chemiatria">Old Version</a>
                     <a href="http://www.graylark.com/eve">My GenChem 1 reference site</a>
-                    <a href="https://github.com/evames/">My projects on GitHub</a>
+                    <a href="https://www.github.com/evames/">My projects on GitHub</a>
                 </div>
             </div>
         </div>

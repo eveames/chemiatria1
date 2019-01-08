@@ -14,6 +14,8 @@
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/Lewis', 'PublicController@lewis');
+
 Route::resource('words', 'WordController');
 Route::resource('facts', 'FactController');
 Route::resource('skills', 'SkillController');
